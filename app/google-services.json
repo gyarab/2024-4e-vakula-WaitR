@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310117212715",
+    "project_id": "waitr-dee9a",
+    "storage_bucket": "waitr-dee9a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310117212715:android:adef6c222c54b6a8e4006e",
+        "android_client_info": {
+          "package_name": "com.example.waitr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK1HHUC6-z5HCxDLtN6Cru-CwCX93GP-E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

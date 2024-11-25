@@ -1,6 +1,8 @@
 package com.example.waitr
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,6 +17,20 @@ class MainActivity : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        val toRegisterButton = findViewById<Button>(R.id.ToRegisterPage_button)
+        val toLoginButton = findViewById<Button>(R.id.ToLoginPage_button)
+
+        toRegisterButton.setOnClickListener {
+            // Navigate to the "Registration"
+            val intent = Intent(this, Registration::class.java)
+            startActivity(intent)
+        }
+
+        toLoginButton.setOnClickListener {
+            // Navigate to te "Login"
+            val intent = Intent(this, Login::class.java)
+            startActivity(intent)
         }
     }
 }
