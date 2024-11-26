@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">WaitR</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="Password">Password</string>
+    <string name="Register">Register</string>
+    <string name="welcome">Welcome</string>
+    <string name="click_to_login">Click to login</string>
+    <string name="click_to_register">click to register</string>
 </resources>
