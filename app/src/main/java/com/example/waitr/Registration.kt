@@ -16,10 +16,12 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
 
 class Registration : AppCompatActivity() {
     private lateinit var editTextEmail: TextInputEditText
     private lateinit var editTextPassword: TextInputEditText
+    private lateinit var editTextUsername: TextInputEditText
     private lateinit var registerButton: Button
     private lateinit var auth: FirebaseAuth
     private lateinit var nacitaciKolecko: ProgressBar
@@ -27,6 +29,8 @@ class Registration : AppCompatActivity() {
 
     public override fun onStart() {
         super.onStart()
+        FirebaseAuth.getInstance().signOut()
+
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         if (currentUser != null) {
@@ -47,6 +51,7 @@ class Registration : AppCompatActivity() {
         }
         editTextEmail = findViewById(R.id.email)
         editTextPassword = findViewById(R.id.password)
+        editTextUsername = findViewById(R.id.username)
         registerButton = findViewById(R.id.register_button)
         auth = Firebase.auth
         nacitaciKolecko = findViewById(R.id.nacitani)
@@ -58,34 +63,62 @@ class Registration : AppCompatActivity() {
         }
 
         registerButton.setOnClickListener {
-            val email = editTextEmail.getText().toString()
-            val password = editTextPassword.getText().toString()
+            val email = editTextEmail.text.toString()
+            val password = editTextPassword.text.toString()
+            val username = editTextUsername.text.toString()
             nacitaciKolecko.visibility = View.VISIBLE
 
-            if (TextUtils.isEmpty(email)){
+            if (TextUtils.isEmpty(email)) {
                 Toast.makeText(this, "Enter Email", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            if (TextUtils.isEmpty(password)){
+            if (TextUtils.isEmpty(password)) {
                 Toast.makeText(this, "Enter Password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-//TODO dodelat prihlaseni
+            if (TextUtils.isEmpty(username)) {
+                Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     nacitaciKolecko.visibility = View.GONE
                     if (task.isSuccessful) {
-                        Toast.makeText(
-                            baseContext,
-                            "Account created",
-                            Toast.LENGTH_SHORT,
-                        ).show()
+                        // Získání UID vytvořeného uživatele
+                        val userId = auth.currentUser?.uid
+                        if (userId != null) {
+                            // Přidání uživatele do Firestore
+                            val userMap = hashMapOf(
+                                "username" to username,
+                                "email" to email
+                            )
 
-                        val intent = Intent(applicationContext, Login::class.java)
-                        startActivity(intent)
-                        finish()
+                            val db = Firebase.firestore
+                            db.collection("users").document(userId)
+                                .set(userMap)
+                                .addOnSuccessListener {
+                                    Toast.makeText(
+                                        baseContext,
+                                        "Account created and saved",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+
+                                    // Přesměrování na přihlašovací obrazovku
+                                    val intent = Intent(applicationContext, Login::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(
+                                        baseContext,
+                                        "Failed to save user: ${e.message}",
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                        }
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // Pokud registrace selže
                         Toast.makeText(
                             baseContext,
                             "Authentication failed",

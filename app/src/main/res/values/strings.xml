@@ -7,4 +7,8 @@
     <string name="welcome">Welcome</string>
     <string name="click_to_login">Click to login</string>
     <string name="click_to_register">click to register</string>
+    <string name="Username">Username</string>
+    <string name="logout">Logout</string>
+    <string name="open">Open Navigation Drawer</string>
+    <string name="close">Close Navigation Drawer</string>
 </resources>
