@@ -2,13 +2,16 @@ package com.example.waitr
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowInsetsController
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -27,12 +30,11 @@ class CompanyMenu : AppCompatActivity() {
     private lateinit var yourEmail: TextView
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
-    val userId = currentUser?.uid
+    private val userId = currentUser?.uid
     val db = FirebaseFirestore.getInstance()
-    val usersCollection = db.collection("users")
+    private val usersCollection = db.collection("users")
 
 
-    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -91,8 +93,18 @@ class CompanyMenu : AppCompatActivity() {
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) {
-            true
-        } else super.onOptionsItemSelected(item)
+            true // Událost byla zpracována výsuvným menu
+        } else {
+            when (item.itemId) {
+                R.id.logout_button -> {
+                    // Akce pro logout
+                    FirebaseAuth.getInstance().signOut()
+                    Toast.makeText(this, "Logged out", Toast.LENGTH_SHORT).show()
+                    true
+                }
+                else -> super.onOptionsItemSelected(item)
+            }
+        }
     }
 
     private fun enableEdgeToEdge() {
