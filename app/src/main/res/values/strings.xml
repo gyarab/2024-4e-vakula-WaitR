@@ -11,4 +11,7 @@
     <string name="logout">Logout</string>
     <string name="open">Open Navigation Drawer</string>
     <string name="close">Close Navigation Drawer</string>
+    <string name="your_companies">Your Companies:</string>
+    <string name="create_company">Create Company</string>
+    <string name="scrollable_company_list">scrollable_company_list</string>
 </resources>
