@@ -15,4 +15,6 @@
     <string name="create_company">Create Company</string>
     <string name="scrollable_company_list">scrollable_company_list</string>
     <string name="join_company">Join Company</string>
+    <string name="company_name">Company name</string>
+    <string name="create">Create</string>
 </resources>

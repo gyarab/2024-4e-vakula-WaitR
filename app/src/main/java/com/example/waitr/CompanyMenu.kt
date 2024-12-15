@@ -1,6 +1,7 @@
 package com.example.waitr
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +9,8 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowInsetsController
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -19,7 +22,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 class CompanyMenu : AppCompatActivity() {
@@ -31,8 +36,8 @@ class CompanyMenu : AppCompatActivity() {
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
     private val userId = currentUser?.uid
-    val db = FirebaseFirestore.getInstance()
-    private val usersCollection = db.collection("users")
+    private val db = FirebaseDatabase.getInstance("https://waitr-dee9a-default-rtdb.europe-west1.firebasedatabase.app/").reference // Using Realtime Database reference
+    private lateinit var createCompanyPopup: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,19 +63,20 @@ class CompanyMenu : AppCompatActivity() {
         yourEmail = headerView.findViewById(R.id.yourEmail)
 
         userId?.let {
-            usersCollection.document(it).get()
-                .addOnSuccessListener { document ->
-                    if (document.exists()) {
-                        val username = document.getString("username") // assuming username is saved under "username"
-                        val email = document.getString("email") // assuming email is saved under "email"
+            val userRef = db.child("users").child(it) // Realtime Database path to user data
+            userRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        val username = dataSnapshot.child("username").getValue(String::class.java)
+                        val email = dataSnapshot.child("email").getValue(String::class.java)
 
-                        // Nastav text do TextInputLayout
-                        yourUsername.setText(username)
-                        yourEmail.setText(email)
+                        // Set text in TextViews
+                        yourUsername.text = username
+                        yourEmail.text = email
                     }
                 }
                 .addOnFailureListener { exception ->
-                    Log.e("Firestore", "Error getting documents: ", exception)
+                    Log.e("RealtimeDB", "Error getting data: ", exception)
                 }
         }
 
@@ -90,6 +96,125 @@ class CompanyMenu : AppCompatActivity() {
                 else -> false
             }
         }
+        val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+
+        userId?.let {
+            val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
+            userRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        for (companySnapshot in dataSnapshot.children) {
+                            val companyId = companySnapshot.key
+                            val companyName = companySnapshot.child("companyName").getValue(String::class.java)
+
+                            if (companyId != null && companyName != null) {
+                                val newButton = Button(this).apply {
+                                    text = companyName
+                                    tag = companyId // Uložení ID podniku
+                                }
+
+                                newButton.setOnClickListener {
+                                    val companyIdasString = it.tag as String
+                                    val intent = Intent(this, Company::class.java)
+                                    intent.putExtra("COMPANY_ID", companyIdasString)
+                                    startActivity(intent)
+                                }
+
+                                // Přidání tlačítka do LinearLayout
+                                linearLayoutContainer.addView(newButton)
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("RealtimeDB", "Error getting companies: ", exception)
+                }
+        }
+
+        createCompanyPopup = findViewById(R.id.Create_Company_popup_button)
+        createCompanyPopup.setOnClickListener {
+            showCreateCompanyPopup()
+        }
+
+    }
+    private fun showCreateCompanyPopup() {
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.create_company_popup)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.85).toInt(),
+            (resources.displayMetrics.heightPixels * 0.6).toInt()
+        )
+
+        // Zarovnání na střed
+        dialog.window?.setBackgroundDrawableResource(android.R.color.holo_blue_light)
+
+        // Reference na prvky v popup layoutu
+        val createButton = dialog.findViewById<Button>(R.id.Create_Company_button)
+        val companyNameInput = dialog.findViewById<TextInputEditText>(R.id.Company_name)
+        val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+
+        // Akce při kliknutí na tlačítko "Create"
+        createButton.setOnClickListener {
+            val companyName = companyNameInput.text.toString().trim()
+            if (companyName.isNotEmpty()) {
+                if (userId != null) {
+                    // vytvoreni id pro spolecnost
+                    val companyId = db.child("users").child(userId).child("companies").push().key
+
+                    if (companyId != null) {
+                        // Vytvoř nový Button
+                        val newButton = Button(this).apply {
+                            text = companyName
+                            tag = companyId // Uložení ID podniku (například z databáze)
+                        }
+
+                        newButton.setOnClickListener {
+                            val companyIdasString = it.tag as String // Získání ID podniku
+                            val intent = Intent(this, Company::class.java)
+                            intent.putExtra(
+                                "COMPANY_ID",
+                                companyIdasString
+                            ) // Předání ID do nové aktivity
+                            startActivity(intent)
+                        }
+                        // Přidání tlačítka do LinearLayout
+                        linearLayoutContainer.addView(newButton)
+
+                        // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
+                        val companyMap = mapOf(
+                            "companyName" to companyName
+                        )
+
+                        // Uložení společnosti do uživatele
+                        db.child("users").child(userId).child("companies").child(companyId)
+                            .setValue(companyMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this,
+                                    "Company '$companyName' created!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(
+                                    this,
+                                    "Failed to create company: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        dialog.dismiss()
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Please enter a company name", Toast.LENGTH_SHORT).show()
+            }
+        }
+        // Zobrazení dialogu
+        dialog.show()
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) {

@@ -16,7 +16,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import com.google.firebase.firestore.firestore
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class Registration : AppCompatActivity() {
     private lateinit var editTextEmail: TextInputEditText
@@ -26,6 +27,7 @@ class Registration : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var nacitaciKolecko: ProgressBar
     private lateinit var prihlasSe: TextView
+    private lateinit var database: DatabaseReference
 
     public override fun onStart() {
         super.onStart()
@@ -44,7 +46,7 @@ class Registration : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_registration)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.registration)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -56,6 +58,8 @@ class Registration : AppCompatActivity() {
         auth = Firebase.auth
         nacitaciKolecko = findViewById(R.id.nacitani)
         prihlasSe = findViewById(R.id.loginnow)
+        database = FirebaseDatabase.getInstance("https://waitr-dee9a-default-rtdb.europe-west1.firebasedatabase.app/").reference
+
         prihlasSe.setOnClickListener(){
             val intent = Intent(applicationContext, Login::class.java)
             startActivity(intent)
@@ -88,15 +92,13 @@ class Registration : AppCompatActivity() {
                         // Získání UID vytvořeného uživatele
                         val userId = auth.currentUser?.uid
                         if (userId != null) {
-                            // Přidání uživatele do Firestore
-                            val userMap = hashMapOf(
+                            // Přidání uživatele do Realtime Database
+                            val userMap = mapOf(
                                 "username" to username,
                                 "email" to email
                             )
 
-                            val db = Firebase.firestore
-                            db.collection("users").document(userId)
-                                .set(userMap)
+                            database.child("users").child(userId).setValue(userMap)
                                 .addOnSuccessListener {
                                     Toast.makeText(
                                         baseContext,
