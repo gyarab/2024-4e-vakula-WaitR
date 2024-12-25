@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/ModelView"
+        android:title="@string/model_view"/>
+
+    <item android:id="@+id/Foodmenu"
+        android:title="@string/food_menu"/>
+
+    <item android:id="@+id/Analytics"
+        android:title="@string/analytics"/>
+</menu>

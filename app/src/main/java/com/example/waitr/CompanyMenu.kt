@@ -1,31 +1,24 @@
 package com.example.waitr
 
-import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.view.WindowInsetsController
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 
 class CompanyMenu : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -115,7 +108,7 @@ class CompanyMenu : AppCompatActivity() {
 
                                 newButton.setOnClickListener {
                                     val companyIdasString = it.tag as String
-                                    val intent = Intent(this, Company::class.java)
+                                    val intent = Intent(this, Company_manager::class.java)
                                     intent.putExtra("COMPANY_ID", companyIdasString)
                                     startActivity(intent)
                                 }
@@ -173,7 +166,7 @@ class CompanyMenu : AppCompatActivity() {
 
                         newButton.setOnClickListener {
                             val companyIdasString = it.tag as String // Získání ID podniku
-                            val intent = Intent(this, Company::class.java)
+                            val intent = Intent(this, Company_manager::class.java)
                             intent.putExtra(
                                 "COMPANY_ID",
                                 companyIdasString
