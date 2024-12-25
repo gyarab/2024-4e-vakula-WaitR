@@ -97,7 +97,7 @@ class CompanyMenu : AppCompatActivity() {
             }
         }
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
-
+// Načtení seznamu podniků z database
         userId?.let {
             val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
             userRef.get()
