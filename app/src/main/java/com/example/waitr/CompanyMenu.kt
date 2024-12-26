@@ -16,6 +16,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.contains
 import androidx.core.view.isEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
@@ -40,8 +41,7 @@ class CompanyMenu : AppCompatActivity() {
     private var selectedCompanyName: String? = null
     private var selectedAuthorization: String? = null
     private var selectedCompanyTag: CompanyTag? = null
-
-
+    private lateinit var noCompaniesTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +51,11 @@ class CompanyMenu : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
+        }
+        noCompaniesTextView = TextView(this).apply {
+            text = "No companies yet"
+            textSize = 16f
+            gravity = Gravity.CENTER
         }
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -124,6 +129,7 @@ class CompanyMenu : AppCompatActivity() {
                                 }
 
                                 // Přidání tlačítka do LinearLayout
+                                linearLayoutContainer.removeView(noCompaniesTextView)
                                 linearLayoutContainer.addView(newButton)
                             }
                         }
@@ -132,6 +138,7 @@ class CompanyMenu : AppCompatActivity() {
                 .addOnFailureListener { exception ->
                     Log.e("RealtimeDB", "Error getting companies: ", exception)
                 }
+            checksIfNoCompanies()
         }
 
         createCompanyPopup = findViewById(R.id.Create_Company_popup_button)
@@ -202,6 +209,7 @@ class CompanyMenu : AppCompatActivity() {
                                     "Company '$companyName' created!",
                                     Toast.LENGTH_SHORT
                                 ).show()
+                                checksIfNoCompanies()
                             }
                             .addOnFailureListener { e ->
                                 Toast.makeText(
@@ -281,6 +289,7 @@ class CompanyMenu : AppCompatActivity() {
                 .addOnSuccessListener {
                     val buttonToRemove = linearLayoutContainer.findViewWithTag<Button>(CompanyTag)
                     linearLayoutContainer.removeView(buttonToRemove)
+                    checksIfNoCompanies()
                     Toast.makeText(this, "Company deleted successfully!", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
@@ -288,19 +297,27 @@ class CompanyMenu : AppCompatActivity() {
                 }
         }
     }
-/* zatim nevyuzito
-    private fun checksIfNoCompanies(){
+    private fun checksIfNoCompanies() {
+        val userRef = userId?.let {
+            db.child("users").child(it).child("companies")
+        }
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
-        if (linearLayoutContainer.isEmpty()) {
-            val textView = TextView(this).apply {
-                text = "No companies yet"
-                textSize = 16f
-                gravity = Gravity.CENTER
+        userRef?.get()?.addOnSuccessListener { dataSnapshot ->
+            if (!dataSnapshot.hasChildren()) {
+                if (noCompaniesTextView.parent == null) {
+                    linearLayoutContainer.removeAllViews()
+                    linearLayoutContainer.addView(noCompaniesTextView)
+                }
+            } else {
+                if (noCompaniesTextView.parent != null) {
+                    linearLayoutContainer.removeView(noCompaniesTextView)
+                }
             }
-            linearLayoutContainer.addView(textView)
+        }?.addOnFailureListener { exception ->
+            Log.e("Firebase", "Error getting data: ", exception)
         }
     }
-*/
+
     // metoda pro funkcnost hamburgeru
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) {
