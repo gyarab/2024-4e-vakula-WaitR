@@ -52,28 +52,26 @@ class CompanyMenu : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
         drawerToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
         val headerView = navigationView.getHeaderView(0)
-
-
         yourUsername = headerView.findViewById(R.id.yourUsername)
         yourEmail = headerView.findViewById(R.id.yourEmail)
-
+// nacteni dat do headeru
         userId?.let {
-            val userRef = db.child("users").child(it) // Realtime Database path to user data
+            val userRef = db.child("users").child(it)
             userRef.get()
                 .addOnSuccessListener { dataSnapshot ->
                     if (dataSnapshot.exists()) {
                         val username = dataSnapshot.child("username").getValue(String::class.java)
                         val email = dataSnapshot.child("email").getValue(String::class.java)
 
-                        // Set text in TextViews
+                        // nastaveni textu v TextView
                         yourUsername.text = username
                         yourEmail.text = email
                     }
@@ -82,11 +80,11 @@ class CompanyMenu : AppCompatActivity() {
                     Log.e("RealtimeDB", "Error getting data: ", exception)
                 }
         }
-
+// funkcnost polozek v drawermenu
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                         R.id.logout_button -> {
-                    //Odhlášení uživatele z Firebase
+                    // Odhlášení
                     FirebaseAuth.getInstance().signOut()
 
                     // Přesun na Login obrazovku
@@ -100,7 +98,7 @@ class CompanyMenu : AppCompatActivity() {
             }
         }
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
-// Načtení seznamu podniků z database
+// Načtení seznamu podniků z database...
         userId?.let {
             val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
             userRef.get()
@@ -248,8 +246,10 @@ class CompanyMenu : AppCompatActivity() {
             val intent: Intent
             if (selectedAuthorization == "manager"){
                 intent = Intent(this, Company_manager::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
                 startActivity(intent)
+                finish()
             }
         }
 
@@ -301,6 +301,7 @@ class CompanyMenu : AppCompatActivity() {
         }
     }
 */
+    // metoda pro funkcnost hamburgeru
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) {
             true // Událost byla zpracována výsuvným menu
