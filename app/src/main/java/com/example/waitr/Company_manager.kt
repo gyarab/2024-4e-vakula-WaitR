@@ -32,6 +32,9 @@ class Company_manager : AppCompatActivity() {
     private lateinit var yourEmail: TextView
     private lateinit var yourAuthStatus: TextView
     private lateinit var bottomNavigationView : BottomNavigationView
+    private lateinit var modelView: Model_view
+    private lateinit var foodMenu: Food_menu
+    private lateinit var analytics: Analytics
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,22 +47,25 @@ class Company_manager : AppCompatActivity() {
         // hlavni id podle ktereho se do layoutu nactou sparna data z database
         val intentmain = intent
         val CompanyID = intentmain.getStringExtra("COMPANY_ID")
-        // kod pro prepinani fragmentu
-        val modelView = Model_view()
-        val foodMenu = Food_menu()
-        val analytics = Analytics()
 
-        setCurrentFragment(modelView)
+        // Vytvoření fragmentů a předání CompanyID
+        CompanyID?.let {
+            modelView = Model_view.newInstance(it)
+            foodMenu = Food_menu.newInstance(it)
+            analytics = Analytics.newInstance(it)
 
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
-        bottomNavigationView.setOnNavigationItemSelectedListener {
-            when(it.itemId){
-                R.id.ModelView -> setCurrentFragment(modelView)
-                R.id.Foodmenu -> setCurrentFragment(foodMenu)
-                R.id.Analytics -> setCurrentFragment(analytics)
+            setCurrentFragment(modelView)
+            bottomNavigationView = findViewById(R.id.bottomNavigationView)
+            bottomNavigationView.setOnNavigationItemSelectedListener {
+                when(it.itemId){
+                    R.id.ModelView -> setCurrentFragment(modelView)
+                    R.id.Foodmenu -> setCurrentFragment(foodMenu)
+                    R.id.Analytics -> setCurrentFragment(analytics)
+                }
+                true
             }
-            true
         }
+
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.company_manager_main)
         navigationView = findViewById(R.id.manager_company_drawer_menu)
@@ -123,9 +129,16 @@ class Company_manager : AppCompatActivity() {
 
     }
     // Metoda pro meneni fragmentu
-    private fun setCurrentFragment(fragment: Fragment) = supportFragmentManager.beginTransaction().apply {
-        replace(R.id.companyframelayout, fragment)
-        commit()
+    private fun setCurrentFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        supportFragmentManager.fragments.forEach { transaction.hide(it) }
+
+        if (fragment.isAdded) {
+            transaction.show(fragment)
+        } else {
+            transaction.add(R.id.companyframelayout, fragment)
+        }
+        transaction.commit()
     }
     // metoda na funkcnost hamburgeru
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

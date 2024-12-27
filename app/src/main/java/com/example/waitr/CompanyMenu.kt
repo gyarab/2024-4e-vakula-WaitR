@@ -227,8 +227,7 @@ class CompanyMenu : AppCompatActivity() {
                                     "authorization" to "manager",
                                     "status" to "offline"
                                 )
-                            ),
-                            "ModelView" to "" // Můžete zde přidat další informace, pokud je máte
+                            )
                         )
 
                         db.child("companies").child(companyId)
@@ -283,6 +282,7 @@ class CompanyMenu : AppCompatActivity() {
         enterButton.setOnClickListener{
             val intent: Intent
             if (selectedAuthorization == "manager"){
+                dialog1.dismiss()
                 intent = Intent(this, Company_manager::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
@@ -315,6 +315,7 @@ class CompanyMenu : AppCompatActivity() {
     private fun deleteCompany(companyId: String, CompanyTag: CompanyTag){
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
         if (userId != null) {
+            db.child("companies").child(companyId).removeValue()
             db.child("users").child(userId).child("companies").child(companyId).removeValue()
                 .addOnSuccessListener {
                     val buttonToRemove = linearLayoutContainer.findViewWithTag<Button>(CompanyTag)

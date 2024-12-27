@@ -17,7 +17,6 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline32"
         app:layout_constraintStart_toStartOf="@+id/guideline31"
         app:layout_constraintTop_toTopOf="@+id/guideline34">
-
     </FrameLayout>
 
     <HorizontalScrollView
