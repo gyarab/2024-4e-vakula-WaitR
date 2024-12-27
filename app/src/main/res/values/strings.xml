@@ -28,4 +28,7 @@
     <string name="info">Info</string>
     <string name="members">Members</string>
     <string name="invite">Invite</string>
+    <string name="scene1">Scene1</string>
+    <string name="edit">edit</string>
+    <string name="help">help</string>
 </resources>
