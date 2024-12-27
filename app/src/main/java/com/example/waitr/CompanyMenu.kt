@@ -200,9 +200,39 @@ class CompanyMenu : AppCompatActivity() {
                             "Authorization" to "manager"
                         )
 
-                        // Uložení společnosti do uživatele
+                        // Uložení společnosti k uživateli
                         db.child("users").child(userId).child("companies").child(companyId)
                             .setValue(companyMap)
+                            .addOnSuccessListener {
+                                Toast.makeText(
+                                    this,
+                                    "Company '$companyName' created!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                checksIfNoCompanies()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(
+                                    this,
+                                    "Failed to create company: ${e.message}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                        // ulozeni spolecnosti do database
+                        val companyMap2 = mapOf(
+                            "name" to companyName,
+                            "users" to mapOf(
+                                userId to mapOf(
+                                    "authorization" to "manager",
+                                    "status" to "offline"
+                                )
+                            ),
+                            "ModelView" to "" // Můžete zde přidat další informace, pokud je máte
+                        )
+
+                        db.child("companies").child(companyId)
+                            .setValue(companyMap2)
                             .addOnSuccessListener {
                                 Toast.makeText(
                                     this,

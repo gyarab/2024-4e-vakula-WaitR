@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.Toast
 
@@ -22,6 +23,12 @@ class Model_view : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+//promenne
+private lateinit var editButton: ImageButton
+private lateinit var helpButton: ImageButton
+private lateinit var currentScene: String
+private lateinit var platno: FrameLayout
+
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,18 +37,24 @@ class Model_view : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
     }
-
+// zde psat kod souvisejici s UI
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_model_view, container, false)
+        val view = inflater.inflate(R.layout.fragment_model_view, container, false)
+
+    editButton = view.findViewById(R.id.edit_button)
+    editButton.setOnClickListener {
+        //TODO dodelat edit
     }
-    // zde psat kod souvisejici s UI
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        
+    helpButton = view.findViewById(R.id.help_button)
+    helpButton.setOnClickListener {
+        //TODO dodelat help tlacitko
+    }
+
+        // Inflate the layout for this fragment
+        return view
     }
 
     companion object {
