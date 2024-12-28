@@ -114,7 +114,25 @@ class Company_manager : AppCompatActivity() {
                     true
                 }
                 R.id.manager_logout_of_company_button -> {
-                    // TODO zmenit online status
+                    // zmena online statusu pri opusteni podniku
+                    val onlineStatusMap = mapOf(
+                        "status" to "offline"
+                    )
+                    CompanyID?.let {
+                            it1 ->
+                        if (userId != null) {
+                            db.child("companies").child(it1).child("users").child(userId)
+                                .setValue(onlineStatusMap)
+                                .addOnSuccessListener {
+                                    Log.d("StatusChange", "Changed status successfully")
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.e("StatusChange", "Failed to change online status", exception)
+                                }
+                            Log.e("NotSignedIn", "user is not signed in")
+                        }
+                        Log.e("NoCompanyId", "Failed to get the companyId")
+                    }
                     // Přesun na Company menu obrazovku
                     val intent = Intent(this, CompanyMenu::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

@@ -281,6 +281,25 @@ class CompanyMenu : AppCompatActivity() {
 
         enterButton.setOnClickListener{
             val intent: Intent
+            // zmena online statusu pri vstupu do podniku
+            val onlineStatusMap = mapOf(
+                "status" to "online"
+            )
+            selectedCompanyId?.let {
+                it1 ->
+                if (userId != null) {
+                    db.child("companies").child(it1).child("users").child(userId)
+                        .setValue(onlineStatusMap)
+                        .addOnSuccessListener {
+                            Log.d("StatusChange", "Changed status successfully")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("StatusChange", "Failed to change online status", exception)
+                        }
+                    Log.e("NotSignedIn", "user is not signed in")
+                }
+                Log.e("NoCompanyId", "Failed to get the companyId")
+            }
             if (selectedAuthorization == "manager"){
                 dialog1.dismiss()
                 intent = Intent(this, Company_manager::class.java)
