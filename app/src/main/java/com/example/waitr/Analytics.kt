@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 
 //promenne
-private var CompanyID: String? = null
+var CompanyID: String? = null
 
 class Analytics : Fragment() {
     // TODO: Rename and change types of parameters

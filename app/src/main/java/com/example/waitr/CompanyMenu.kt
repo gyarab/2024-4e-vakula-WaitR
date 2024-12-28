@@ -158,8 +158,6 @@ class CompanyMenu : AppCompatActivity() {
             (resources.displayMetrics.heightPixels * 0.6).toInt()
         )
 
-        dialog.window?.setBackgroundDrawableResource(android.R.color.holo_blue_light)
-
         // Reference na prvky v popup layoutu
         val createButton = dialog.findViewById<Button>(R.id.Create_Company_button)
         val companyNameInput = dialog.findViewById<TextInputEditText>(R.id.Company_name)
