@@ -35,4 +35,5 @@
     <string name="here_you_can_invite_users">Here you can invite users</string>
     <string name="here_you_create_your_company">Here you create your Company</string>
     <string name="email_of_user_you_want_to_invite">Email of user you want to invite</string>
+    <string name="invites">Invites</string>
 </resources>

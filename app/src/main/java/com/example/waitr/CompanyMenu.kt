@@ -1,8 +1,11 @@
 package com.example.waitr
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.Resources
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -27,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase
 data class CompanyTag(val companyId: String, val companyName: String, val authorization: String)
 
 class CompanyMenu : AppCompatActivity() {
+    //promenne
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var drawerToggle: ActionBarDrawerToggle
@@ -42,7 +46,15 @@ class CompanyMenu : AppCompatActivity() {
     private var selectedAuthorization: String? = null
     private var selectedCompanyTag: CompanyTag? = null
     private lateinit var noCompaniesTextView: TextView
+    private lateinit var invitesDisplay: LinearLayout
+    private lateinit var joinCompany: Button
+    private lateinit var invitesDialog: Dialog
+    private lateinit var linearLayoutContainer: LinearLayout
+    private lateinit var noInvitesYet: TextView
+    private lateinit var username: String
+    private lateinit var email: String
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -52,8 +64,20 @@ class CompanyMenu : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        //definovani dialogu pro zobrazeni pozvanek
+        invitesDialog = Dialog(this)
+        invitesDialog.setContentView(R.layout.displaying_invites_in_company_menu_popup)
+        //definovani dynamickeho layoutu v dialogu
+        invitesDisplay = invitesDialog.findViewById(R.id.display_invites_layout)
+        linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+
         noCompaniesTextView = TextView(this).apply {
             text = "No companies yet"
+            textSize = 16f
+            gravity = Gravity.CENTER
+        }
+        noInvitesYet = TextView(this).apply {
+            text = "No invites yet"
             textSize = 16f
             gravity = Gravity.CENTER
         }
@@ -67,18 +91,25 @@ class CompanyMenu : AppCompatActivity() {
         val headerView = navigationView.getHeaderView(0)
         yourUsername = headerView.findViewById(R.id.yourUsername)
         yourEmail = headerView.findViewById(R.id.yourEmail)
-// nacteni dat do headeru
+
+        // nacteni dat do headeru
         userId?.let {
             val userRef = db.child("users").child(it)
             userRef.get()
                 .addOnSuccessListener { dataSnapshot ->
                     if (dataSnapshot.exists()) {
-                        val username = dataSnapshot.child("username").getValue(String::class.java)
-                        val email = dataSnapshot.child("email").getValue(String::class.java)
+                        val usernamedata = dataSnapshot.child("username").getValue(String::class.java)
+                        val emaildata = dataSnapshot.child("email").getValue(String::class.java)
 
-                        // nastaveni textu v TextView
-                        yourUsername.text = username
-                        yourEmail.text = email
+                        // nastaveni textu v TextView a nastaveni globalnich promenych
+                        yourUsername.text = usernamedata
+                        yourEmail.text = emaildata
+                        if (emaildata != null) {
+                            email = emaildata
+                        }
+                        if (usernamedata != null) {
+                            username = usernamedata
+                        }
                     }
                 }
                 .addOnFailureListener { exception ->
@@ -102,48 +133,17 @@ class CompanyMenu : AppCompatActivity() {
                 else -> false
             }
         }
-        val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
-// Načtení seznamu podniků z database...
-        userId?.let {
-            val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
-            userRef.get()
-                .addOnSuccessListener { dataSnapshot ->
-                    if (dataSnapshot.exists()) {
-                        for (companySnapshot in dataSnapshot.children) {
-                            val companyId = companySnapshot.key
-                            val companyName = companySnapshot.child("companyName").getValue(String::class.java)
-                            val authorization = companySnapshot.child("Authorization").getValue(String::class.java)
 
-                            if (companyId != null && companyName != null && authorization != null) {
-                                val newButton = Button(this).apply {
-                                    text = companyName
-                                    tag = CompanyTag(companyId, companyName, authorization)
-                                }
-                                newButton.setOnClickListener {
-                                    val companyTag = it.tag as CompanyTag
-                                    selectedCompanyTag = companyTag
-                                    selectedCompanyId = companyTag.companyId // Aktualizace ID
-                                    selectedCompanyName = companyTag.companyName
-                                    selectedAuthorization = companyTag.authorization
-                                    selectedCompanyOptions()
-                                }
-
-                                // Přidání tlačítka do LinearLayout
-                                linearLayoutContainer.removeView(noCompaniesTextView)
-                                linearLayoutContainer.addView(newButton)
-                            }
-                        }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("RealtimeDB", "Error getting companies: ", exception)
-                }
-            checksIfNoCompanies()
-        }
+        //Načtení seznamu podniků z database
+        loadCompanies()
 
         createCompanyPopup = findViewById(R.id.Create_Company_popup_button)
         createCompanyPopup.setOnClickListener {
             showCreateCompanyPopup()
+        }
+        joinCompany = findViewById(R.id.Join_Company_button)
+        joinCompany.setOnClickListener {
+            showJoinCompanyPopup()
         }
 
     }
@@ -154,8 +154,8 @@ class CompanyMenu : AppCompatActivity() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.85).toInt(),
-            (resources.displayMetrics.heightPixels * 0.6).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
 
         // Reference na prvky v popup layoutu
@@ -195,7 +195,7 @@ class CompanyMenu : AppCompatActivity() {
                         // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
                         val companyMap = mapOf(
                             "companyName" to companyName,
-                            "Authorization" to "manager"
+                            "authorization" to "manager"
                         )
 
                         // Uložení společnosti k uživateli
@@ -223,7 +223,9 @@ class CompanyMenu : AppCompatActivity() {
                             "users" to mapOf(
                                 userId to mapOf(
                                     "authorization" to "manager",
-                                    "status" to "offline"
+                                    "status" to "offline",
+                                    "email" to email,
+                                    "username" to username
                                 )
                             )
                         )
@@ -256,6 +258,271 @@ class CompanyMenu : AppCompatActivity() {
         // Zobrazení dialogu
         dialog.show()
     }
+    private fun showJoinCompanyPopup(){
+        // Nastavení velikosti dialogu
+        invitesDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+        loadInvites()
+        invitesDialog.show()
+    }
+    // Pomocná funkce pro převod dp na px
+    fun Int.dpToPx(): Int {
+        return (this * Resources.getSystem().displayMetrics.density).toInt()
+    }
+    private fun selectedCompanyFromInviteOptions(){
+        // Vytvoření dialogu
+        val dialog1 = Dialog(this)
+        dialog1.setContentView(R.layout.selected_company_from_invite_options)
+
+        // Nastavení velikosti dialogu
+        dialog1.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.65).toInt(),
+            (resources.displayMetrics.heightPixels * 0.4).toInt()
+        )
+
+        dialog1.window?.setBackgroundDrawableResource(android.R.color.white)
+
+        val enterButton = dialog1.findViewById<Button>(R.id.enter_company_from_invite_button)
+        val selectedCompanyNameView = dialog1.findViewById<TextView>(R.id.company_from_invite_to_display)
+        selectedCompanyNameView.apply {
+            text = selectedCompanyName
+        }
+        enterButton.setOnClickListener{
+            val intent: Intent
+            // zmena online statusu pri vstupu do podniku
+            val onlineStatusMap = mapOf(
+                "status" to "online"
+            )
+            selectedCompanyId?.let {
+                    it1 ->
+                if (userId != null) {
+                    db.child("companies").child(it1).child("users").child(userId)
+                        .updateChildren(onlineStatusMap)
+                        .addOnSuccessListener {
+                            Log.d("StatusChange", "Changed status successfully")
+                        }
+                        .addOnFailureListener { exception ->
+                            Log.e("StatusChange", "Failed to change online status", exception)
+                        }
+                    Log.e("NotSignedIn", "user is not signed in")
+                }
+                Log.e("NoCompanyId", "Failed to get the companyId")
+            }
+
+            dialog1.dismiss()
+            //TODO zmenit na Company_employee
+            intent = Intent(this, Company_manager::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
+            startActivity(intent)
+            finish()
+        }
+        dialog1.show()
+    }
+    private fun acceptInvite(companyId: String, companyName: String, textViewId: Int){
+        if (companyName.isNotEmpty()) {
+            selectedCompanyName = companyName
+            selectedCompanyId = companyId // Nastavení ID do globální proměnné
+            // Vytvoř nový Button
+            val newButton = Button(this).apply {
+                selectedCompanyName = companyName
+                text = companyName
+                //tag = companyId // Uložení ID podniku
+                tag = CompanyTag(companyId, companyName, "manager")
+            }
+            newButton.setOnClickListener {
+                val companyTag = it.tag as CompanyTag
+                selectedCompanyTag = companyTag
+                selectedCompanyId = companyTag.companyId // Aktualizace ID
+                selectedCompanyName = companyTag.companyName
+                selectedAuthorization = companyTag.authorization
+                selectedCompanyFromInviteOptions()
+            }
+            // Přidání tlačítka do LinearLayout
+            linearLayoutContainer.addView(newButton)
+            val view = invitesDisplay.findViewWithTag<TextView>(textViewId)
+            Log.e("naslo to invite", view.toString())
+            invitesDisplay.removeView(view)
+
+            // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
+            val companyMap = mapOf(
+                "companyName" to companyName,
+                "authorization" to "employee"
+            )
+
+            // Uložení společnosti k uživateli
+            if (userId != null) {
+                db.child("users").child(userId).child("companies").child(companyId)
+                    .setValue(companyMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(
+                            this,
+                            "Company: '$companyName' joined!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        invitesDialog.dismiss()
+                        checksIfNoCompanies()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(
+                            this,
+                            "Failed to create company: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                //pridani uzivatele ke spolecnosti
+                val newUserMap = mapOf(
+                    userId to mapOf(
+                        "authorization" to "employee",
+                        "status" to "offline",
+                        "email" to email,
+                        "username" to username
+                    )
+                )
+                db.child("companies").child(companyId).child("users")
+                    .updateChildren(newUserMap)
+                    .addOnSuccessListener {
+                        Log.d("DatabaseUpdate", "User added successfully")
+                    }
+                    .addOnFailureListener{ exception ->
+                        Log.e("DatabaseUpdate", "Error adding user: ${exception.message}")
+                    }
+                // smazani poznamky po potvrzeni
+                removeInvite(companyId)
+            }
+        }
+    }
+    // vymaze poznamku z database uzivatele
+    private fun removeInvite(companyIdToRemove: String){
+        userId?.let { userId ->
+            val invitesRef = db.child("users").child(userId).child("invites")
+            invitesRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        for (invite in dataSnapshot.children) {
+                            val inviteValue = invite.getValue(String::class.java)
+                            if (inviteValue == companyIdToRemove) {
+                                invite.ref.removeValue()
+                                    .addOnSuccessListener {
+                                        Log.d("RemoveInvite", "Invite successfully removed.")
+                                    }
+                                    .addOnFailureListener { exception ->
+                                        Log.e("RemoveInvite", "Failed to remove invite.", exception)
+                                    }
+                                break // Pokud chceš smazat jen jeden uzel, ukonči cyklus
+                            }
+                        }
+                    } else {
+                        Log.d("RemoveInvite", "No invites found.")
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("RemoveInvite", "Failed to fetch invites.", exception)
+                }
+        }
+    }
+    private fun loadInvites(){
+        if (invitesDisplay.contains(noInvitesYet)){
+            invitesDisplay.removeView(noInvitesYet)
+        }
+        userId?.let {
+            val invitesRef = db.child("users").child(it).child("invites")
+
+            invitesRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        for (inviteSnapshot in dataSnapshot.children) {
+                            // Získání ID společnosti z uzlu invites
+                            val companyID = inviteSnapshot.key
+                            companyID?.let { id ->
+                                // Odkaz na uzel společnosti v databázi
+                                val companiesRef = db.child("companies").child(id)
+
+                                companiesRef.child("name").get()
+                                    .addOnSuccessListener { companySnapshot ->
+
+                                        val companyName = companySnapshot.getValue(String::class.java)
+                                        val textViewID = View.generateViewId()
+
+                                        companyName?.let { name ->
+                                            // Dynamické vytvoření TextView pro každou pozvánku
+                                            val inviteToDisplay = TextView(this).apply {
+                                                text = "New invite from company: $name\nClick to accept" // Nastavení textu
+                                                layoutParams = LinearLayout.LayoutParams(300.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                                                    setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx()) // Nastavení marginů
+                                                }
+                                                textSize = 18f // Nastavení velikosti textu
+                                                setBackgroundColor(Color.parseColor("#BDEDBF")) // Nastavení barvy pozadí
+                                                tag = textViewID
+                                            }
+                                            // Nastavení listeneru na TextView
+                                            inviteToDisplay.setOnClickListener {
+                                                acceptInvite(companyID, companyName, textViewID)
+                                            }
+
+                                            // Přidání TextView do vašeho layoutu
+                                            invitesDisplay.addView(inviteToDisplay)
+
+                                        }
+                                    }.addOnFailureListener { error ->
+                                        Log.e("DatabaseError", "Failed to load inviteCompany name: ${error.message}")
+                                    }
+                            }
+                        }
+                    } else {
+                        Log.d("Invites", "No invites found.")
+                        // text ze nejsou ivity
+                        invitesDisplay.addView(noInvitesYet)
+                    }
+                }.addOnFailureListener { error ->
+                    Log.e("DatabaseError", "Failed to load invites: ${error.message}")
+                }
+        }
+    }
+    private fun loadCompanies(){
+        userId?.let {
+            val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
+            userRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        for (companySnapshot in dataSnapshot.children) {
+                            val companyId = companySnapshot.key
+                            val companyName = companySnapshot.child("companyName").getValue(String::class.java)
+                            val authorization = companySnapshot.child("authorization").getValue(String::class.java)
+
+                            if (companyId != null && companyName != null && authorization != null) {
+                                val newButton = Button(this).apply {
+                                    text = companyName
+                                    tag = CompanyTag(companyId, companyName, authorization)
+                                }
+                                newButton.setOnClickListener {
+                                    val companyTag = it.tag as CompanyTag
+                                    selectedCompanyTag = companyTag
+                                    selectedCompanyId = companyTag.companyId // Aktualizace ID
+                                    selectedCompanyName = companyTag.companyName
+                                    selectedAuthorization = companyTag.authorization
+                                    if (selectedAuthorization.equals("manager")){
+                                        selectedCompanyOptions()
+                                    } else if (selectedAuthorization.equals("employee")){
+                                        selectedCompanyFromInviteOptions()
+                                    }
+                                }
+
+                                // Přidání tlačítka do LinearLayout
+                                linearLayoutContainer.removeView(noCompaniesTextView)
+                                linearLayoutContainer.addView(newButton)
+                            }
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("RealtimeDB", "Error getting companies: ", exception)
+                }
+            checksIfNoCompanies()
+        }
+    }
     private fun selectedCompanyOptions() {
         // Vytvoření dialogu
         val dialog1 = Dialog(this)
@@ -287,7 +554,7 @@ class CompanyMenu : AppCompatActivity() {
                 it1 ->
                 if (userId != null) {
                     db.child("companies").child(it1).child("users").child(userId)
-                        .setValue(onlineStatusMap)
+                        .updateChildren(onlineStatusMap)
                         .addOnSuccessListener {
                             Log.d("StatusChange", "Changed status successfully")
                         }
@@ -298,14 +565,13 @@ class CompanyMenu : AppCompatActivity() {
                 }
                 Log.e("NoCompanyId", "Failed to get the companyId")
             }
-            if (selectedAuthorization == "manager"){
-                dialog1.dismiss()
-                intent = Intent(this, Company_manager::class.java)
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
-                startActivity(intent)
-                finish()
-            }
+
+            dialog1.dismiss()
+            intent = Intent(this, Company_manager::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
+            startActivity(intent)
+            finish()
         }
 
         deleteButton.setOnClickListener{
@@ -328,22 +594,38 @@ class CompanyMenu : AppCompatActivity() {
         }
         dialog1.show()
     }
-
+//metoda pro smazani vsem spolecnosti
     private fun deleteCompany(companyId: String, CompanyTag: CompanyTag){
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
-        if (userId != null) {
-            db.child("companies").child(companyId).removeValue()
-            db.child("users").child(userId).child("companies").child(companyId).removeValue()
-                .addOnSuccessListener {
-                    val buttonToRemove = linearLayoutContainer.findViewWithTag<Button>(CompanyTag)
-                    linearLayoutContainer.removeView(buttonToRemove)
-                    checksIfNoCompanies()
-                    Toast.makeText(this, "Company deleted successfully!", Toast.LENGTH_SHORT).show()
+        db.child("users").get()
+            .addOnSuccessListener { snapshot ->
+                snapshot.children.forEach { userSnapshot ->
+                    val userId = userSnapshot.key
+                    if (userId != null) {
+                        db.child("users").child(userId).child("companies").child(companyId).removeValue()
+                            .addOnSuccessListener {
+                                Log.d("DeleteCompany", "Company $companyId removed for user $userId")
+                            }
+                            .addOnFailureListener { exception ->
+                            Log.e("DeleteCompany", "Failed to remove company for user $userId", exception)
+                            }
+                    }
                 }
-                .addOnFailureListener {
+                // Odstrani spolecnosti z database podniku
+                db.child("companies").child(companyId).removeValue()
+                    .addOnSuccessListener {
+                        val buttonToRemove = linearLayoutContainer.findViewWithTag<Button>(CompanyTag)
+                        linearLayoutContainer.removeView(buttonToRemove)
+                        checksIfNoCompanies()
+                        Toast.makeText(this, "Company deleted successfully for all users!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener {
                     Toast.makeText(this, "Failed to delete company: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
-        }
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(this, "Failed to retrieve users: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
     }
     private fun checksIfNoCompanies() {
         val userRef = userId?.let {

@@ -90,7 +90,7 @@ class Company_manager : AppCompatActivity() {
                         val username = dataSnapshot.child("username").getValue(String::class.java)
                         val email = dataSnapshot.child("email").getValue(String::class.java)
                         val authorization = CompanyID?.let { it1 ->
-                            dataSnapshot.child("companies").child(it1).child("Authorization").getValue(String::class.java)
+                            dataSnapshot.child("companies").child(it1).child("authorization").getValue(String::class.java)
                         }
                         // nastaveni textu v TextView
                         yourUsername.text = username
@@ -128,7 +128,7 @@ class Company_manager : AppCompatActivity() {
                             it1 ->
                         if (userId != null) {
                             db.child("companies").child(it1).child("users").child(userId)
-                                .setValue(onlineStatusMap)
+                                .updateChildren(onlineStatusMap)
                                 .addOnSuccessListener {
                                     Log.d("StatusChange", "Changed status successfully")
                                 }
@@ -286,5 +286,26 @@ class Company_manager : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+    // pri ukonceni aktivity se provede tahle metoda
+    override fun onDestroy() {
+        super.onDestroy()
+        // Nastavení statusu na "offline"
+        val onlineStatusMap = mapOf(
+            "status" to "offline"
+        )
+
+        CompanyID?.let { companyId ->
+            userId?.let { userId ->
+                db.child("companies").child(companyId).child("users").child(userId)
+                    .updateChildren(onlineStatusMap)
+                    .addOnSuccessListener {
+                        Log.d("StatusChange", "Changed status successfully to offline")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("StatusChange", "Failed to change online status to offline", exception)
+                    }
+            } ?: Log.e("StatusChange", "User ID is null")
+        } ?: Log.e("StatusChange", "Company ID is null")
     }
 }
