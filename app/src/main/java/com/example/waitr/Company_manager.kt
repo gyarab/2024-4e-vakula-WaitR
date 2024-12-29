@@ -38,6 +38,7 @@ class Company_manager : AppCompatActivity() {
     private lateinit var modelView: Model_view
     private lateinit var foodMenu: Food_menu
     private lateinit var analytics: Analytics
+    private lateinit var CompanyID: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -47,9 +48,9 @@ class Company_manager : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        // hlavni id podle ktereho se do layoutu nactou sparna data z database
+        // hlavni id podle ktereho se do layoutu nactou spravna data z database
         val intentmain = intent
-        val CompanyID = intentmain.getStringExtra("COMPANY_ID")
+        CompanyID = intentmain.getStringExtra("COMPANY_ID").toString()
 
         // Vytvoření fragmentů a předání CompanyID
         CompanyID?.let {
@@ -147,7 +148,6 @@ class Company_manager : AppCompatActivity() {
             }
         }
 
-
     }
     private fun showInviteUserPopUp(){
         // Vytvoření dialogu
@@ -192,14 +192,15 @@ class Company_manager : AppCompatActivity() {
                     }
                     // Zkontroluj, zda už uživatel nemá pozvánku
                     val invitesRef = db.child("users").child(foundUid).child("invites")
-                    invitesRef.setValue(null)
                     invitesRef.get()
                         .addOnSuccessListener { invitesSnapshot ->
                             var maUzInvite = false
 
                             if (invitesSnapshot.hasChildren()) {
                                 for (invite in invitesSnapshot.children) {
-                                    if (invite.child("from").getValue(String::class.java) == CompanyID) {
+                                    // Získej hodnotu uzlu
+                                    val companyValue = invite.getValue(String::class.java)
+                                    if (companyValue == CompanyID) {
                                         maUzInvite = true
                                         break
                                     }
@@ -208,27 +209,29 @@ class Company_manager : AppCompatActivity() {
 
                             if (!maUzInvite) {
                                 // Odeslání pozvánky
-                                val invitesMap = mapOf(
-                                    "from" to CompanyID
+                                val newInvite = mapOf(
+                                    CompanyID to CompanyID
                                 )
                                 Log.e("id", foundUid)
-                                db.child("users").child(foundUid).child("invites")
-                                    .updateChildren(invitesMap)
-                                    .addOnSuccessListener {
-                                        Toast.makeText(
-                                            this,
-                                            "Invite sent!",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                        dialog.dismiss()
-                                    }
-                                    .addOnFailureListener {
-                                        Toast.makeText(
-                                            this,
-                                            "Failed to send invite",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
+
+                                    db.child("users").child(foundUid).child("invites")
+                                        .updateChildren(newInvite) // Vytvoří nový uzel pod "invites"
+                                        .addOnSuccessListener {
+                                            Log.e("feo", foundUid + " " + newInvite)
+                                            Toast.makeText(
+                                                this,
+                                                "Invite sent!",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            dialog.dismiss()
+                                        }
+                                        .addOnFailureListener {
+                                            Toast.makeText(
+                                                this,
+                                                "Failed to send invite",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                             } else {
                                 Toast.makeText(
                                     this,
@@ -256,74 +259,6 @@ class Company_manager : AppCompatActivity() {
                 }
         }
         dialog.show()
-    }
-
-    private fun checkIfAlreadyHasInvite(idUzivatele: String, callback: (Boolean) -> Unit) {
-        // Reference na uzel invites
-        val invitesRef = db.child("users").child(idUzivatele).child("invites")
-
-        invitesRef.get()
-            .addOnSuccessListener { dataSnapshot ->
-                var maUzInvite = false
-                if (dataSnapshot.exists()) {
-                    // Kontrola, zda existuje pozvánka od této společnosti
-                    for (invitesSnapshot in dataSnapshot.children) {
-                        if (invitesSnapshot.child("from").getValue(String::class.java) == CompanyID) {
-                            maUzInvite = true
-                            break
-                        }
-                    }
-                }
-
-                // Zavolání callbacku s výsledkem
-                callback(maUzInvite)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("RealtimeDB", "Error getting invites ", exception)
-                // V případě chyby zavoláme callback s `false` jako výchozí hodnotou
-                callback(false)
-            }
-    }
-    private fun sendInvite(idUzivatele: String) {
-        val invitesMap = mapOf(
-            "from" to CompanyID
-        )
-        db.child("users").child(idUzivatele).child("invites").setValue(invitesMap)
-            .addOnSuccessListener {
-                Toast.makeText(
-                    this,
-                    "Invite sent!",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-            .addOnFailureListener {
-                Toast.makeText(
-                    this,
-                    "Failed to send invite",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-    }
-    //metoda pro ziskani uid uzivatele pomoci emailu
-    private fun findUserByEmail(emailInput: String, callback: (String?) -> Unit){
-        db.child("users").get()
-            .addOnSuccessListener { dataSnapshot ->
-            var foundUid: String? = null
-
-            // Iterace přes všechny uživatele
-            for (userSnapshot in dataSnapshot.children) {
-                val email = userSnapshot.child("email").getValue(String::class.java)
-                if (email == emailInput) {
-                    foundUid = userSnapshot.key // UID je klíčem ve struktuře
-                    break
-                }
-            }
-            // vraceni hodnoty pomoci funkce
-            callback(foundUid)
-        }.addOnFailureListener { exception ->
-            Log.e("Firebase", "Chyba při čtení uživatelů: ${exception.message}")
-        }
-
     }
     // Metoda pro meneni fragmentu
     private fun setCurrentFragment(fragment: Fragment) {
