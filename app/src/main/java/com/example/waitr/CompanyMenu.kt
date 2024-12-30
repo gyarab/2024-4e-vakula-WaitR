@@ -458,7 +458,7 @@ class CompanyMenu : AppCompatActivity() {
                                             // Dynamické vytvoření TextView pro každou pozvánku
                                             val inviteToDisplay = TextView(this).apply {
                                                 text = "New invite from company: $name\nClick to accept" // Nastavení textu
-                                                layoutParams = LinearLayout.LayoutParams(300.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT).apply {
+                                                layoutParams = LinearLayout.LayoutParams(280.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT).apply {
                                                     setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx()) // Nastavení marginů
                                                 }
                                                 textSize = 18f // Nastavení velikosti textu

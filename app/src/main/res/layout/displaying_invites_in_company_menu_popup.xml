@@ -21,7 +21,7 @@
     <LinearLayout
         android:id="@+id/display_invites_layout"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="760dp"
         android:background="#fff"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/guideline52"
@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.10" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline50"
