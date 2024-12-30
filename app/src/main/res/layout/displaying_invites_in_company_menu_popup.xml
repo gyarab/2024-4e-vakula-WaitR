@@ -21,7 +21,7 @@
     <LinearLayout
         android:id="@+id/display_invites_layout"
         android:layout_width="0dp"
-        android:layout_height="760dp"
+        android:layout_height="0dp"
         android:background="#fff"
         android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@+id/guideline52"
