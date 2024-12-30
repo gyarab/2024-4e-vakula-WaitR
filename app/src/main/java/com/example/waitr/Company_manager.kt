@@ -366,8 +366,8 @@ class Company_manager : AppCompatActivity() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels),
-            (resources.displayMetrics.heightPixels)
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         val constrainedLayout = dialog.findViewById<ConstraintLayout>(R.id.constraint_layout_for_current_users)
         val displayOnlineUsers = constrainedLayout.findViewById<LinearLayout>(R.id.display_current_online_users)

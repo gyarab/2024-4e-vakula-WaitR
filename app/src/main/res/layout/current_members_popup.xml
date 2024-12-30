@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#91D5F4">
+    android:background="#fff">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_for_current_users"
         android:layout_width="329dp"
         android:layout_height="668dp"
-        android:background="#fff"
+        android:background="#91D5F4"
         app:layout_constraintBottom_toTopOf="@+id/guideline62"
         app:layout_constraintEnd_toStartOf="@+id/guideline60"
         app:layout_constraintStart_toStartOf="@+id/guideline59"
-        app:layout_constraintTop_toTopOf="@+id/guideline61">
+        app:layout_constraintTop_toTopOf="parent">
 
 
         <TextView
@@ -72,7 +72,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="38dp"
-            android:background="#D0CCCC"
+            android:background="#fff"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline66"
@@ -87,7 +87,7 @@
             android:id="@+id/display_current_online_users"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="#A3EFA5"
+            android:background="#fff"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline66"
@@ -157,8 +157,8 @@
         android:autoSizeTextType="uniform"
         android:text="Close"
         android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline63"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline65"
         app:layout_constraintStart_toStartOf="@+id/guideline64"
-        app:layout_constraintTop_toTopOf="@+id/guideline62" />
+        app:layout_constraintTop_toBottomOf="@+id/constraint_layout_for_current_users" />
 </androidx.constraintlayout.widget.ConstraintLayout>
