@@ -35,9 +35,12 @@
 
     <Button
         android:id="@+id/enter_company_from_invite_button"
-        android:layout_width="288dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="@string/enter"
+        app:layout_constraintVertical_bias="0.5"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline58"
         app:layout_constraintEnd_toStartOf="@+id/guideline56"
         app:layout_constraintStart_toStartOf="@+id/guideline55"

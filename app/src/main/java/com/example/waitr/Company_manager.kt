@@ -5,7 +5,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
+import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -162,101 +164,114 @@ class Company_manager : AppCompatActivity() {
         // Reference na prvky v popup layoutu
         val inviteButton = dialog.findViewById<Button>(R.id.invite_user_button)
         val userToInvite = dialog.findViewById<TextInputEditText>(R.id.user_to_invite)
+        val spinner: Spinner = dialog.findViewById(R.id.positionSpinner)
+
+        // Možnosti pro Spinner
+        val options = listOf("Select position", "employee", "manager")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, options)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapter
 
         //akce pri kliknuti na tlacitka invite
         inviteButton.setOnClickListener {
             val emailOfUser = userToInvite.text.toString().trim()
+            val selectedPosition = spinner.selectedItem.toString()
+            if (selectedPosition.equals("Select position", ignoreCase = true)) {
+                Toast.makeText(this, "Please select the user's position", Toast.LENGTH_SHORT).show()
+            } else {
+                // Získání UID uživatele podle emailu
+                db.child("users").get()
+                    .addOnSuccessListener { dataSnapshot ->
+                        var foundUid: String? = null
 
-            // Získání UID uživatele podle emailu
-            db.child("users").get()
-                .addOnSuccessListener { dataSnapshot ->
-                    var foundUid: String? = null
-
-                    // Iterace přes všechny uživatele
-                    for (userSnapshot in dataSnapshot.children) {
-                        val email = userSnapshot.child("email").getValue(String::class.java)
-                        if (email == emailOfUser) {
-                            foundUid = userSnapshot.key // UID je klíčem ve struktuře
-                            break
+                        // Iterace přes všechny uživatele
+                        for (userSnapshot in dataSnapshot.children) {
+                            val email = userSnapshot.child("email").getValue(String::class.java)
+                            if (email == emailOfUser) {
+                                foundUid = userSnapshot.key // UID je klíčem ve struktuře
+                                break
+                            }
                         }
-                    }
 
-                    // Pokud UID není nalezeno, zobraz chybovou zprávu
-                    if (foundUid == null) {
-                        Toast.makeText(
-                            this,
-                            "User not found",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@addOnSuccessListener
-                    }
-                    // Zkontroluj, zda už uživatel nemá pozvánku
-                    val invitesRef = db.child("users").child(foundUid).child("invites")
-                    invitesRef.get()
-                        .addOnSuccessListener { invitesSnapshot ->
-                            var maUzInvite = false
-
-                            if (invitesSnapshot.hasChildren()) {
-                                for (invite in invitesSnapshot.children) {
-                                    // Získej hodnotu uzlu
-                                    val companyValue = invite.getValue(String::class.java)
-                                    if (companyValue == CompanyID) {
-                                        maUzInvite = true
+                        // Pokud UID není nalezeno, zobraz chybovou zprávu
+                        if (foundUid == null) {
+                            Toast.makeText(
+                                this,
+                                "User not found",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            return@addOnSuccessListener
+                        }
+                        //zkontroluj jestli uz neni ve spolecnosti
+                        val usersInCompanyRef = db.child("companies").child(CompanyID).child("users")
+                        usersInCompanyRef.get()
+                            .addOnSuccessListener { usersInCompanySnapshot ->
+                                var userAlreadyInCompany = false
+                                for (userInCompany in usersInCompanySnapshot.children) {
+                                    if (userInCompany.key == foundUid) {
+                                        userAlreadyInCompany = true
                                         break
                                     }
                                 }
-                            }
-
-                            if (!maUzInvite) {
-                                // Odeslání pozvánky
-                                val newInvite = mapOf(
-                                    CompanyID to CompanyID
-                                )
-                                Log.e("id", foundUid)
-
-                                    db.child("users").child(foundUid).child("invites")
-                                        .updateChildren(newInvite) // Vytvoří nový uzel pod "invites"
-                                        .addOnSuccessListener {
-                                            Log.e("feo", foundUid + " " + newInvite)
+                                if (userAlreadyInCompany) {
+                                    Toast.makeText(
+                                        this,
+                                        "This user is already in company!",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    return@addOnSuccessListener
+                                }
+                                // Pokračujeme dále s kontrolou pozvánky
+                                val invitesRef = db.child("users").child(foundUid).child("invites")
+                                invitesRef.get()
+                                    .addOnSuccessListener { invitesSnapshot ->
+                                        if (invitesSnapshot.hasChild(CompanyID)) {
                                             Toast.makeText(
                                                 this,
-                                                "Invite sent!",
+                                                "The user already has an invitation!",
                                                 Toast.LENGTH_SHORT
                                             ).show()
-                                            dialog.dismiss()
+                                        } else {
+                                            val position = if (selectedPosition == "manager") "manager" else "employee"
+                                            val newInvite = mapOf(
+                                                CompanyID to mapOf("position" to position)
+                                            )
+                                            db.child("users").child(foundUid).child("invites")
+                                                .updateChildren(newInvite)
+                                                .addOnSuccessListener {
+                                                    Toast.makeText(
+                                                        this,
+                                                        "Invite sent!",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                    dialog.dismiss()
+                                                }
+                                                .addOnFailureListener {
+                                                    Toast.makeText(
+                                                        this,
+                                                        "Failed to send invite",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
                                         }
-                                        .addOnFailureListener {
-                                            Toast.makeText(
-                                                this,
-                                                "Failed to send invite",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                            } else {
-                                Toast.makeText(
-                                    this,
-                                    "The user already has an invitation!",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("Firebase", "Error getting invites", it)
+                                    }
                             }
-                        }
-                        .addOnFailureListener { exception ->
-                            Log.e("RealtimeDB", "Error getting invites", exception)
-                            Toast.makeText(
-                                this,
-                                "Failed to check invites",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("Firebase", "Error getting users", exception)
-                    Toast.makeText(
-                        this,
-                        "Error fetching users",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
+                            .addOnFailureListener {
+                                Log.e("Firebase error", "Failed to check users in company")
+                            }
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("Firebase", "Error getting users", exception)
+                        Toast.makeText(
+                            this,
+                            "Error fetching users",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+            }
         }
         dialog.show()
     }

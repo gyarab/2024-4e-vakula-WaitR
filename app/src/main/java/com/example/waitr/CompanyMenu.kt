@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.icu.text.Transliterator.Position
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -321,7 +322,7 @@ class CompanyMenu : AppCompatActivity() {
         }
         dialog1.show()
     }
-    private fun acceptInvite(companyId: String, companyName: String, textViewId: Int){
+    private fun acceptInvite(companyId: String, companyName: String, textViewId: Int, position: String){
         if (companyName.isNotEmpty()) {
             selectedCompanyName = companyName
             selectedCompanyId = companyId // Nastavení ID do globální proměnné
@@ -338,7 +339,12 @@ class CompanyMenu : AppCompatActivity() {
                 selectedCompanyId = companyTag.companyId // Aktualizace ID
                 selectedCompanyName = companyTag.companyName
                 selectedAuthorization = companyTag.authorization
-                selectedCompanyFromInviteOptions()
+                if (position == "manager"){
+                    selectedCompanyOptions()
+                }
+                if (position == "employee"){
+                    selectedCompanyFromInviteOptions()
+                }
             }
             // Přidání tlačítka do LinearLayout
             linearLayoutContainer.addView(newButton)
@@ -349,7 +355,7 @@ class CompanyMenu : AppCompatActivity() {
             // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
             val companyMap = mapOf(
                 "companyName" to companyName,
-                "authorization" to "employee"
+                "authorization" to position
             )
 
             // Uložení společnosti k uživateli
@@ -375,7 +381,7 @@ class CompanyMenu : AppCompatActivity() {
                 //pridani uzivatele ke spolecnosti
                 val newUserMap = mapOf(
                     userId to mapOf(
-                        "authorization" to "employee",
+                        "authorization" to position,
                         "status" to "offline",
                         "email" to email,
                         "username" to username
@@ -402,7 +408,7 @@ class CompanyMenu : AppCompatActivity() {
                 .addOnSuccessListener { dataSnapshot ->
                     if (dataSnapshot.exists()) {
                         for (invite in dataSnapshot.children) {
-                            val inviteValue = invite.getValue(String::class.java)
+                            val inviteValue = invite.key
                             if (inviteValue == companyIdToRemove) {
                                 invite.ref.removeValue()
                                     .addOnSuccessListener {
@@ -436,6 +442,8 @@ class CompanyMenu : AppCompatActivity() {
                         for (inviteSnapshot in dataSnapshot.children) {
                             // Získání ID společnosti z uzlu invites
                             val companyID = inviteSnapshot.key
+                            //ziskani pozice
+                            val position = inviteSnapshot.child("position").getValue(String::class.java)
                             companyID?.let { id ->
                                 // Odkaz na uzel společnosti v databázi
                                 val companiesRef = db.child("companies").child(id)
@@ -459,7 +467,9 @@ class CompanyMenu : AppCompatActivity() {
                                             }
                                             // Nastavení listeneru na TextView
                                             inviteToDisplay.setOnClickListener {
-                                                acceptInvite(companyID, companyName, textViewID)
+                                                if (position != null) {
+                                                    acceptInvite(companyID, companyName, textViewID, position)
+                                                }
                                             }
 
                                             // Přidání TextView do vašeho layoutu

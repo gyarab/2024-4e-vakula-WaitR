@@ -66,8 +66,8 @@
         android:id="@+id/invite_showcase_text"
         android:layout_width="247dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:background="#fff"
+        android:gravity="center"
         android:text="@string/here_you_can_invite_users"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/user_to_invite_layout"
@@ -81,7 +81,7 @@
         android:layout_width="329dp"
         android:layout_height="wrap_content"
         android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/invite_user_button"
+        app:layout_constraintBottom_toTopOf="@+id/positionSpinner"
         app:layout_constraintEnd_toStartOf="@+id/guideline40"
         app:layout_constraintStart_toStartOf="@+id/guideline39"
         app:layout_constraintTop_toBottomOf="@+id/invite_showcase_text"
@@ -92,8 +92,20 @@
             android:id="@+id/user_to_invite"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="@string/email_of_user_you_want_to_invite"/>
+            android:hint="@string/email_of_user_you_want_to_invite" />
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Spinner
+        android:id="@+id/positionSpinner"
+        android:layout_width="164dp"
+        android:layout_height="48dp"
+        android:background="#fff"
+        android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toTopOf="@+id/invite_user_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline44"
+        app:layout_constraintStart_toStartOf="@+id/guideline43"
+        app:layout_constraintTop_toBottomOf="@+id/user_to_invite_layout"
+        app:layout_constraintVertical_bias="0.5" />
 
     <Button
         android:id="@+id/invite_user_button"
@@ -103,6 +115,6 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline42"
         app:layout_constraintEnd_toStartOf="@+id/guideline44"
         app:layout_constraintStart_toStartOf="@+id/guideline43"
-        app:layout_constraintTop_toBottomOf="@+id/user_to_invite_layout"
+        app:layout_constraintTop_toBottomOf="@+id/positionSpinner"
         app:layout_constraintVertical_bias="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
