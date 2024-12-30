@@ -4,15 +4,19 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.MenuItem
+import android.view.SubMenu
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -22,7 +26,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 class Company_manager : AppCompatActivity() {
     // promenne sem
@@ -41,6 +48,9 @@ class Company_manager : AppCompatActivity() {
     private lateinit var foodMenu: Food_menu
     private lateinit var analytics: Analytics
     private lateinit var CompanyID: String
+    private var valueEventListener: ValueEventListener? = null
+    private var onlineMembers: ArrayList<String> = ArrayList()
+    private var offlineMembers: ArrayList<String> = ArrayList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -83,6 +93,7 @@ class Company_manager : AppCompatActivity() {
         yourUsername = headerView.findViewById(R.id.yourUsername_company_manager)
         yourEmail = headerView.findViewById(R.id.yourEmail_company_manager)
         yourAuthStatus = headerView.findViewById(R.id.auth_status_company_manager)
+
         // nacteni dat do headeru
         userId?.let {
             val userRef = db.child("users").child(it)
@@ -111,6 +122,7 @@ class Company_manager : AppCompatActivity() {
                     true
                 }
                 R.id.manager_show_members_button -> {
+                    currentMembersPopup(onlineMembers, offlineMembers)
                     true
                 }
                 R.id.manager_add_members_button -> {
@@ -149,7 +161,8 @@ class Company_manager : AppCompatActivity() {
                 else -> false
             }
         }
-
+        // zavolani metody pro nastaveni listeneru
+        setupRealtimeListener()
     }
     private fun showInviteUserPopUp(){
         // Vytvoření dialogu
@@ -304,7 +317,10 @@ class Company_manager : AppCompatActivity() {
     }
     // pri ukonceni aktivity se provede tahle metoda
     override fun onDestroy() {
+        val usersRef = db.child("companies").child(CompanyID).child("users")
         super.onDestroy()
+        // Odstraní posluchač při ukončení aktivity
+        valueEventListener?.let { usersRef.removeEventListener(it) }
         // Nastavení statusu na "offline"
         val onlineStatusMap = mapOf(
             "status" to "offline"
@@ -322,5 +338,75 @@ class Company_manager : AppCompatActivity() {
                     }
             } ?: Log.e("StatusChange", "User ID is null")
         } ?: Log.e("StatusChange", "Company ID is null")
+    }
+    //získání useru z menu a rozdělení na online a offline
+    private fun fetchUsers(){
+        onlineMembers.clear()
+        offlineMembers.clear()
+        val usersRef = db.child("companies").child(CompanyID).child("users")
+        usersRef.get()
+            .addOnSuccessListener { usersDataSnapshot ->
+                for(user in usersDataSnapshot.children){
+                    val userName = user.child("username").getValue(String::class.java)
+                    val userStatus = user.child("status").getValue(String::class.java)
+                    if (userStatus == "online" && userName != null){
+                        onlineMembers.add(userName)
+                    }
+                    if (userStatus == "offline" && userName != null){
+                        offlineMembers.add(userName)
+                    }
+                }
+            }
+    }
+    // upravi v NavigationDrawer menu polozku Members
+    private fun currentMembersPopup(online: ArrayList<String>, offline: ArrayList<String>){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.current_members_popup)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels),
+            (resources.displayMetrics.heightPixels)
+        )
+        val constrainedLayout = dialog.findViewById<ConstraintLayout>(R.id.constraint_layout_for_current_users)
+        val displayOnlineUsers = constrainedLayout.findViewById<LinearLayout>(R.id.display_current_online_users)
+        val displayOfflineUsers = constrainedLayout.findViewById<LinearLayout>(R.id.display_current_offline_users)
+        val closePopup = dialog.findViewById<Button>(R.id.close_current_users_popup)
+        closePopup.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        for (user in online){
+            val userToDisplay = TextView(this).apply {
+                text = user
+                textSize = 20f
+                gravity = Gravity.CENTER
+            }
+            displayOnlineUsers.addView(userToDisplay)
+        }
+        for (user in offline){
+            val userToDisplay = TextView(this).apply {
+                text = user
+                textSize = 20f
+                gravity = Gravity.CENTER
+            }
+            displayOfflineUsers.addView(userToDisplay)
+        }
+        dialog.show()
+    }
+    //nastaveni realtime listeneru
+    private fun setupRealtimeListener() {
+        val usersRef = db.child("companies").child(CompanyID).child("users")
+        valueEventListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                fetchUsers()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Failed to listen for changes: ${error.message}")
+            }
+        }
+        usersRef.addValueEventListener(valueEventListener!!)
     }
 }

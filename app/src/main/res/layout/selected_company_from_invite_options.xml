@@ -41,6 +41,7 @@
         app:layout_constraintVertical_bias="0.5"
         android:autoSizeMaxTextSize="1000dp"
         android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@+id/guideline58"
         app:layout_constraintEnd_toStartOf="@+id/guideline56"
         app:layout_constraintStart_toStartOf="@+id/guideline55"
