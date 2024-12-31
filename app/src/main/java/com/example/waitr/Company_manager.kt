@@ -51,6 +51,10 @@ class Company_manager : AppCompatActivity() {
     private var valueEventListener: ValueEventListener? = null
     private var onlineMembers: ArrayList<String> = ArrayList()
     private var offlineMembers: ArrayList<String> = ArrayList()
+    private lateinit var currentMembersDialog: Dialog
+    private lateinit var displayOnlineUsers: LinearLayout
+    private lateinit var displayOfflineUsers: LinearLayout
+    private lateinit var constrainedLayoutForCurrentUsers: ConstraintLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -81,6 +85,16 @@ class Company_manager : AppCompatActivity() {
                 true
             }
         }
+        //definovani dynamickych UI prvku
+        currentMembersDialog = Dialog(this)
+        currentMembersDialog.setContentView(R.layout.current_members_popup)
+        currentMembersDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+        constrainedLayoutForCurrentUsers = currentMembersDialog.findViewById(R.id.constraint_layout_for_current_users)
+        displayOnlineUsers = constrainedLayoutForCurrentUsers.findViewById(R.id.display_current_online_users)
+        displayOfflineUsers = constrainedLayoutForCurrentUsers.findViewById(R.id.display_current_offline_users)
 
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.company_manager_main)
@@ -122,7 +136,7 @@ class Company_manager : AppCompatActivity() {
                     true
                 }
                 R.id.manager_show_members_button -> {
-                    currentMembersPopup(onlineMembers, offlineMembers)
+                    currentMembersPopup()
                     true
                 }
                 R.id.manager_add_members_button -> {
@@ -356,28 +370,25 @@ class Company_manager : AppCompatActivity() {
                         offlineMembers.add(userName)
                     }
                 }
+                loadCurrentUsersToLayout()
             }
     }
     // upravi v NavigationDrawer menu polozku Members
-    private fun currentMembersPopup(online: ArrayList<String>, offline: ArrayList<String>){
-        // Vytvoření dialogu
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.current_members_popup)
-
-        // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.85).toInt()
-        )
-        val constrainedLayout = dialog.findViewById<ConstraintLayout>(R.id.constraint_layout_for_current_users)
-        val displayOnlineUsers = constrainedLayout.findViewById<LinearLayout>(R.id.display_current_online_users)
-        val displayOfflineUsers = constrainedLayout.findViewById<LinearLayout>(R.id.display_current_offline_users)
-        val closePopup = dialog.findViewById<Button>(R.id.close_current_users_popup)
+    private fun currentMembersPopup(){
+        loadCurrentUsersToLayout()
+        val closePopup = currentMembersDialog.findViewById<Button>(R.id.close_current_users_popup)
         closePopup.setOnClickListener {
-            dialog.dismiss()
+            currentMembersDialog.dismiss()
         }
+        currentMembersDialog.show()
+    }
+    //dynamicke nacteni uzivatelu do layoutu
+    private fun loadCurrentUsersToLayout(){
+        displayOnlineUsers.removeAllViews()
+        displayOfflineUsers.removeAllViews()
+        Log.e("je list prazdny", onlineMembers.toString() + " "+ offlineMembers.toString() )
 
-        for (user in online){
+        for (user in onlineMembers){
             val userToDisplay = TextView(this).apply {
                 text = user
                 textSize = 20f
@@ -385,7 +396,7 @@ class Company_manager : AppCompatActivity() {
             }
             displayOnlineUsers.addView(userToDisplay)
         }
-        for (user in offline){
+        for (user in offlineMembers){
             val userToDisplay = TextView(this).apply {
                 text = user
                 textSize = 20f
@@ -393,7 +404,6 @@ class Company_manager : AppCompatActivity() {
             }
             displayOfflineUsers.addView(userToDisplay)
         }
-        dialog.show()
     }
     //nastaveni realtime listeneru
     private fun setupRealtimeListener() {

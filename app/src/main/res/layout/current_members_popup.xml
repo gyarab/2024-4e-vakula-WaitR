@@ -8,8 +8,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraint_layout_for_current_users"
-        android:layout_width="329dp"
-        android:layout_height="668dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="#91D5F4"
         app:layout_constraintBottom_toTopOf="@+id/guideline62"
         app:layout_constraintEnd_toStartOf="@+id/guideline60"
@@ -150,7 +150,7 @@
 
     <Button
         android:id="@+id/close_current_users_popup"
-        android:layout_width="164dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:autoSizeMaxTextSize="1000dp"
         android:autoSizeMinTextSize="1dp"
