@@ -42,4 +42,9 @@
     <string name="cancel">Cancel</string>
     <string name="add_menu_item">Add menu item</string>
     <string name="add_menu_group">Add menu group</string>
+    <string name="item_name">Item name</string>
+    <string name="item_price">Item price</string>
+    <string name="item_discription">Item discription</string>
+    <string name="add">Add</string>
+    <string name="group_name">Group name</string>
 </resources>

@@ -7,7 +7,7 @@
     android:background="#3F51B5">
 
     <ScrollView
-        android:id="@+id/scrollable_menu_layout"
+        android:id="@+id/scrollable_edit_menu_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#fff"
@@ -18,7 +18,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline78">
 
         <LinearLayout
-            android:id="@+id/menu_layout"
+            android:id="@+id/edit_menu_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical" />
