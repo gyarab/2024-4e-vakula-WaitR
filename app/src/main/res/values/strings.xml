@@ -38,4 +38,8 @@
     <string name="invites">Invites</string>
     <string name="scrollable_menu_list">scrollable_menu_list</string>
     <string name="menu">Menu</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_menu_item">Add menu item</string>
+    <string name="add_menu_group">Add menu group</string>
 </resources>

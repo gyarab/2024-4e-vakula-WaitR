@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3F51B5">
+
+    <ScrollView
+        android:id="@+id/scrollable_menu_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#fff"
+        android:contentDescription="@string/scrollable_menu_list"
+        app:layout_constraintBottom_toTopOf="@+id/guideline79"
+        app:layout_constraintEnd_toStartOf="@+id/guideline77"
+        app:layout_constraintStart_toStartOf="@+id/guideline76"
+        app:layout_constraintTop_toTopOf="@+id/guideline78">
+
+        <LinearLayout
+            android:id="@+id/menu_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline76"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline77"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline78"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline79"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline81"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <TextView
+        android:id="@+id/save_menu_edit"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:text="@string/save"
+        android:textSize="30sp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeTextType="uniform"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:background="#58BF5C"
+        app:layout_constraintBottom_toTopOf="@+id/cancel_menu_edit"
+        app:layout_constraintEnd_toStartOf="@+id/guideline77"
+        app:layout_constraintStart_toStartOf="@+id/guideline81"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/cancel_menu_edit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#000"
+        android:gravity="center"
+        android:background="#E74848"
+        android:textSize="30sp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/cancel"
+        app:layout_constraintBottom_toTopOf="@+id/guideline78"
+        app:layout_constraintEnd_toStartOf="@+id/guideline77"
+        app:layout_constraintStart_toStartOf="@+id/guideline81"
+        app:layout_constraintTop_toBottomOf="@id/save_menu_edit" />
+
+    <TextView
+        android:id="@+id/add_menu_item"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add_menu_item"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeTextType="uniform"
+        android:textSize="22sp"
+        android:gravity="center"
+        android:background="#fff"
+        android:textColor="#000"
+        app:layout_constraintBottom_toTopOf="@+id/add_menu_group"
+        app:layout_constraintEnd_toStartOf="@+id/guideline80"
+        app:layout_constraintStart_toStartOf="@+id/guideline76"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/add_menu_group"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add_menu_group"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:background="#fff"
+        android:textColor="#000"
+        app:layout_constraintBottom_toTopOf="@+id/guideline78"
+        app:layout_constraintEnd_toStartOf="@+id/guideline80"
+        app:layout_constraintStart_toStartOf="@+id/guideline76"
+        app:layout_constraintTop_toBottomOf="@id/add_menu_item" />
+</androidx.constraintlayout.widget.ConstraintLayout>
