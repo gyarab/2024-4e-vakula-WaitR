@@ -41,7 +41,6 @@ class Food_menu : Fragment() {
         arguments?.let {
             CompanyID = it.getString(CompanyID)
         }
-        // TODO nacte z db menu a updatne ui
         menu = MenuGroup("menuId", "menu", mutableListOf(), mutableListOf())
     }
 
@@ -639,9 +638,10 @@ class Food_menu : Fragment() {
                 ).show()
             }
         })
-        updateMenuUI(menuLayout)
+        updateMenuUI(menuLayout, menu)
         //updateEditMenuUI(editMenuLayout)
     }
+    //TODO fix
     private fun updateEditMenuUI(parentLayout: LinearLayout) {
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()
@@ -727,7 +727,8 @@ class Food_menu : Fragment() {
             renderMenuGroup(it, parentLayout)
         }
     }
-    private fun updateMenuUI(parentLayout: LinearLayout){
+    //TODO fix
+    private fun updateMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup?){
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()
 
