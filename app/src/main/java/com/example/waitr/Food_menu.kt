@@ -763,6 +763,17 @@ class Food_menu : Fragment() {
                         setMargins(32, 0, 0, 8)
                     }
                 }
+                itemView.setOnClickListener { view ->
+                    CustomClickListener(
+                        onClick = {
+
+                        },
+                        onDoubleClick = {
+                            selectedItemID = itemView.tag.toString()
+                            itemOptionPopup(selectedItemID!!)
+                        }
+                    ).onClick(view)
+                }
                 menuGroupLayout.addView(itemView)
             }
 
