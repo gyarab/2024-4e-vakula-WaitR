@@ -42,7 +42,7 @@ class Food_menu : Fragment() {
             CompanyID = it.getString(CompanyID)
         }
         // TODO nacte z db menu a updatne ui
-        menu = MenuGroup("menuId", "menu", null, null)
+        menu = MenuGroup("menuId", "menu", mutableListOf(), mutableListOf())
     }
 
     override fun onCreateView(
@@ -63,6 +63,7 @@ class Food_menu : Fragment() {
         editButton.setOnClickListener {
             showEditMenuPopup()
         }
+        fetchMenu()
     }
 
     companion object {
@@ -77,7 +78,7 @@ class Food_menu : Fragment() {
 
     private fun showEditMenuPopup(){
         editMenu = menu
-        updateMenu()
+        //updateMenu()
 
         // Nastavení velikosti dialogu
         editMenuDialoge.window?.setLayout(
@@ -90,6 +91,7 @@ class Food_menu : Fragment() {
         val addItemButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_item)
         val addGroupButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_group)
         saveButton.setOnClickListener {
+            Log.e("editMenu", editMenu.toString())
             menu = editMenu
             updateMenu()
             editMenuDialoge.dismiss()
@@ -183,6 +185,7 @@ class Food_menu : Fragment() {
                 val menuGroupToUpdate = findGroupById(editMenu, selectedGroupID!!)
                 if (menuGroupToUpdate != null) {
                     menuGroupToUpdate.items?.add(newMenuItem)
+                    Log.e("je prazdne?", editMenu.toString())
                 }
                 val headerforLayout = findViewWithTagRecursively(editMenuLayout, selectedGroupID!!)
                 val layoutToUpdate = headerforLayout?.parent
@@ -215,7 +218,7 @@ class Food_menu : Fragment() {
                 return@setOnClickListener
             } else {
                 val randomID = UUID.randomUUID().toString()
-                val menuGroup = MenuGroup(randomID, groupName, null, null)
+                val menuGroup = MenuGroup(randomID, groupName, mutableListOf(), mutableListOf())
 
                 val groupHeader = TextView(context).apply {
                     text = "$groupName:"
@@ -251,10 +254,12 @@ class Food_menu : Fragment() {
                 if (selectedGroupID == null){
                     editMenu.subGroups?.add(menuGroup)
                     editMenuLayout.addView(menuGroupLayout)
+                    Log.e("je prazdne?", editMenu.toString())
                 }else {
                     val menuGroupToUpdate = findGroupById(editMenu, selectedGroupID!!)
                     if (menuGroupToUpdate != null) {
                         menuGroupToUpdate.subGroups?.add(menuGroup)
+                        Log.e("je prazdne?", editMenu.toString())
                     }
                     val headerforLayout = findViewWithTagRecursively(editMenuLayout, selectedGroupID!!)
                     val layoutToUpdate = headerforLayout?.parent
@@ -604,6 +609,7 @@ class Food_menu : Fragment() {
                     if (fetchedMenu != null) {
                         // Assign to local variable or state
                         menu = fetchedMenu
+                        Log.e("nacteno spravne", menu.toString())
                         Toast.makeText(
                             context,
                             "Menu loaded successfully!",
@@ -634,7 +640,7 @@ class Food_menu : Fragment() {
             }
         })
         updateMenuUI(menuLayout)
-        updateEditMenuUI(editMenuLayout)
+        //updateEditMenuUI(editMenuLayout)
     }
     private fun updateEditMenuUI(parentLayout: LinearLayout) {
         // Nejprve vyčistit layout
