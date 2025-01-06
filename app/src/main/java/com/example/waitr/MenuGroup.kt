@@ -1,8 +1,8 @@
 package com.example.waitr
 
 data class MenuGroup(
-    val id: String,
-    var name: String,
+    val id: String = "",
+    var name: String = "",
     val items: MutableList<MenuItem>? = mutableListOf(),
     val subGroups: MutableList<MenuGroup>? = mutableListOf()
 ){

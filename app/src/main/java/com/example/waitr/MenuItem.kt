@@ -1,10 +1,10 @@
 package com.example.waitr
 
 data class MenuItem(
-    val id: String,
-    var name: String,
-    var price: Double,
-    var description: String
+    val id: String = "",
+    var name: String = "",
+    var price: Double = 0.0,
+    var description: String = ""
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(

@@ -92,6 +92,7 @@ class Food_menu : Fragment() {
         saveButton.setOnClickListener {
             menu = editMenu
             updateMenu()
+            editMenuDialoge.dismiss()
         }
         cancelButton.setOnClickListener {
             val builder = AlertDialog.Builder(requireContext())
