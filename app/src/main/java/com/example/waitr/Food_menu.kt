@@ -301,8 +301,8 @@ class Food_menu : Fragment() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.7).toInt(),
-            (resources.displayMetrics.heightPixels * 0.6).toInt()
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            (resources.displayMetrics.heightPixels * 0.9).toInt()
         )
         // Reference na prvky v popup layoutu
         val nameOfTheItem = dialog.findViewById<TextView>(R.id.name_of_the_item)
@@ -608,12 +608,10 @@ class Food_menu : Fragment() {
                     if (fetchedMenu != null) {
                         // Assign to local variable or state
                         menu = fetchedMenu
-                        Log.e("nacteno spravne", menu.toString())
-                        Toast.makeText(
-                            context,
-                            "Menu loaded successfully!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        editMenu = fetchedMenu
+                        updateMenuUI(menuLayout, menu)
+                        updateEditMenuUI(editMenuLayout, editMenu)
+
                     } else {
                         Toast.makeText(
                             context,
@@ -638,166 +636,141 @@ class Food_menu : Fragment() {
                 ).show()
             }
         })
-        updateMenuUI(menuLayout, menu)
-        //updateEditMenuUI(editMenuLayout)
     }
-    //TODO fix
-    private fun updateEditMenuUI(parentLayout: LinearLayout) {
+    private fun updateEditMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup) {
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()
+        renderEditMenuGroup(menuGroup, parentLayout)
+    }
+    // rekurzivní funkce pro vykreslení MenuGroup
+    fun renderEditMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
+        // Vytvoření hlavičky MenuGroup
+        val groupHeader = TextView(context).apply {
+            text = "${menuGroup.name}:"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            tag = menuGroup.id
+        }
+        groupHeader.setOnClickListener { view ->
+            CustomClickListener(
+                onClick = {
+                    selectedGroupID = groupHeader.tag.toString()
+                    Log.e("testik", selectedGroupID!!)
+                },
+                onDoubleClick = {
+                    selectedGroupID = groupHeader.tag.toString()
+                    groupOptionsPopup(selectedGroupID!!)
+                }
+            ).onClick(view)
+        }
 
-        // Vnitřní rekurzivní funkce pro vykreslení MenuGroup
-        fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
-            // Vytvoření hlavičky MenuGroup
-            val groupHeader = TextView(context).apply {
-                text = "${menuGroup.name}:"
+        // Vytvoření layoutu pro podskupiny
+        val menuGroupLayout = LinearLayout(context).apply {
+            setBackgroundColor(android.graphics.Color.LTGRAY)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.VERTICAL
+        }
+
+        // Přidání hlavičky skupiny do layoutu skupiny
+        menuGroupLayout.addView(groupHeader)
+
+        // Přidání všech položek do layoutu skupiny
+        menuGroup.items.forEach { menuItem ->
+            val itemView = TextView(context).apply {
+                text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
-                tag = menuGroup.id
-            }
-            groupHeader.setOnClickListener { view ->
-                CustomClickListener(
-                    onClick = {
-                        selectedGroupID = groupHeader.tag.toString()
-                        Log.e("testik", selectedGroupID!!)
-                    },
-                    onDoubleClick = {
-                        selectedGroupID = groupHeader.tag.toString()
-                        groupOptionsPopup(selectedGroupID!!)
-                    }
-                ).onClick(view)
-            }
-
-            // Vytvoření layoutu pro podskupiny
-            val menuGroupLayout = LinearLayout(context).apply {
-                setBackgroundColor(android.graphics.Color.LTGRAY)
+                tag = menuItem.id
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(32, 0, 0, 0)
+                    setMargins(32, 0, 0, 8)
                 }
-                orientation = LinearLayout.VERTICAL
+            }
+            itemView.setOnClickListener { view ->
+                //TODO opravid doubleclick
+                selectedItemID = itemView.tag.toString()
+                itemOptionPopup(selectedItemID!!)
             }
 
-            // Přidání hlavičky skupiny do layoutu skupiny
-            menuGroupLayout.addView(groupHeader)
-
-            // Přidání všech položek do layoutu skupiny
-            menuGroup.items?.forEach { menuItem ->
-                val itemView = TextView(context).apply {
-                    text = "${menuItem.name} - ${menuItem.price} Kč"
-                    textSize = 25f
-                    setPadding(16, 16, 16, 16)
-                    tag = menuItem.id
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(32, 0, 0, 8)
-                    }
-                }
-                itemView.setOnClickListener { view ->
-                    CustomClickListener(
-                        onClick = {
-
-                        },
-                        onDoubleClick = {
-                            selectedItemID = itemView.tag.toString()
-                            itemOptionPopup(selectedItemID!!)
-                        }
-                    ).onClick(view)
-                }
-
-                menuGroupLayout.addView(itemView)
-            }
-
-            // Rekurzivně vykreslit podskupiny
-            menuGroup.subGroups?.forEach { subGroup ->
-                renderMenuGroup(subGroup, menuGroupLayout)
-            }
-
-            // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
-            parent.addView(menuGroupLayout)
+            menuGroupLayout.addView(itemView)
         }
 
-        // Pokud je hlavní menu null, nic nevykreslíme
-        menu?.let {
-            // TODO dodelat tamtu vec
-            renderMenuGroup(it, parentLayout)
+        // Rekurzivně vykreslit podskupiny
+        menuGroup.subGroups.forEach { subGroup ->
+            renderMenuGroup(subGroup, menuGroupLayout)
         }
+
+        // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
+        parent.addView(menuGroupLayout)
     }
-    //TODO fix
-    private fun updateMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup?){
+    private fun updateMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup){
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()
 
-        // Vnitřní rekurzivní funkce pro vykreslení MenuGroup
-        fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
-            // Vytvoření hlavičky MenuGroup
-            val groupHeader = TextView(context).apply {
-                text = "${menuGroup.name}:"
+        if (menuGroup.items.isEmpty() && menuGroup.subGroups.isEmpty()){
+            // TODO dodelat tamtu vec
+        } else {
+            renderMenuGroup(menuGroup, parentLayout)
+        }
+    }
+    //rekurzivní funkce pro vykreslení MenuGroup
+    fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
+        // Vytvoření hlavičky MenuGroup
+        val groupHeader = TextView(context).apply {
+            text = "${menuGroup.name}:"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            tag = menuGroup.id
+        }
+
+        // Vytvoření layoutu pro podskupiny
+        val menuGroupLayout = LinearLayout(context).apply {
+            setBackgroundColor(android.graphics.Color.LTGRAY)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.VERTICAL
+        }
+
+        // Přidání hlavičky skupiny do layoutu skupiny
+        menuGroupLayout.addView(groupHeader)
+
+        // Přidání všech položek do layoutu skupiny
+        menuGroup.items.forEach { menuItem ->
+            val itemView = TextView(context).apply {
+                text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
-                tag = menuGroup.id
-            }
-
-            // Vytvoření layoutu pro podskupiny
-            val menuGroupLayout = LinearLayout(context).apply {
-                setBackgroundColor(android.graphics.Color.LTGRAY)
+                tag = menuItem.id
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(32, 0, 0, 0)
+                    setMargins(32, 0, 0, 8)
                 }
-                orientation = LinearLayout.VERTICAL
             }
-
-            // Přidání hlavičky skupiny do layoutu skupiny
-            menuGroupLayout.addView(groupHeader)
-
-            // Přidání všech položek do layoutu skupiny
-            menuGroup.items?.forEach { menuItem ->
-                val itemView = TextView(context).apply {
-                    text = "${menuItem.name} - ${menuItem.price} Kč"
-                    textSize = 25f
-                    setPadding(16, 16, 16, 16)
-                    tag = menuItem.id
-                    layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT
-                    ).apply {
-                        setMargins(32, 0, 0, 8)
-                    }
-                }
-                itemView.setOnClickListener { view ->
-                    CustomClickListener(
-                        onClick = {
-
-                        },
-                        onDoubleClick = {
-                            selectedItemID = itemView.tag.toString()
-                            itemOptionPopup(selectedItemID!!)
-                        }
-                    ).onClick(view)
-                }
-                menuGroupLayout.addView(itemView)
+            itemView.setOnClickListener { view ->
+                selectedItemID = itemView.tag.toString()
+                itemOptionPopup(selectedItemID!!)
             }
-
-            // Rekurzivně vykreslit podskupiny
-            menuGroup.subGroups?.forEach { subGroup ->
-                renderMenuGroup(subGroup, menuGroupLayout)
-            }
-
-            // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
-            parent.addView(menuGroupLayout)
+            menuGroupLayout.addView(itemView)
         }
 
-        // Pokud je hlavní menu null, nic nevykreslíme
-        menu?.let {
-            // TODO dodelat tamtu vec
-            renderMenuGroup(it, parentLayout)
+        // Rekurzivně vykreslit podskupiny
+        menuGroup.subGroups.forEach { subGroup ->
+            renderMenuGroup(subGroup, menuGroupLayout)
         }
+        // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
+        parent.addView(menuGroupLayout)
     }
 }

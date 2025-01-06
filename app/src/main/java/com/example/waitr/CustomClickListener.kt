@@ -8,7 +8,7 @@ class CustomClickListener(
 ) : View.OnClickListener {
 
     private var lastClickTime = 0L
-    private val DOUBLE_CLICK_THRESHOLD = 300
+    private val DOUBLE_CLICK_THRESHOLD = 500
 
     override fun onClick(v: View?) {
         val currentTime = System.currentTimeMillis()
