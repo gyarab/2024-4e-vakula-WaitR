@@ -2,14 +2,17 @@ package com.example.waitr
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +38,8 @@ class Food_menu : Fragment() {
     private var newItemname: String? = null
     private var newItemPrice: Double? = null
     private var newItemDescription: String? = null
+    private lateinit var noMenuTODisplayTextView: TextView
+    private lateinit var addMenuButtonIfNon: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +63,27 @@ class Food_menu : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        noMenuTODisplayTextView = TextView(context).apply {
+            text = "You need to create your menu first"
+            textSize = 25f
+            gravity = Gravity.CENTER
+        }
+        addMenuButtonIfNon = ImageButton(context).apply {
+            contentDescription = "Add Menu"
+            setImageResource(R.drawable.baseline_add_24)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            setBackgroundColor(Color.parseColor("#673AB7"))
+            layoutParams = LinearLayout.LayoutParams(
+                300,
+                300
+            ).apply {
+                setMargins(0, 16, 0, 0)
+                gravity = Gravity.CENTER
+            }
+            setOnClickListener {
+                showEditMenuPopup()
+            }
+        }
         val editButton = view.findViewById<ImageButton>(R.id.edit_menu_button)
         editButton.setOnClickListener {
             showEditMenuPopup()
@@ -166,7 +192,7 @@ class Food_menu : Fragment() {
                     setMargins(32, 0, 0, 8)
                 }
             }
-            itemView.setOnClickListener { view ->
+            itemView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
 
@@ -175,8 +201,8 @@ class Food_menu : Fragment() {
                         selectedItemID = itemView.tag.toString()
                         itemOptionPopup(selectedItemID!!)
                     }
-                ).onClick(view)
-            }
+                )
+            )
             if (selectedGroupID == null){
                 editMenu.items?.add(newMenuItem)
                 editMenuLayout.addView(itemView)
@@ -225,7 +251,7 @@ class Food_menu : Fragment() {
                     setPadding(16, 16, 16, 16)
                     tag = randomID
                 }
-                groupHeader.setOnClickListener { view ->
+                groupHeader.setOnClickListener(
                     CustomClickListener(
                         onClick = {
                             selectedGroupID = groupHeader.tag.toString()
@@ -236,8 +262,8 @@ class Food_menu : Fragment() {
                             selectedGroupID = groupHeader.tag.toString()
                             groupOptionsPopup(selectedGroupID!!)
                         }
-                    ).onClick(view)
-                }
+                    )
+                )
                 val menuGroupLayout = LinearLayout(context).apply {
                     setBackgroundColor(android.graphics.Color.LTGRAY)
                     layoutParams = LinearLayout.LayoutParams(
@@ -640,10 +666,39 @@ class Food_menu : Fragment() {
     private fun updateEditMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup) {
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()
-        renderEditMenuGroup(menuGroup, parentLayout)
+        menuGroup.items.forEach { menuItem ->
+            val itemView = TextView(context).apply {
+                text = "${menuItem.name} - ${menuItem.price} Kč"
+                textSize = 25f
+                setPadding(16, 16, 16, 16)
+                tag = menuItem.id
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(32, 0, 0, 8)
+                }
+            }
+            itemView.setOnClickListener(
+                CustomClickListener(
+                    onClick = {
+
+                    },
+                    onDoubleClick = {
+                        selectedItemID = itemView.tag.toString()
+                        itemOptionPopup(selectedItemID!!)
+                    }
+                )
+            )
+
+            parentLayout.addView(itemView)
+        }
+        menuGroup.subGroups.forEach { subGroup ->
+            renderEditMenuGroup(subGroup, parentLayout)
+        }
     }
     // rekurzivní funkce pro vykreslení MenuGroup
-    fun renderEditMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
+    private fun renderEditMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
         val groupHeader = TextView(context).apply {
             text = "${menuGroup.name}:"
@@ -651,7 +706,7 @@ class Food_menu : Fragment() {
             setPadding(16, 16, 16, 16)
             tag = menuGroup.id
         }
-        groupHeader.setOnClickListener { view ->
+        groupHeader.setOnClickListener(
             CustomClickListener(
                 onClick = {
                     selectedGroupID = groupHeader.tag.toString()
@@ -661,8 +716,8 @@ class Food_menu : Fragment() {
                     selectedGroupID = groupHeader.tag.toString()
                     groupOptionsPopup(selectedGroupID!!)
                 }
-            ).onClick(view)
-        }
+            )
+        )
 
         // Vytvoření layoutu pro podskupiny
         val menuGroupLayout = LinearLayout(context).apply {
@@ -693,18 +748,24 @@ class Food_menu : Fragment() {
                     setMargins(32, 0, 0, 8)
                 }
             }
-            itemView.setOnClickListener { view ->
-                //TODO opravid doubleclick
-                selectedItemID = itemView.tag.toString()
-                itemOptionPopup(selectedItemID!!)
-            }
+            itemView.setOnClickListener(
+                CustomClickListener(
+                    onClick = {
+
+                    },
+                    onDoubleClick = {
+                        selectedItemID = itemView.tag.toString()
+                        itemOptionPopup(selectedItemID!!)
+                    }
+                )
+            )
 
             menuGroupLayout.addView(itemView)
         }
 
         // Rekurzivně vykreslit podskupiny
         menuGroup.subGroups.forEach { subGroup ->
-            renderMenuGroup(subGroup, menuGroupLayout)
+            renderEditMenuGroup(subGroup, menuGroupLayout)
         }
 
         // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
@@ -715,13 +776,43 @@ class Food_menu : Fragment() {
         parentLayout.removeAllViews()
 
         if (menuGroup.items.isEmpty() && menuGroup.subGroups.isEmpty()){
-            // TODO dodelat tamtu vec
+            parentLayout.addView(noMenuTODisplayTextView)
+            parentLayout.addView(addMenuButtonIfNon)
         } else {
-            renderMenuGroup(menuGroup, parentLayout)
+            menuGroup.items.forEach { menuItem ->
+                val itemView = TextView(context).apply {
+                    text = "${menuItem.name} - ${menuItem.price} Kč"
+                    textSize = 25f
+                    setPadding(16, 16, 16, 16)
+                    tag = menuItem.id
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(32, 0, 0, 8)
+                    }
+                }
+                itemView.setOnClickListener(
+                    CustomClickListener(
+                        onClick = {
+
+                        },
+                        onDoubleClick = {
+                            selectedItemID = itemView.tag.toString()
+                            itemOptionPopup(selectedItemID!!)
+                        }
+                    )
+                )
+
+                parentLayout.addView(itemView)
+            }
+            menuGroup.subGroups.forEach { subGroup ->
+                renderMenuGroup(subGroup, parentLayout)
+            }
         }
     }
     //rekurzivní funkce pro vykreslení MenuGroup
-    fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
+    private fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
         val groupHeader = TextView(context).apply {
             text = "${menuGroup.name}:"
