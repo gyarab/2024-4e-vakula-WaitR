@@ -1,5 +1,6 @@
 package com.example.waitr
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.graphics.Color
@@ -189,7 +190,7 @@ class Food_menu : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
                     // Nastavení margin: levý, horní, pravý, dolní
-                    setMargins(32, 0, 0, 8)
+                    setMargins(64, 0, 0, 8)
                 }
             }
             itemView.setOnClickListener(
@@ -204,12 +205,12 @@ class Food_menu : Fragment() {
                 )
             )
             if (selectedGroupID == null){
-                editMenu.items?.add(newMenuItem)
+                editMenu.items.add(newMenuItem)
                 editMenuLayout.addView(itemView)
             } else {
                 val menuGroupToUpdate = findGroupById(editMenu, selectedGroupID!!)
                 if (menuGroupToUpdate != null) {
-                    menuGroupToUpdate.items?.add(newMenuItem)
+                    menuGroupToUpdate.items.add(newMenuItem)
                     Log.e("je prazdne?", editMenu.toString())
                 }
                 val headerforLayout = findViewWithTagRecursively(editMenuLayout, selectedGroupID!!)
@@ -246,7 +247,7 @@ class Food_menu : Fragment() {
                 val menuGroup = MenuGroup(randomID, groupName, mutableListOf(), mutableListOf())
 
                 val groupHeader = TextView(context).apply {
-                    text = "$groupName:"
+                    text = "- $groupName:"
                     textSize = 25f
                     setPadding(16, 16, 16, 16)
                     tag = randomID
@@ -256,7 +257,6 @@ class Food_menu : Fragment() {
                         onClick = {
                             selectedGroupID = groupHeader.tag.toString()
                             Log.e("testik", selectedGroupID!!)
-                            //TODO set visibility
                         },
                         onDoubleClick = {
                             selectedGroupID = groupHeader.tag.toString()
@@ -265,7 +265,6 @@ class Food_menu : Fragment() {
                     )
                 )
                 val menuGroupLayout = LinearLayout(context).apply {
-                    setBackgroundColor(android.graphics.Color.LTGRAY)
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -277,13 +276,13 @@ class Food_menu : Fragment() {
                 menuGroupLayout.addView(groupHeader)
 
                 if (selectedGroupID == null){
-                    editMenu.subGroups?.add(menuGroup)
+                    editMenu.subGroups.add(menuGroup)
                     editMenuLayout.addView(menuGroupLayout)
                     Log.e("je prazdne?", editMenu.toString())
                 }else {
                     val menuGroupToUpdate = findGroupById(editMenu, selectedGroupID!!)
                     if (menuGroupToUpdate != null) {
-                        menuGroupToUpdate.subGroups?.add(menuGroup)
+                        menuGroupToUpdate.subGroups.add(menuGroup)
                         Log.e("je prazdne?", editMenu.toString())
                     }
                     val headerforLayout = findViewWithTagRecursively(editMenuLayout, selectedGroupID!!)
@@ -575,11 +574,11 @@ class Food_menu : Fragment() {
     }
     private fun findItemById(group: MenuGroup, itemId: String): MenuItem? {
         // Hledání v aktuální skupině
-        group.items?.forEach { item ->
+        group.items.forEach { item ->
             if (item.id == itemId) return item
         }
         // Rekurzivní hledání v podskupinách
-        group.subGroups?.forEach { subGroup ->
+        group.subGroups.forEach { subGroup ->
             val found = findItemById(subGroup, itemId)
             if (found != null) return found
         }
@@ -591,7 +590,7 @@ class Food_menu : Fragment() {
         if (group.id == groupId) return group
 
         // Rekurzivní hledání v podskupinách
-        group.subGroups?.forEach { subGroup ->
+        group.subGroups.forEach { subGroup ->
             val found = findGroupById(subGroup, groupId)
             if (found != null) return found
         }
@@ -701,7 +700,7 @@ class Food_menu : Fragment() {
     private fun renderEditMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
         val groupHeader = TextView(context).apply {
-            text = "${menuGroup.name}:"
+            text = "- ${menuGroup.name}:"
             textSize = 25f
             setPadding(16, 16, 16, 16)
             tag = menuGroup.id
@@ -721,7 +720,6 @@ class Food_menu : Fragment() {
 
         // Vytvoření layoutu pro podskupiny
         val menuGroupLayout = LinearLayout(context).apply {
-            setBackgroundColor(android.graphics.Color.LTGRAY)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -745,7 +743,7 @@ class Food_menu : Fragment() {
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(32, 0, 0, 8)
+                    setMargins(64, 0, 0, 8)
                 }
             }
             itemView.setOnClickListener(
@@ -815,7 +813,7 @@ class Food_menu : Fragment() {
     private fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
         val groupHeader = TextView(context).apply {
-            text = "${menuGroup.name}:"
+            text = "- ${menuGroup.name}:"
             textSize = 25f
             setPadding(16, 16, 16, 16)
             tag = menuGroup.id
@@ -823,7 +821,6 @@ class Food_menu : Fragment() {
 
         // Vytvoření layoutu pro podskupiny
         val menuGroupLayout = LinearLayout(context).apply {
-            setBackgroundColor(android.graphics.Color.LTGRAY)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -835,6 +832,23 @@ class Food_menu : Fragment() {
 
         // Přidání hlavičky skupiny do layoutu skupiny
         menuGroupLayout.addView(groupHeader)
+
+        // Vytvoření layoutu pro podřízené položky
+        val childContainer = LinearLayout(context).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 8)
+            }
+            orientation = LinearLayout.VERTICAL
+        }
+
+        // Skrytí nebo zobrazení podřízených prvků při kliknutí na hlavičku
+        groupHeader.setOnClickListener {
+            val visibility = if (childContainer.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+            childContainer.visibility = visibility
+        }
 
         // Přidání všech položek do layoutu skupiny
         menuGroup.items.forEach { menuItem ->
@@ -854,13 +868,17 @@ class Food_menu : Fragment() {
                 selectedItemID = itemView.tag.toString()
                 itemOptionPopup(selectedItemID!!)
             }
-            menuGroupLayout.addView(itemView)
+            childContainer.addView(itemView)
         }
 
         // Rekurzivně vykreslit podskupiny
         menuGroup.subGroups.forEach { subGroup ->
-            renderMenuGroup(subGroup, menuGroupLayout)
+            renderMenuGroup(subGroup, childContainer)
         }
+
+        // Přidání podřízeného layoutu do hlavního layoutu
+        menuGroupLayout.addView(childContainer)
+
         // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
         parent.addView(menuGroupLayout)
     }
