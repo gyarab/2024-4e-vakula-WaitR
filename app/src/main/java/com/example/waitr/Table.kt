@@ -7,6 +7,8 @@ data class Table(
     var numberOfPeople: Int = 0,
     var listOfOrders: MutableList<Order> = mutableListOf(),
     var totalOrderPrice: Double = 0.0,
+    var height: Double = 0.0,
+    var width: Double = 0.0,
     var xPosition: Double = 0.0,
     var yPosition: Double = 0.0
 ){
@@ -18,6 +20,8 @@ data class Table(
             "numberOfPeople" to numberOfPeople,
             "listOfOrders" to listOfOrders.map { it.toMap() },
             "totalOrderPrice" to totalOrderPrice,
+            "height" to height,
+            "width" to width,
             "xPosition" to xPosition,
             "yPosition" to yPosition
         )

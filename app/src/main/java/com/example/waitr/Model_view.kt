@@ -1,5 +1,6 @@
 package com.example.waitr
 
+import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +38,7 @@ class Model_view : Fragment() {
     private lateinit var addStageButtonIfNon: ImageButton
     private var dynamicLinearLayout: LinearLayout? = null
     private lateinit var viewModel: ModelViewModel
+    private lateinit var editModelDialoge: Dialog
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +58,9 @@ class Model_view : Fragment() {
     ): View? {
     // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_model_view, container, false)
+    // nastaveni promenne editModelDialoge
+    editModelDialoge = Dialog(requireContext())
+    editModelDialoge.setContentView(R.layout.edit_model_view_popup)
 
     platno = view.findViewById(R.id.canvas_layout)
     noStagesTODisplayTextView = TextView(context).apply {
@@ -79,17 +84,25 @@ class Model_view : Fragment() {
             //TODO
         }
     }
-
-    editButton = view.findViewById(R.id.edit_button)
-    editButton.setOnClickListener {
-        //TODO dodelat edit
-    }
-    helpButton = view.findViewById(R.id.help_button)
-    helpButton.setOnClickListener {
-        //TODO dodelat help tlacitko
-    }
     checkIfSceneExists()
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        editButton = view.findViewById(R.id.edit_button)
+        editButton.setOnClickListener {
+            showEditModelPopUp()
+        }
+        helpButton = view.findViewById(R.id.help_button)
+        helpButton.setOnClickListener {
+            //TODO dodelat help tlacitko
+        }
+    }
+
+    private fun showEditModelPopUp(){
+        
     }
 
     override fun onResume() {
