@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline123"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline124"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline125"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.3" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline126"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.7" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline127"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline128"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/scene_name_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="#fff"
+        app:layout_constraintBottom_toTopOf="@+id/add_scene_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline124"
+        app:layout_constraintStart_toStartOf="@+id/guideline123"
+        app:layout_constraintTop_toTopOf="@+id/guideline127"
+        app:layout_constraintVertical_bias="0.5">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/scene_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="@string/scene_name" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/add_scene_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/add"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toTopOf="@+id/guideline128"
+        app:layout_constraintEnd_toStartOf="@+id/guideline126"
+        app:layout_constraintStart_toStartOf="@+id/guideline125"
+        app:layout_constraintTop_toBottomOf="@+id/scene_name_layout"
+        app:layout_constraintVertical_bias="0.5" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

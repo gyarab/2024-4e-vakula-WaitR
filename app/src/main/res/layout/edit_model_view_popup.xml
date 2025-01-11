@@ -146,20 +146,22 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <Button
-                android:layout_width="100dp"
-                android:layout_height="48dp"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:autoSizeMaxTextSize="1000dp"
                 android:autoSizeMinTextSize="1dp"
                 android:autoSizeTextType="uniform"
-                android:background="#fff"
                 android:text="@string/scene1"
-                android:textColor="#000" />
+                android:background="#fff"
+                android:textColor="#000"
+                android:gravity="center"/>
+
         </LinearLayout>
     </HorizontalScrollView>
 
     <FrameLayout
-        android:id="@+id/canvas_layout"
+        android:id="@+id/edit_model_canvas_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="@color/white"

@@ -58,4 +58,6 @@
     <string name="add_scene">Add Scene</string>
     <string name="add_table">Add Table</string>
     <string name="add_helpershape">Add HelperShape</string>
+    <string name="scene_name">Scene name</string>
+    <string name="table_name">Table name</string>
 </resources>
