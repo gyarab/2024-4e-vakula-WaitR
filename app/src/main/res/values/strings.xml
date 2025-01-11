@@ -60,4 +60,6 @@
     <string name="add_helpershape">Add HelperShape</string>
     <string name="scene_name">Scene name</string>
     <string name="table_name">Table name</string>
+    <string name="scrollable_scene_list">scrollable_scene_list</string>
+    <string name="done">Done</string>
 </resources>

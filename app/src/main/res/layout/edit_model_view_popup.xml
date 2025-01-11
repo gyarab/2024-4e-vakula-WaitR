@@ -135,6 +135,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#673AB7"
+        android:contentDescription="@string/scrollable_scene_list"
         app:layout_constraintBottom_toTopOf="@+id/guideline121"
         app:layout_constraintEnd_toStartOf="@+id/guideline117"
         app:layout_constraintStart_toStartOf="@+id/guideline116"
@@ -145,17 +146,6 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:autoSizeMaxTextSize="1000dp"
-                android:autoSizeMinTextSize="1dp"
-                android:autoSizeTextType="uniform"
-                android:text="@string/scene1"
-                android:background="#fff"
-                android:textColor="#000"
-                android:gravity="center"/>
 
         </LinearLayout>
     </HorizontalScrollView>
@@ -189,4 +179,18 @@
         app:layout_constraintStart_toStartOf="@+id/guideline116"
         app:layout_constraintTop_toBottomOf="@+id/add_table"
         app:layout_constraintVertical_bias="0.5" />
+
+    <ImageButton
+        android:id="@+id/confirm_table_changes_button"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#58BF5C"
+        android:contentDescription="@string/done"
+        android:scaleType="fitCenter"
+        android:src="@drawable/baseline_done_24"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/guideline120"
+        app:layout_constraintEnd_toStartOf="@+id/guideline119"
+        app:layout_constraintStart_toEndOf="@+id/add_table"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

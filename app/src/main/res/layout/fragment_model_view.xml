@@ -24,6 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#673AB7"
+        android:contentDescription="@string/scrollable_scene_list"
         app:layout_constraintBottom_toTopOf="@+id/guideline34"
         app:layout_constraintEnd_toStartOf="@+id/guideline32"
         app:layout_constraintStart_toStartOf="@+id/guideline31"
@@ -34,15 +35,6 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <Button
-                android:layout_width="100dp"
-                android:layout_height="48dp"
-                android:autoSizeMaxTextSize="1000dp"
-                android:autoSizeMinTextSize="1dp"
-                android:autoSizeTextType="uniform"
-                android:background="#FAFAFA"
-                android:text="@string/scene1"
-                android:textColor="#000" />
         </LinearLayout>
 
 
