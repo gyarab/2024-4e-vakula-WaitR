@@ -10,8 +10,8 @@ data class MenuGroup(
         return mapOf(
             "id" to id,
             "name" to name,
-            "items" to items?.map { it.toMap() },
-            "subGroups" to subGroups?.map { it.toMap() }
+            "items" to items.map { it.toMap() },
+            "subGroups" to subGroups.map { it.toMap() }
         )
     }
     fun deleteGroup(targetId: String): Boolean {
