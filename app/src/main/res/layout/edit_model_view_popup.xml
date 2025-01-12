@@ -191,6 +191,6 @@
         android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/guideline120"
         app:layout_constraintEnd_toStartOf="@+id/guideline119"
-        app:layout_constraintStart_toEndOf="@+id/add_table"
+        app:layout_constraintStart_toStartOf="@+id/guideline118"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

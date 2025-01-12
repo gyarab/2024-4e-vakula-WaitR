@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.util.TypedValue
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,7 +23,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
 import androidx.lifecycle.ViewModelProvider
-import androidx.transition.Scene
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -50,11 +48,8 @@ class Model_view : Fragment() {
     private lateinit var editModelDialoge: Dialog
     private lateinit var editModelScenesLayout: LinearLayout
     private lateinit var editModelSceneLayout: FrameLayout
-    private var selectedFrameLayoutId: String? = null
     private var model: Model = Model(mutableListOf())
     private var editModel: Model = Model(mutableListOf())
-    private var listOfScenesAsLayouts: MutableList<FrameLayout> = mutableListOf()
-    private var editListOfScenesAsLayouts: MutableList<FrameLayout> = mutableListOf()
     private var tableEditMode: Boolean = false
     private lateinit var saveButton: TextView
     private lateinit var cancelButton: TextView
@@ -63,10 +58,19 @@ class Model_view : Fragment() {
     private lateinit var addHelperButton: TextView
     private lateinit var confirmTableChanges: ImageButton
     private lateinit var currentTableToEdit: TextView
+    private lateinit var currentHelperToEdit: TextView
     private var finalX: Int = 0
     private var finalY: Int = 0
     private var finalWidth: Int = 0
     private var finalHeight: Int = 0
+    private var selectedStageId: String? = null
+    private var selectedTableId: String? = null
+    private var selectedHelperId: String? = null
+    private var helperEditMode: Boolean = false
+    private var initialX = 0f
+    private var initialY = 0f
+    private var initialTouchX = 0f
+    private var initialTouchY = 0f
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +97,41 @@ class Model_view : Fragment() {
     editModelScenesLayout = scrollableView.findViewById(R.id.linearlayout_for_scenes)
     editModelSceneLayout = editModelDialoge.findViewById(R.id.edit_model_canvas_layout)
     confirmTableChanges = editModelDialoge.findViewById(R.id.confirm_table_changes_button)
+    confirmTableChanges.setOnClickListener {
+        if (tableEditMode){
+            tableEditMode = false
+            val table = findTableById(selectedTableId!!)
+            table?.xPosition = finalX
+            table?.yPosition = finalY
+
+            confirmTableChanges.visibility = View.GONE
+            saveButton.visibility = View.VISIBLE
+            cancelButton.visibility = View.VISIBLE
+            addTableButton.visibility = View.VISIBLE
+            addSceneButton.visibility = View.VISIBLE
+            addHelperButton.visibility = View.VISIBLE
+            editModelScenesLayout.visibility = View.VISIBLE
+            Log.e("model", editModel.toString())
+        }
+        if (helperEditMode){
+            helperEditMode = false
+            val helper = findHelperById(selectedHelperId!!)
+            helper?.xPosition = finalX
+            helper?.yPosition = finalY
+
+            confirmTableChanges.visibility = View.GONE
+            saveButton.visibility = View.VISIBLE
+            cancelButton.visibility = View.VISIBLE
+            addTableButton.visibility = View.VISIBLE
+            addSceneButton.visibility = View.VISIBLE
+            addHelperButton.visibility = View.VISIBLE
+            editModelScenesLayout.visibility = View.VISIBLE
+            Log.e("model", editModel.toString())
+        }
+
+
+
+    }
 
     platno = view.findViewById(R.id.canvas_layout)
     noStagesTODisplayTextView = TextView(context).apply {
@@ -113,7 +152,7 @@ class Model_view : Fragment() {
             gravity = Gravity.CENTER
         }
         setOnClickListener {
-            //TODO
+            showEditModelPopUp()
         }
     }
     checkIfSceneExists()
@@ -204,8 +243,9 @@ class Model_view : Fragment() {
                 150,
                 0,
                 0)
-            val currentScene = selectedFrameLayoutId?.let { it1 -> findSceneById(editModel, it1) }
-            currentScene?.listOfTables?.add(table)
+            val currentModelScene = selectedStageId?.let { it1 -> findSceneById(editModel, it1) }
+            currentModelScene?.listOfTables?.add(table)
+            Log.e("model", editModel.toString())
 
             val textView = TextView(context).apply {
                 text = tableName
@@ -219,19 +259,23 @@ class Model_view : Fragment() {
                     width = 150 // Výchozí šířka
                     height = 150 // Výchozí výška
                 }
+                tag = randomID
             }
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        tableEditMode = true
-                        currentTableToEdit = textView
-                        confirmTableChanges.visibility = View.VISIBLE
-                        saveButton.visibility = View.GONE
-                        cancelButton.visibility = View.GONE
-                        addTableButton.visibility = View.GONE
-                        addSceneButton.visibility = View.GONE
-                        addHelperButton.visibility = View.GONE
-                        editModelScenesLayout.visibility = View.GONE
+                        selectedTableId = textView.tag.toString()
+                        if (!tableEditMode) {
+                            tableEditMode = true
+                            currentTableToEdit = textView
+                            confirmTableChanges.visibility = View.VISIBLE
+                            saveButton.visibility = View.GONE
+                            cancelButton.visibility = View.GONE
+                            addTableButton.visibility = View.GONE
+                            addSceneButton.visibility = View.GONE
+                            addHelperButton.visibility = View.GONE
+                            editModelScenesLayout.visibility = View.GONE
+                        }
                     },
                     onDoubleClick = {
 
@@ -240,17 +284,12 @@ class Model_view : Fragment() {
             )
             editModelSceneLayout.addView(textView)
 
-            // Logika pro drag & drop a úpravu dimenzí
-            var initialX = 0f
-            var initialY = 0f
-            var initialTouchX = 0f
-            var initialTouchY = 0f
-
             textView.setOnTouchListener { view, event ->
-                if (tableEditMode) {
+                if (tableEditMode && currentTableToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
                     val params = view.layoutParams as FrameLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
+                            // Inicializace proměnných při zahájení dotyku
                             initialX = params.leftMargin.toFloat()
                             initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
@@ -262,32 +301,43 @@ class Model_view : Fragment() {
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Dočasné nové souřadnice
+                            // Vypočítat nové souřadnice
                             val newLeft = (initialX + deltaX).toInt()
                                 .coerceIn(0, editModelSceneLayout.width - view.width)
                             val newTop = (initialY + deltaY).toInt()
                                 .coerceIn(0, editModelSceneLayout.height - view.height)
 
-                            // Kontrola překryvu
-                            val hasOverlap = editModelSceneLayout.children.any { child ->
-                                if (child == view) return@any false // Ignorovat sebe
-                                val otherParams = child.layoutParams as FrameLayout.LayoutParams
-                                val otherRect = Rect(
-                                    otherParams.leftMargin,
-                                    otherParams.topMargin,
-                                    otherParams.leftMargin + child.width,
-                                    otherParams.topMargin + child.height
-                                )
-                                val newRect = Rect(
-                                    newLeft,
-                                    newTop,
-                                    newLeft + view.width,
-                                    newTop + view.height
-                                )
-                                Rect.intersects(otherRect, newRect)
+                            val tempParams = FrameLayout.LayoutParams(params)
+                            tempParams.leftMargin = newLeft
+                            tempParams.topMargin = newTop
+
+                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            var canMove = true
+                            for (i in 0 until editModelSceneLayout.childCount) {
+                                val otherView = editModelSceneLayout.getChildAt(i)
+                                if (otherView != view && otherView is TextView) {
+                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherRect = Rect(
+                                        otherParams.leftMargin,
+                                        otherParams.topMargin,
+                                        otherParams.leftMargin + otherView.width,
+                                        otherParams.topMargin + otherView.height
+                                    )
+                                    val newRect = Rect(
+                                        tempParams.leftMargin,
+                                        tempParams.topMargin,
+                                        tempParams.leftMargin + view.width,
+                                        tempParams.topMargin + view.height
+                                    )
+                                    if (Rect.intersects(newRect, otherRect)) {
+                                        canMove = false
+                                        break
+                                    }
+                                }
                             }
 
-                            if (!hasOverlap) {
+                            if (canMove) {
+                                // Pokud nedochází k překryvu, aktualizuj souřadnice
                                 params.leftMargin = newLeft
                                 params.topMargin = newTop
                                 view.layoutParams = params
@@ -303,97 +353,6 @@ class Model_view : Fragment() {
                     }
                 } else false
             }
-
-            editModelSceneLayout.setOnTouchListener { _, event ->
-                if (tableEditMode){
-                    when (event.action) {
-                        MotionEvent.ACTION_MOVE -> {
-                            // Pokud se dotyká mimo TextView, mění se rozměry
-                            val centerX = textView.left + textView.width / 2
-                            val centerY = textView.top + textView.height / 2
-
-                            val params = textView.layoutParams as FrameLayout.LayoutParams
-                            val newWidth: Int
-                            val newHeight: Int
-
-                            if (event.x > centerX) {
-                                // Změna šířky
-                                val widthPercent =
-                                    ((event.x - textView.left) / editModelSceneLayout.width).coerceIn(
-                                        0.1f,
-                                        0.9f
-                                    )
-                                newWidth = (widthPercent * editModelSceneLayout.width).toInt()
-                            } else {
-                                newWidth = textView.layoutParams.width
-                            }
-
-                            if (event.y > centerY) {
-                                // Změna výšky
-                                val heightPercent =
-                                    ((event.y - textView.top) / editModelSceneLayout.height).coerceIn(
-                                        0.1f,
-                                        0.9f
-                                    )
-                                newHeight = (heightPercent * editModelSceneLayout.height).toInt()
-                            } else {
-                                newHeight = textView.layoutParams.height
-                            }
-
-                            // Vytvoření obdélníku pro nové rozměry TextView
-                            val newRect = Rect(
-                                textView.left,
-                                textView.top,
-                                textView.left + newWidth,
-                                textView.top + newHeight
-                            )
-
-                            // Kontrola překryvu s ostatními TextView
-                            val hasOverlap = editModelSceneLayout.children.any { child ->
-                                if (child == textView) return@any false // Ignorovat aktuální TextView
-                                val otherParams = child.layoutParams as FrameLayout.LayoutParams
-                                val otherRect = Rect(
-                                    otherParams.leftMargin,
-                                    otherParams.topMargin,
-                                    otherParams.leftMargin + child.width,
-                                    otherParams.topMargin + child.height
-                                )
-                                Rect.intersects(otherRect, newRect)
-                            }
-
-                            if (!hasOverlap) {
-                                finalWidth = newWidth
-                                finalHeight = newHeight
-                                // Nastavení nových rozměrů, pokud nedojde k překryvu
-                                params.width = newWidth
-                                params.height = newHeight
-                                textView.layoutParams = params
-                                textView.requestLayout()
-                            }
-                            true
-                        }
-
-                        else -> false
-                    }
-                } else false
-            }
-
-            confirmTableChanges.setOnClickListener {
-                tableEditMode = false
-                table.height = finalHeight
-                table.width = finalWidth
-                table.xPosition = finalX
-                table.yPosition = finalY
-
-                confirmTableChanges.visibility = View.GONE
-                saveButton.visibility = View.VISIBLE
-                cancelButton.visibility = View.VISIBLE
-                addTableButton.visibility = View.VISIBLE
-                addSceneButton.visibility = View.VISIBLE
-                addHelperButton.visibility = View.VISIBLE
-                editModelScenesLayout.visibility = View.VISIBLE
-            }
-
             dialog.dismiss()
         }
         dialog.show()
@@ -422,6 +381,8 @@ class Model_view : Fragment() {
 
             val scene = ModelScene(randomID, sceneName, mutableListOf(), mutableListOf())
             editModel.listOfScenes.add(scene)
+            selectedStageId = randomID
+            drawEditScene()
 
             val textViewForScene = TextView(requireContext()).apply {
                 layoutParams = LinearLayout.LayoutParams(
@@ -440,17 +401,14 @@ class Model_view : Fragment() {
                 ellipsize = TextUtils.TruncateAt.END
                 tag = randomID
             }
-            val frameLayout = FrameLayout(requireContext())
             textViewForScene.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        currentScene = frameLayout
-                        selectedFrameLayoutId = textViewForScene.tag.toString()
-                        switchFrameLayoutContent(frameLayout, editModelSceneLayout)
+                        selectedStageId = textViewForScene.tag.toString()
+                        drawEditScene()
                     },
                     onDoubleClick = {
-                        currentScene = frameLayout
-                        selectedFrameLayoutId = textViewForScene.tag.toString()
+                        selectedStageId = textViewForScene.tag.toString()
                         sceneOptionsPopup()
                     }
                 )
@@ -469,38 +427,42 @@ class Model_view : Fragment() {
             val randomId = UUID.randomUUID().toString()
             val helper = HelperShape(
                 randomId,
-                200,
-                200,
+                150,
+                150,
                 0,
                 0
             )
-            val currentScene = selectedFrameLayoutId?.let { it1 -> findSceneById(editModel, it1) }
-            currentScene?.listOfHelpers?.add(helper)
+            val scene = findSceneById(editModel, selectedStageId!!)
+            scene?.listOfHelpers?.add(helper)
 
             val textView = TextView(context).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.BLACK)
+                tag = randomId
                 layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.WRAP_CONTENT,
                     FrameLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    width = 200 // Výchozí šířka
-                    height = 200 // Výchozí výška
+                    width = 150
+                    height = 150
                 }
             }
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        tableEditMode = true
-                        currentTableToEdit = textView
-                        confirmTableChanges.visibility = View.VISIBLE
-                        saveButton.visibility = View.GONE
-                        cancelButton.visibility = View.GONE
-                        addTableButton.visibility = View.GONE
-                        addSceneButton.visibility = View.GONE
-                        addHelperButton.visibility = View.GONE
-                        editModelScenesLayout.visibility = View.GONE
+                        selectedHelperId = textView.tag.toString()
+                        if (!helperEditMode) {
+                            helperEditMode = true
+                            currentHelperToEdit = textView
+                            confirmTableChanges.visibility = View.VISIBLE
+                            saveButton.visibility = View.GONE
+                            cancelButton.visibility = View.GONE
+                            addTableButton.visibility = View.GONE
+                            addSceneButton.visibility = View.GONE
+                            addHelperButton.visibility = View.GONE
+                            editModelScenesLayout.visibility = View.GONE
+                        }
                     },
                     onDoubleClick = {
 
@@ -509,17 +471,12 @@ class Model_view : Fragment() {
             )
             editModelSceneLayout.addView(textView)
 
-            // Logika pro drag & drop a úpravu dimenzí
-            var initialX = 0f
-            var initialY = 0f
-            var initialTouchX = 0f
-            var initialTouchY = 0f
-
             textView.setOnTouchListener { view, event ->
-                if (tableEditMode) {
+                if (helperEditMode && currentHelperToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
                     val params = view.layoutParams as FrameLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
+                            // Inicializace proměnných při zahájení dotyku
                             initialX = params.leftMargin.toFloat()
                             initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
@@ -531,32 +488,43 @@ class Model_view : Fragment() {
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Dočasné nové souřadnice
+                            // Vypočítat nové souřadnice
                             val newLeft = (initialX + deltaX).toInt()
                                 .coerceIn(0, editModelSceneLayout.width - view.width)
                             val newTop = (initialY + deltaY).toInt()
                                 .coerceIn(0, editModelSceneLayout.height - view.height)
 
-                            // Kontrola překryvu
-                            val hasOverlap = editModelSceneLayout.children.any { child ->
-                                if (child == view) return@any false // Ignorovat sebe
-                                val otherParams = child.layoutParams as FrameLayout.LayoutParams
-                                val otherRect = Rect(
-                                    otherParams.leftMargin,
-                                    otherParams.topMargin,
-                                    otherParams.leftMargin + child.width,
-                                    otherParams.topMargin + child.height
-                                )
-                                val newRect = Rect(
-                                    newLeft,
-                                    newTop,
-                                    newLeft + view.width,
-                                    newTop + view.height
-                                )
-                                Rect.intersects(otherRect, newRect)
+                            val tempParams = FrameLayout.LayoutParams(params)
+                            tempParams.leftMargin = newLeft
+                            tempParams.topMargin = newTop
+
+                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            var canMove = true
+                            for (i in 0 until editModelSceneLayout.childCount) {
+                                val otherView = editModelSceneLayout.getChildAt(i)
+                                if (otherView != view && otherView is TextView) {
+                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherRect = Rect(
+                                        otherParams.leftMargin,
+                                        otherParams.topMargin,
+                                        otherParams.leftMargin + otherView.width,
+                                        otherParams.topMargin + otherView.height
+                                    )
+                                    val newRect = Rect(
+                                        tempParams.leftMargin,
+                                        tempParams.topMargin,
+                                        tempParams.leftMargin + view.width,
+                                        tempParams.topMargin + view.height
+                                    )
+                                    if (Rect.intersects(newRect, otherRect)) {
+                                        canMove = false
+                                        break
+                                    }
+                                }
                             }
 
-                            if (!hasOverlap) {
+                            if (canMove) {
+                                // Pokud nedochází k překryvu, aktualizuj souřadnice
                                 params.leftMargin = newLeft
                                 params.topMargin = newTop
                                 view.layoutParams = params
@@ -572,73 +540,116 @@ class Model_view : Fragment() {
                     }
                 } else false
             }
+        }
+    }
+    @SuppressLint("ClickableViewAccessibility")
+    private fun drawEditScene(){
+        editModelSceneLayout.removeAllViews()
+        lateinit var scene: ModelScene
+        editModel.listOfScenes.forEach { modelScene ->
+            if (modelScene.id == selectedStageId){
+                scene = modelScene
+            }
+        }
+        scene.listOfTables.forEach { table ->
+            val textView = TextView(context).apply {
+                text = table.name
+                textSize = 18f
+                tag = table.id
+                gravity = Gravity.CENTER
+                setBackgroundColor(Color.LTGRAY)
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    width = table.width
+                    height = table.height
+                    setMargins(table.xPosition, table.yPosition, 0, 0)
+                }
+            }
+            textView.setOnClickListener(
+                CustomClickListener(
+                    onClick = {
+                        selectedTableId = textView.tag.toString()
+                        if (!tableEditMode) {
+                            tableEditMode = true
+                            currentTableToEdit = textView
+                            confirmTableChanges.visibility = View.VISIBLE
+                            saveButton.visibility = View.GONE
+                            cancelButton.visibility = View.GONE
+                            addTableButton.visibility = View.GONE
+                            addSceneButton.visibility = View.GONE
+                            addHelperButton.visibility = View.GONE
+                            editModelScenesLayout.visibility = View.GONE
+                        }
+                    },
+                    onDoubleClick = {
 
-            editModelSceneLayout.setOnTouchListener { _, event ->
-                if (tableEditMode) {
+                    }
+                )
+            )
+            textView.setOnTouchListener { view, event ->
+                if (tableEditMode && currentTableToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
+                    val params = view.layoutParams as FrameLayout.LayoutParams
                     when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            // Inicializace proměnných při zahájení dotyku
+                            initialX = params.leftMargin.toFloat()
+                            initialY = params.topMargin.toFloat()
+                            initialTouchX = event.rawX
+                            initialTouchY = event.rawY
+                            true
+                        }
+
                         MotionEvent.ACTION_MOVE -> {
-                            // Pokud se dotyká mimo TextView, mění se rozměry
-                            val centerX = currentTableToEdit.left + currentTableToEdit.width / 2
-                            val centerY = currentTableToEdit.top + currentTableToEdit.height / 2
+                            val deltaX = event.rawX - initialTouchX
+                            val deltaY = event.rawY - initialTouchY
 
-                            val params = currentTableToEdit.layoutParams as FrameLayout.LayoutParams
-                            val newWidth: Int
-                            val newHeight: Int
+                            // Vypočítat nové souřadnice
+                            val newLeft = (initialX + deltaX).toInt()
+                                .coerceIn(0, editModelSceneLayout.width - view.width)
+                            val newTop = (initialY + deltaY).toInt()
+                                .coerceIn(0, editModelSceneLayout.height - view.height)
 
-                            if (event.x > centerX) {
-                                // Změna šířky
-                                val widthPercent =
-                                    ((event.x - currentTableToEdit.left) / editModelSceneLayout.width).coerceIn(
-                                        0.1f,
-                                        0.9f
+                            val tempParams = FrameLayout.LayoutParams(params)
+                            tempParams.leftMargin = newLeft
+                            tempParams.topMargin = newTop
+
+                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            var canMove = true
+                            for (i in 0 until editModelSceneLayout.childCount) {
+                                val otherView = editModelSceneLayout.getChildAt(i)
+                                if (otherView != view && otherView is TextView) {
+                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherRect = Rect(
+                                        otherParams.leftMargin,
+                                        otherParams.topMargin,
+                                        otherParams.leftMargin + otherView.width,
+                                        otherParams.topMargin + otherView.height
                                     )
-                                newWidth = (widthPercent * editModelSceneLayout.width).toInt()
-                            } else {
-                                newWidth = currentTableToEdit.layoutParams.width
-                            }
-
-                            if (event.y > centerY) {
-                                // Změna výšky
-                                val heightPercent =
-                                    ((event.y - currentTableToEdit.top) / editModelSceneLayout.height).coerceIn(
-                                        0.1f,
-                                        0.9f
+                                    val newRect = Rect(
+                                        tempParams.leftMargin,
+                                        tempParams.topMargin,
+                                        tempParams.leftMargin + view.width,
+                                        tempParams.topMargin + view.height
                                     )
-                                newHeight = (heightPercent * editModelSceneLayout.height).toInt()
-                            } else {
-                                newHeight = currentTableToEdit.layoutParams.height
+                                    if (Rect.intersects(newRect, otherRect)) {
+                                        canMove = false
+                                        break
+                                    }
+                                }
                             }
 
-                            // Vytvoření obdélníku pro nové rozměry TextView
-                            val newRect = Rect(
-                                currentTableToEdit.left,
-                                currentTableToEdit.top,
-                                currentTableToEdit.left + newWidth,
-                                currentTableToEdit.top + newHeight
-                            )
+                            if (canMove) {
+                                // Pokud nedochází k překryvu, aktualizuj souřadnice
+                                params.leftMargin = newLeft
+                                params.topMargin = newTop
+                                view.layoutParams = params
 
-                            // Kontrola překryvu s ostatními TextView
-                            val hasOverlap = editModelSceneLayout.children.any { child ->
-                                if (child == currentTableToEdit) return@any false // Ignorovat aktuální TextView
-                                val otherParams = child.layoutParams as FrameLayout.LayoutParams
-                                val otherRect = Rect(
-                                    otherParams.leftMargin,
-                                    otherParams.topMargin,
-                                    otherParams.leftMargin + child.width,
-                                    otherParams.topMargin + child.height
-                                )
-                                Rect.intersects(otherRect, newRect)
+                                finalX = newLeft
+                                finalY = newTop
                             }
 
-                            if (!hasOverlap) {
-                                finalWidth = newWidth
-                                finalHeight = newHeight
-                                // Nastavení nových rozměrů, pokud nedojde k překryvu
-                                params.width = newWidth
-                                params.height = newHeight
-                                currentTableToEdit.layoutParams = params
-                                currentTableToEdit.requestLayout()
-                            }
                             true
                         }
 
@@ -646,27 +657,133 @@ class Model_view : Fragment() {
                     }
                 } else false
             }
-
-            confirmTableChanges.setOnClickListener {
-                tableEditMode = false
-                helper.height = finalHeight
-                helper.width = finalWidth
-                helper.xPosition = finalX
-                helper.yPosition = finalY
-
-                confirmTableChanges.visibility = View.GONE
-                saveButton.visibility = View.VISIBLE
-                cancelButton.visibility = View.VISIBLE
-                addTableButton.visibility = View.VISIBLE
-                addSceneButton.visibility = View.VISIBLE
-                addHelperButton.visibility = View.VISIBLE
-                editModelScenesLayout.visibility = View.VISIBLE
+            editModelSceneLayout.addView(textView)
+        }
+        scene.listOfHelpers.forEach { helper ->
+            val textView = TextView(context).apply {
+                textSize = 18f
+                gravity = Gravity.CENTER
+                setBackgroundColor(Color.BLACK)
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    width = helper.width
+                    height = helper.height
+                    setMargins(helper.xPosition, helper.yPosition, 0, 0)
+                }
             }
+            textView.setOnClickListener(
+                CustomClickListener(
+                    onClick = {
+                        selectedHelperId = textView.tag.toString()
+                        if (!helperEditMode) {
+                            helperEditMode = true
+                            currentHelperToEdit = textView
+                            confirmTableChanges.visibility = View.VISIBLE
+                            saveButton.visibility = View.GONE
+                            cancelButton.visibility = View.GONE
+                            addTableButton.visibility = View.GONE
+                            addSceneButton.visibility = View.GONE
+                            addHelperButton.visibility = View.GONE
+                            editModelScenesLayout.visibility = View.GONE
+                        }
+                    },
+                    onDoubleClick = {
+
+                    }
+                )
+            )
+            textView.setOnTouchListener { view, event ->
+                if (helperEditMode && currentHelperToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
+                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            // Inicializace proměnných při zahájení dotyku
+                            initialX = params.leftMargin.toFloat()
+                            initialY = params.topMargin.toFloat()
+                            initialTouchX = event.rawX
+                            initialTouchY = event.rawY
+                            true
+                        }
+
+                        MotionEvent.ACTION_MOVE -> {
+                            val deltaX = event.rawX - initialTouchX
+                            val deltaY = event.rawY - initialTouchY
+
+                            // Vypočítat nové souřadnice
+                            val newLeft = (initialX + deltaX).toInt()
+                                .coerceIn(0, editModelSceneLayout.width - view.width)
+                            val newTop = (initialY + deltaY).toInt()
+                                .coerceIn(0, editModelSceneLayout.height - view.height)
+
+                            val tempParams = FrameLayout.LayoutParams(params)
+                            tempParams.leftMargin = newLeft
+                            tempParams.topMargin = newTop
+
+                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            var canMove = true
+                            for (i in 0 until editModelSceneLayout.childCount) {
+                                val otherView = editModelSceneLayout.getChildAt(i)
+                                if (otherView != view && otherView is TextView) {
+                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherRect = Rect(
+                                        otherParams.leftMargin,
+                                        otherParams.topMargin,
+                                        otherParams.leftMargin + otherView.width,
+                                        otherParams.topMargin + otherView.height
+                                    )
+                                    val newRect = Rect(
+                                        tempParams.leftMargin,
+                                        tempParams.topMargin,
+                                        tempParams.leftMargin + view.width,
+                                        tempParams.topMargin + view.height
+                                    )
+                                    if (Rect.intersects(newRect, otherRect)) {
+                                        canMove = false
+                                        break
+                                    }
+                                }
+                            }
+
+                            if (canMove) {
+                                // Pokud nedochází k překryvu, aktualizuj souřadnice
+                                params.leftMargin = newLeft
+                                params.topMargin = newTop
+                                view.layoutParams = params
+
+                                finalX = newLeft
+                                finalY = newTop
+                            }
+
+                            true
+                        }
+
+                        else -> false
+                    }
+                } else false
+            }
+            editModelSceneLayout.addView(textView)
         }
     }
 
     private fun sceneOptionsPopup(){
 
+    }
+
+    private fun findTableById(id: String): Table?{
+        val scene = findSceneById(editModel, selectedStageId!!)
+        scene?.listOfTables?.forEach { table ->
+            if (table.id == id) return table
+        }
+        return null
+    }
+    private fun findHelperById(id: String): HelperShape?{
+        val scene = findSceneById(editModel, selectedStageId!!)
+        scene?.listOfHelpers?.forEach { helper ->
+            if (helper.id == id) return helper
+        }
+        return null
     }
 
     private fun findSceneById(model: Model, id: String): ModelScene? {
