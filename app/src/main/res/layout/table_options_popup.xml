@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline135"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline136"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline137"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline138"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline139"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline140"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline141"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline142"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <TextView
+        android:id="@+id/table_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/table"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline141"
+        app:layout_constraintEnd_toStartOf="@+id/guideline138"
+        app:layout_constraintStart_toStartOf="@+id/guideline137"
+        app:layout_constraintTop_toTopOf="@+id/guideline139" />
+
+    <Button
+        android:id="@+id/save_table_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/save"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline140"
+        app:layout_constraintEnd_toStartOf="@+id/guideline137"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toTopOf="@+id/guideline142" />
+
+    <Button
+        android:id="@+id/cancel_table_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/cancel"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline140"
+        app:layout_constraintEnd_toStartOf="@+id/guideline138"
+        app:layout_constraintStart_toStartOf="@+id/guideline137"
+        app:layout_constraintTop_toTopOf="@+id/guideline142" />
+
+    <Button
+        android:id="@+id/delete_table_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/delete"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline140"
+        app:layout_constraintEnd_toStartOf="@+id/guideline136"
+        app:layout_constraintStart_toStartOf="@+id/guideline138"
+        app:layout_constraintTop_toTopOf="@+id/guideline142" />
+
+    <TextView
+        android:id="@+id/name_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/name"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toTopOf="@+id/guideline141"
+        app:layout_constraintVertical_bias="0.035" />
+
+    <TextView
+        android:id="@+id/name_of_the_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/name_textview"
+        app:layout_constraintVertical_bias="0.02" />
+
+    <Button
+        android:id="@+id/change_table_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/change_name"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/name_of_the_table"
+        app:layout_constraintVertical_bias="0.041" />
+
+    <TextView
+        android:id="@+id/height_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/height"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/change_table_name"
+        app:layout_constraintVertical_bias="0.069" />
+
+    <TextView
+        android:id="@+id/height_of_the_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/height_textview"
+        app:layout_constraintVertical_bias="0.032" />
+
+    <Button
+        android:id="@+id/change_table_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/change_height"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/height_of_the_table"
+        app:layout_constraintVertical_bias="0.025" />
+
+    <TextView
+        android:id="@+id/width_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/width"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/change_table_height"
+        app:layout_constraintVertical_bias="0.102" />
+
+    <TextView
+        android:id="@+id/width_of_the_table"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text=""
+        android:textSize="10sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/width_textview"
+        app:layout_constraintVertical_bias="0.064" />
+
+    <Button
+        android:id="@+id/change_table_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/change_width"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline142"
+        app:layout_constraintStart_toStartOf="@+id/guideline135"
+        app:layout_constraintTop_toBottomOf="@+id/width_of_the_table"
+        app:layout_constraintVertical_bias="0.095" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -62,4 +62,9 @@
     <string name="table_name">Table name</string>
     <string name="scrollable_scene_list">scrollable_scene_list</string>
     <string name="done">Done</string>
+    <string name="table">Table</string>
+    <string name="change_height">Change height</string>
+    <string name="height">Height:</string>
+    <string name="change_width">Change width</string>
+    <string name="width">Width:</string>
 </resources>
