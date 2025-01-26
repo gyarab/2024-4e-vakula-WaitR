@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline143"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline144"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline145"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline146"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.66" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline147"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline148"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline149"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.15" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline150"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <TextView
+        android:id="@+id/helper_textview"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/helper"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline149"
+        app:layout_constraintEnd_toStartOf="@+id/guideline146"
+        app:layout_constraintStart_toStartOf="@+id/guideline145"
+        app:layout_constraintTop_toTopOf="@+id/guideline147" />
+
+    <Button
+        android:id="@+id/save_helper_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/save"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline148"
+        app:layout_constraintEnd_toStartOf="@+id/guideline145"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toTopOf="@+id/guideline150" />
+
+    <Button
+        android:id="@+id/cancel_helper_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/cancel"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline148"
+        app:layout_constraintEnd_toStartOf="@+id/guideline146"
+        app:layout_constraintStart_toStartOf="@+id/guideline145"
+        app:layout_constraintTop_toTopOf="@+id/guideline150" />
+
+    <Button
+        android:id="@+id/delete_helper_options_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/delete"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline148"
+        app:layout_constraintEnd_toStartOf="@+id/guideline144"
+        app:layout_constraintStart_toStartOf="@+id/guideline146"
+        app:layout_constraintTop_toTopOf="@+id/guideline150" />
+
+    <TextView
+        android:id="@+id/height_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/height"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toTopOf="@+id/guideline149"
+        app:layout_constraintVertical_bias="0.035" />
+
+    <TextView
+        android:id="@+id/height_of_the_helper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toBottomOf="@+id/height_textview"
+        app:layout_constraintVertical_bias="0.02" />
+
+    <Button
+        android:id="@+id/change_helper_height"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/change_height"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toBottomOf="@+id/height_of_the_helper"
+        app:layout_constraintVertical_bias="0.041" />
+
+    <TextView
+        android:id="@+id/width_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/width"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toBottomOf="@+id/change_helper_height"
+        app:layout_constraintVertical_bias="0.069" />
+
+    <TextView
+        android:id="@+id/width_of_the_helper"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text=""
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toBottomOf="@+id/width_textview"
+        app:layout_constraintVertical_bias="0.032" />
+
+    <Button
+        android:id="@+id/change_helper_width"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/change_width"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline150"
+        app:layout_constraintStart_toStartOf="@+id/guideline143"
+        app:layout_constraintTop_toBottomOf="@+id/width_of_the_helper"
+        app:layout_constraintVertical_bias="0.025" />
+</androidx.constraintlayout.widget.ConstraintLayout>
