@@ -47,8 +47,7 @@ class Model_view : Fragment() {
     private val userId = currentUser?.uid
     private lateinit var noStagesTODisplayTextView: TextView
     private lateinit var addStageButtonIfNon: ImageButton
-    private var dynamicLinearLayout: LinearLayout? = null
-    private lateinit var viewModel: ModelViewModel
+    private lateinit var dynamicLinearLayout: LinearLayout
     private lateinit var editModelDialoge: Dialog
     private lateinit var editModelScenesLayout: LinearLayout
     private lateinit var editModelSceneLayout: FrameLayout
@@ -65,8 +64,6 @@ class Model_view : Fragment() {
     private lateinit var currentHelperToEdit: TextView
     private var finalX: Int = 0
     private var finalY: Int = 0
-    private var finalWidth: Int = 0
-    private var finalHeight: Int = 0
     private var selectedStageId: String? = null
     private var selectedTableId: String? = null
     private var selectedHelperId: String? = null
@@ -85,13 +82,11 @@ class Model_view : Fragment() {
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-    viewModel = ViewModelProvider(this).get(ModelViewModel::class.java)
 
     // Cekati na predani argumentu z aktivity do promene na CompanyID
     arguments?.getString(COMPANY_ID)?.let {
         CompanyID = it
     }
-    checkIfSceneExists()
     }
 // zde psat kod souvisejici s UI
     override fun onCreateView(
@@ -164,6 +159,12 @@ class Model_view : Fragment() {
             showEditModelPopUp()
         }
     }
+    dynamicLinearLayout = LinearLayout(context).apply {
+        orientation = LinearLayout.VERTICAL
+        gravity = Gravity.CENTER
+        addView(noStagesTODisplayTextView)
+        addView(addStageButtonIfNon)
+    }
     checkIfSceneExists()
         return view
     }
@@ -179,6 +180,9 @@ class Model_view : Fragment() {
         helpButton.setOnClickListener {
             //TODO dodelat help tlacitko
         }
+        // nacte model z database ktery nasledne vykresli
+        fetchModel()
+        checkIfSceneExists()
     }
 
     private fun showEditModelPopUp(){
@@ -470,6 +474,7 @@ class Model_view : Fragment() {
                 )
             )
             editModelScenesLayout.addView(textViewForScene)
+            drawEditScenesToBar()
             dialog.dismiss()
         }
         dialog.show()
@@ -641,7 +646,8 @@ class Model_view : Fragment() {
                         }
                     },
                     onDoubleClick = {
-
+                        selectedTableId = textView.tag.toString()
+                        tableOptionsPopup()
                     }
                 )
             )
@@ -729,6 +735,7 @@ class Model_view : Fragment() {
                     height = helper.height
                     setMargins(helper.xPosition, helper.yPosition, 0, 0)
                 }
+                tag = helper.id
             }
             textView.setOnClickListener(
                 CustomClickListener(
@@ -747,7 +754,8 @@ class Model_view : Fragment() {
                         }
                     },
                     onDoubleClick = {
-
+                        selectedHelperId = textView.tag.toString()
+                        helperOptionsPopup()
                     }
                 )
             )
@@ -1105,8 +1113,8 @@ class Model_view : Fragment() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -1151,8 +1159,8 @@ class Model_view : Fragment() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -1208,7 +1216,7 @@ class Model_view : Fragment() {
 
         // Reference na prvky v popup layoutu
         val heightOfTheHelper = dialog.findViewById<TextView>(R.id.height_of_the_helper)
-        heightOfTheHelper.text = heightOfTheHelper.toString()
+        heightOfTheHelper.text = helperHeight.toString()
         val widthOfTheHelper = dialog.findViewById<TextView>(R.id.width_of_the_helper)
         widthOfTheHelper.text = helperWidth.toString()
         val saveButton = dialog.findViewById<Button>(R.id.save_helper_options_button)
@@ -1266,8 +1274,8 @@ class Model_view : Fragment() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -1312,8 +1320,8 @@ class Model_view : Fragment() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -1408,7 +1416,7 @@ class Model_view : Fragment() {
     private fun validateHelperPosition(whichPar: String ,parameter: Int): Boolean {
 
         // Najdi aktuální prvek podle jeho ID
-        val selectedHelper = findTableById(selectedHelperId!!) ?: return false
+        val selectedHelper = findHelperById(selectedHelperId!!) ?: return false
 
         // Získej parametry aktuálního prvku
         val selectedLeft = selectedHelper.xPosition
@@ -1434,10 +1442,10 @@ class Model_view : Fragment() {
 
         // Projdi všechny ostatní prvky a zkontroluj překryvy
         for (child in editModelSceneLayout.children) {
-            val otherTable = findTableById(child.id.toString()) ?: continue
+            val otherTable = findHelperById(child.id.toString()) ?: continue
 
             // Vynech aktuálně kontrolovaný prvek
-            if (otherTable.id == selectedTableId) continue
+            if (otherTable.id == selectedHelperId) continue
 
             // Získej parametry ostatního prvku
             val otherLeft = otherTable.xPosition
@@ -1672,58 +1680,15 @@ class Model_view : Fragment() {
         return null
     }
 
-    private fun switchFrameLayoutContent(sourceLayout: FrameLayout, targetLayout: FrameLayout) {
-        // Odstrani všechny děti z cílového FrameLayout
-        targetLayout.removeAllViews()
 
-        // Přida všechny děti ze zdrojového FrameLayout do cílového FrameLayout
-        for (i in 0 until sourceLayout.childCount) {
-            val child = sourceLayout.getChildAt(i)
-            val clone = cloneView(child)
-            targetLayout.addView(clone)
-        }
-    }
 
-    private fun cloneView(view: View): View {
-        val parent = view.parent
-        if (parent is ViewGroup) {
-            parent.removeView(view)
-        }
-        return view
-    }
 
-    override fun onResume() {
-        super.onResume()
-        updateUI(viewModel.isSceneAvailable)
-    }
+
+
     // metoda ktera zkotroluje jestli jsou vytvorene sceny pro zobrazeni
     private fun checkIfSceneExists(){
-        val ref = CompanyID?.let { db.child("companies").child(it) }
-        ref?.get()?.addOnSuccessListener { dataSnapshot ->
-            if (isAdded) {
-                viewModel.isSceneAvailable = dataSnapshot.hasChild("ModelView")
-                updateUI(viewModel.isSceneAvailable)
-            }
-        }?.addOnFailureListener { exception ->
-            Log.e("Firebase", "Error getting data: ", exception)
-        }
-    }
-    private fun updateUI(isSceneAvailable: Boolean) {
-        if (isSceneAvailable) {
-            dynamicLinearLayout?.let { currentScene.removeView(it) }
-            dynamicLinearLayout = null
-        } else {
-            if (dynamicLinearLayout == null) {
-                dynamicLinearLayout = LinearLayout(context).apply {
-                    orientation = LinearLayout.VERTICAL
-                    gravity = Gravity.CENTER
-                    addView(noStagesTODisplayTextView)
-                    addView(addStageButtonIfNon)
-                }
-            }
-            dynamicLinearLayout?.parent?.let {
-                (it as ViewGroup).removeView(dynamicLinearLayout)
-            }
+        if (model.listOfScenes.isEmpty()){
+            currentScene.removeAllViews()
             currentScene.addView(dynamicLinearLayout)
         }
     }
