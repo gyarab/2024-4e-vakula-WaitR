@@ -78,6 +78,15 @@ class Model_view : Fragment() {
     private var newHelperHeight: Int? = null
     private var newHelperWidth: Int? = null
     private var newSceneName: String? = null
+    private lateinit var tableOptionsDialog: Dialog
+    private lateinit var nameOfTheTable: TextView
+    private lateinit var heightOfTheTable: TextView
+    private lateinit var widthOfTheTable: TextView
+    private lateinit var helperOptionsDialog: Dialog
+    private lateinit var heightOfTheHelper: TextView
+    private lateinit var widthOfTheHelper: TextView
+    private lateinit var sceneOptionsDialog: Dialog
+    private lateinit var nameOfTheScene: TextView
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,10 +111,23 @@ class Model_view : Fragment() {
     editModelScenesLayout = scrollableView.findViewById(R.id.linearlayout_for_scenes)
     editModelSceneLayout = editModelDialoge.findViewById(R.id.edit_model_canvas_layout)
     confirmTableChanges = editModelDialoge.findViewById(R.id.confirm_table_changes_button)
+    tableOptionsDialog = Dialog(requireContext())
+    tableOptionsDialog.setContentView(R.layout.table_options_popup)
+    nameOfTheTable = tableOptionsDialog.findViewById(R.id.name_of_the_table)
+    heightOfTheTable = tableOptionsDialog.findViewById(R.id.height_of_the_table)
+    widthOfTheTable = tableOptionsDialog.findViewById(R.id.width_of_the_table)
+    helperOptionsDialog = Dialog(requireContext())
+    helperOptionsDialog.setContentView(R.layout.helper_options_popup)
+    heightOfTheHelper = helperOptionsDialog.findViewById(R.id.height_of_the_helper)
+    widthOfTheHelper = helperOptionsDialog.findViewById(R.id.width_of_the_helper)
+    sceneOptionsDialog = Dialog(requireContext())
+    sceneOptionsDialog.setContentView(R.layout.scene_options_popup)
+    nameOfTheScene = sceneOptionsDialog.findViewById(R.id.name_of_the_scene)
+
     confirmTableChanges.setOnClickListener {
         if (tableEditMode){
             tableEditMode = false
-            val table = findTableById(selectedTableId!!)
+            val table = findTableById(editModel, selectedTableId!!)
             table?.xPosition = finalX
             table?.yPosition = finalY
 
@@ -120,7 +142,7 @@ class Model_view : Fragment() {
         }
         if (helperEditMode){
             helperEditMode = false
-            val helper = findHelperById(selectedHelperId!!)
+            val helper = findHelperById(editModel, selectedHelperId!!)
             helper?.xPosition = finalX
             helper?.yPosition = finalY
 
@@ -883,20 +905,15 @@ class Model_view : Fragment() {
         val scene = findSceneById(editModel, selectedStageId!!)
         val sceneName = scene?.name
 
-        // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.scene_options_popup)
-
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        sceneOptionsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             (resources.displayMetrics.heightPixels * 0.9).toInt()
         )
 
         // Reference na prvky v popup layoutu
-        val nameOfTheTable = dialog.findViewById<TextView>(R.id.name_of_the_table)
-        nameOfTheTable.text = sceneName
-        val saveButton = dialog.findViewById<Button>(R.id.save_scene_options_button)
+        nameOfTheScene.text = sceneName
+        val saveButton = sceneOptionsDialog.findViewById<Button>(R.id.save_scene_options_button)
         saveButton.setOnClickListener {
             if (newSceneName == null && sceneName != null){
                 scene.name = sceneName
@@ -904,63 +921,76 @@ class Model_view : Fragment() {
             if (newSceneName != null){
                 scene?.name = newSceneName.toString()
             }
+            drawEditScenesToBar()
             newSceneName = null
-            dialog.dismiss()
+            sceneOptionsDialog.dismiss()
         }
-        val cancelButton = dialog.findViewById<Button>(R.id.cancel_scene_options_button)
+        val cancelButton = sceneOptionsDialog.findViewById<Button>(R.id.cancel_scene_options_button)
         cancelButton.setOnClickListener {
             newSceneName = null
-            dialog.dismiss()
+            sceneOptionsDialog.dismiss()
         }
-        val deleteButton = dialog.findViewById<Button>(R.id.delete_scene_options_button)
+        val deleteButton = sceneOptionsDialog.findViewById<Button>(R.id.delete_scene_options_button)
         deleteButton.setOnClickListener {
-            newSceneName = null
-            editModel.deleteScene(selectedStageId!!)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Delete this scene")
+            builder.setMessage("Are you sure you want to delete this scene?")
 
-            val viewToRemove = findViewWithTag(editModelScenesLayout, selectedStageId!!)
-            val layout = viewToRemove?.parent
-            if (layout is LinearLayout){
-                layout.removeView(viewToRemove)
-            }
-            //prepne na jinou scenu
-            if (editModel.listOfScenes.isNotEmpty()){
-                selectedStageId = editModel.listOfScenes.get(0).id
-                drawEditScene()
-            } else {
-                val textView = TextView(context).apply {
-                    this.text = "No Scene"
-                    this.textSize = 18f // Velikost textu
-                    this.setTextColor(Color.LTGRAY) // Barva textu
+            builder.setPositiveButton("Yes") { dialog, _ ->
+                newSceneName = null
+                editModel.deleteScene(selectedStageId!!)
 
+                val viewToRemove = findViewWithTag(editModelScenesLayout, selectedStageId!!)
+                val layout = viewToRemove?.parent
+                if (layout is LinearLayout){
+                    layout.removeView(viewToRemove)
                 }
-                val params = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
-                )
+                //prepne na jinou scenu
+                if (editModel.listOfScenes.isNotEmpty()){
+                    selectedStageId = editModel.listOfScenes.get(0).id
+                    drawEditScene()
+                } else {
+                    val textView = TextView(context).apply {
+                        this.text = "No Scene"
+                        this.textSize = 18f // Velikost textu
+                        this.setTextColor(Color.LTGRAY) // Barva textu
 
-                editModelSceneLayout.addView(textView, params)
+                    }
+                    val params = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    )
 
-                textView.post {
-                    val parentWidth = editModelSceneLayout.width
-                    val parentHeight = editModelSceneLayout.height
-                    val textViewWidth = textView.width
-                    val textViewHeight = textView.height
-                    val leftMargin = (parentWidth - textViewWidth) / 2
-                    val topMargin = (parentHeight - textViewHeight) / 2
+                    editModelSceneLayout.addView(textView, params)
 
-                    params.leftMargin = leftMargin
-                    params.topMargin = topMargin
+                    textView.post {
+                        val parentWidth = editModelSceneLayout.width
+                        val parentHeight = editModelSceneLayout.height
+                        val textViewWidth = textView.width
+                        val textViewHeight = textView.height
+                        val leftMargin = (parentWidth - textViewWidth) / 2
+                        val topMargin = (parentHeight - textViewHeight) / 2
 
-                    textView.layoutParams = params
+                        params.leftMargin = leftMargin
+                        params.topMargin = topMargin
+
+                        textView.layoutParams = params
+                    }
                 }
+                dialog.dismiss()
+                sceneOptionsDialog.dismiss()
             }
-            dialog.dismiss()
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val alertDialog = builder.create()
+            alertDialog.show()
         }
-        val changeNameButton = dialog.findViewById<Button>(R.id.change_scene_name)
+        val changeNameButton = sceneOptionsDialog.findViewById<Button>(R.id.change_scene_name)
         changeNameButton.setOnClickListener {
             changeSceneName()
         }
-        dialog.show()
+        sceneOptionsDialog.show()
     }
 
     private fun changeSceneName(){
@@ -987,36 +1017,31 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newSceneName = newName
+            nameOfTheScene.text = newSceneName
             dialog.dismiss()
         }
         dialog.show()
     }
 
     private fun tableOptionsPopup(){
-        val table = findTableById(selectedTableId!!)
+        val table = findTableById(editModel, selectedTableId!!)
         val scene = findSceneById(editModel, selectedStageId!!)
         val tableName = table?.name
         val tableHeight = table?.height
         val tableWidth = table?.width
 
-        // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.table_options_popup)
 
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        tableOptionsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             (resources.displayMetrics.heightPixels * 0.9).toInt()
         )
 
         // Reference na prvky v popup layoutu
-        val nameOfTheTable = dialog.findViewById<TextView>(R.id.name_of_the_table)
         nameOfTheTable.text = tableName
-        val heightOfTheTable = dialog.findViewById<TextView>(R.id.height_of_the_table)
         heightOfTheTable.text = tableHeight.toString()
-        val widthOfTheTable = dialog.findViewById<TextView>(R.id.width_of_the_table)
         widthOfTheTable.text = tableWidth.toString()
-        val saveButton = dialog.findViewById<Button>(R.id.save_table_options_button)
+        val saveButton = tableOptionsDialog.findViewById<Button>(R.id.save_table_options_button)
         saveButton.setOnClickListener {
             if (newTableName == null && tableName != null){
                 table.name = tableName
@@ -1036,45 +1061,58 @@ class Model_view : Fragment() {
             if (newTableWidth != null){
                 table?.width = newTableWidth!!.toInt()
             }
+            drawEditScene()
             newTableName = null
             newTableHeight = null
             newTableWidth = null
-            dialog.dismiss()
+            tableOptionsDialog.dismiss()
         }
-        val cancelButton = dialog.findViewById<Button>(R.id.cancel_table_options_button)
+        val cancelButton = tableOptionsDialog.findViewById<Button>(R.id.cancel_table_options_button)
         cancelButton.setOnClickListener {
             newTableName = null
             newTableHeight = null
             newTableWidth = null
-            dialog.dismiss()
+            tableOptionsDialog.dismiss()
         }
-        val deleteButton = dialog.findViewById<Button>(R.id.delete_table_options_button)
+        val deleteButton = tableOptionsDialog.findViewById<Button>(R.id.delete_table_options_button)
         deleteButton.setOnClickListener {
-            newTableName = null
-            newTableHeight = null
-            newTableWidth = null
-            scene?.deleteTable(selectedTableId!!)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Delete this table")
+            builder.setMessage("Are you sure you want to delete this table?")
 
-            val viewToRemove = findViewWithTag(editModelSceneLayout, selectedTableId!!)
-            val layout = viewToRemove?.parent
-            if (layout is FrameLayout){
-                layout.removeView(viewToRemove)
+            builder.setPositiveButton("Yes") { dialog, _ ->
+                newTableName = null
+                newTableHeight = null
+                newTableWidth = null
+                scene?.deleteTable(selectedTableId!!)
+
+                val viewToRemove = findViewWithTag(editModelSceneLayout, selectedTableId!!)
+                val layout = viewToRemove?.parent
+                if (layout is FrameLayout){
+                    layout.removeView(viewToRemove)
+                }
+                dialog.dismiss()
+                tableOptionsDialog.dismiss()
             }
-            dialog.dismiss()
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            val alertDialog = builder.create()
+            alertDialog.show()
         }
-        val changeNameButton = dialog.findViewById<Button>(R.id.change_table_name)
+        val changeNameButton = tableOptionsDialog.findViewById<Button>(R.id.change_table_name)
         changeNameButton.setOnClickListener {
             changeTableName()
         }
-        val changeHeightButton = dialog.findViewById<Button>(R.id.change_table_height)
+        val changeHeightButton = tableOptionsDialog.findViewById<Button>(R.id.change_table_height)
         changeHeightButton.setOnClickListener {
             changeTableHeight()
         }
-        val changeWidthButton = dialog.findViewById<Button>(R.id.change_table_width)
+        val changeWidthButton = tableOptionsDialog.findViewById<Button>(R.id.change_table_width)
         changeWidthButton.setOnClickListener {
             changeTableWidth()
         }
-        dialog.show()
+        tableOptionsDialog.show()
     }
 
     private fun changeTableName(){
@@ -1101,6 +1139,7 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newTableName = newName
+            nameOfTheTable.text = newTableName
             dialog.dismiss()
         }
         dialog.show()
@@ -1147,6 +1186,7 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newTableHeight = tableHeight
+            heightOfTheTable.text = newTableHeight.toString()
             dialog.dismiss()
         }
         dialog.show()
@@ -1193,33 +1233,28 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newTableWidth = tableWidth
+            widthOfTheTable.text = newTableWidth.toString()
             dialog.dismiss()
         }
         dialog.show()
     }
 
     private fun helperOptionsPopup(){
-        val helper = findHelperById(selectedHelperId!!)
+        val helper = findHelperById(editModel, selectedHelperId!!)
         val scene = findSceneById(editModel, selectedStageId!!)
         val helperHeight = helper?.height
         val helperWidth = helper?.width
 
-        // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.helper_options_popup)
-
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        helperOptionsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             (resources.displayMetrics.heightPixels * 0.9).toInt()
         )
 
         // Reference na prvky v popup layoutu
-        val heightOfTheHelper = dialog.findViewById<TextView>(R.id.height_of_the_helper)
         heightOfTheHelper.text = helperHeight.toString()
-        val widthOfTheHelper = dialog.findViewById<TextView>(R.id.width_of_the_helper)
         widthOfTheHelper.text = helperWidth.toString()
-        val saveButton = dialog.findViewById<Button>(R.id.save_helper_options_button)
+        val saveButton = helperOptionsDialog.findViewById<Button>(R.id.save_helper_options_button)
         saveButton.setOnClickListener {
             if (newHelperHeight == null && helperHeight != null) {
                 helper.height = helperHeight
@@ -1233,38 +1268,52 @@ class Model_view : Fragment() {
             if (newHelperWidth != null) {
                 helper?.width = newHelperWidth!!.toInt()
             }
+            drawEditScene()
             newHelperHeight = null
             newHelperWidth= null
-            dialog.dismiss()
+            helperOptionsDialog.dismiss()
         }
-        val cancelButton = dialog.findViewById<Button>(R.id.cancel_helper_options_button)
+        val cancelButton = helperOptionsDialog.findViewById<Button>(R.id.cancel_helper_options_button)
         cancelButton.setOnClickListener {
             newHelperHeight = null
             newHelperWidth= null
-            dialog.dismiss()
+            helperOptionsDialog.dismiss()
         }
-        val deleteButton = dialog.findViewById<Button>(R.id.delete_helper_options_button)
+        val deleteButton = helperOptionsDialog.findViewById<Button>(R.id.delete_helper_options_button)
         deleteButton.setOnClickListener {
-            newHelperHeight = null
-            newHelperWidth = null
-            scene?.deleteHelper(selectedHelperId!!)
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Cancel changes")
+            builder.setMessage("Are you sure you want to cancel all the changes?")
 
-            val viewToRemove = findViewWithTag(editModelSceneLayout, selectedHelperId!!)
-            val layout = viewToRemove?.parent
-            if (layout is FrameLayout){
-                layout.removeView(viewToRemove)
+            builder.setPositiveButton("Yes") { dialog, _ ->
+                newHelperHeight = null
+                newHelperWidth = null
+                scene?.deleteHelper(selectedHelperId!!)
+
+                val viewToRemove = findViewWithTag(editModelSceneLayout, selectedHelperId!!)
+                val layout = viewToRemove?.parent
+                if (layout is FrameLayout){
+                    layout.removeView(viewToRemove)
+                }
+                dialog.dismiss()
+                helperOptionsDialog.dismiss()
             }
-            dialog.dismiss()
+            builder.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val alertDialog = builder.create()
+            alertDialog.show()
         }
-        val changeHeightButton = dialog.findViewById<Button>(R.id.change_helper_height)
+        val changeHeightButton = helperOptionsDialog.findViewById<Button>(R.id.change_helper_height)
         changeHeightButton.setOnClickListener {
             changeHelperHeight()
         }
-        val changeWidthButton = dialog.findViewById<Button>(R.id.change_helper_width)
+        val changeWidthButton = helperOptionsDialog.findViewById<Button>(R.id.change_helper_width)
         changeWidthButton.setOnClickListener {
             changeHelperWidth()
         }
-        dialog.show()
+        helperOptionsDialog.show()
     }
 
     private fun changeHelperHeight(){
@@ -1308,6 +1357,7 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newHelperHeight = helperHeight
+            heightOfTheHelper.text = newHelperHeight.toString()
             dialog.dismiss()
         }
         dialog.show()
@@ -1354,6 +1404,7 @@ class Model_view : Fragment() {
                 return@setOnClickListener
             }
             newHelperWidth = helperWidth
+            widthOfTheHelper.text = newHelperWidth.toString()
             dialog.dismiss()
         }
         dialog.show()
@@ -1362,7 +1413,7 @@ class Model_view : Fragment() {
     private fun validateTablePosition(whichPar: String ,parameter: Int): Boolean {
 
         // Najdi aktuální prvek podle jeho ID
-        val selectedTable = findTableById(selectedTableId!!) ?: return false
+        val selectedTable = findTableById(editModel, selectedTableId!!) ?: return false
 
         // Získej parametry aktuálního prvku
         val selectedLeft = selectedTable.xPosition
@@ -1388,7 +1439,7 @@ class Model_view : Fragment() {
 
         // Projdi všechny ostatní prvky a zkontroluj překryvy
         for (child in editModelSceneLayout.children) {
-            val otherTable = findTableById(child.id.toString()) ?: continue
+            val otherTable = findTableById(editModel, child.id.toString()) ?: continue
 
             // Vynech aktuálně kontrolovaný prvek
             if (otherTable.id == selectedTableId) continue
@@ -1416,7 +1467,7 @@ class Model_view : Fragment() {
     private fun validateHelperPosition(whichPar: String ,parameter: Int): Boolean {
 
         // Najdi aktuální prvek podle jeho ID
-        val selectedHelper = findHelperById(selectedHelperId!!) ?: return false
+        val selectedHelper = findHelperById(editModel, selectedHelperId!!) ?: return false
 
         // Získej parametry aktuálního prvku
         val selectedLeft = selectedHelper.xPosition
@@ -1442,7 +1493,7 @@ class Model_view : Fragment() {
 
         // Projdi všechny ostatní prvky a zkontroluj překryvy
         for (child in editModelSceneLayout.children) {
-            val otherTable = findHelperById(child.id.toString()) ?: continue
+            val otherTable = findHelperById(editModel, child.id.toString()) ?: continue
 
             // Vynech aktuálně kontrolovaný prvek
             if (otherTable.id == selectedHelperId) continue
@@ -1645,15 +1696,15 @@ class Model_view : Fragment() {
         }
     }
 
-    private fun findTableById(id: String): Table?{
-        val scene = findSceneById(editModel, selectedStageId!!)
+    private fun findTableById(model: Model, id: String): Table?{
+        val scene = findSceneById(model, selectedStageId!!)
         scene?.listOfTables?.forEach { table ->
             if (table.id == id) return table
         }
         return null
     }
-    private fun findHelperById(id: String): HelperShape?{
-        val scene = findSceneById(editModel, selectedStageId!!)
+    private fun findHelperById(model: Model,id: String): HelperShape?{
+        val scene = findSceneById(model, selectedStageId!!)
         scene?.listOfHelpers?.forEach { helper ->
             if (helper.id == id) return helper
         }

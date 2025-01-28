@@ -69,4 +69,5 @@
     <string name="width">Width:</string>
     <string name="helper">Helper</string>
     <string name="scene">Scene</string>
+    <string name="Close">Close</string>
 </resources>

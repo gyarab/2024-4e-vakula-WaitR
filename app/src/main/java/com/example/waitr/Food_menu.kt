@@ -41,6 +41,12 @@ class Food_menu : Fragment() {
     private var newItemDescription: String? = null
     private lateinit var noMenuTODisplayTextView: TextView
     private lateinit var addMenuButtonIfNon: ImageButton
+    private lateinit var itemOptionsDialog: Dialog
+    private lateinit var nameOfTheItem: TextView
+    private lateinit var priceOfTheItem: TextView
+    private lateinit var descriptionOfTheItem: TextView
+    private lateinit var groupOptionsDialog: Dialog
+    private lateinit var nameOfTheGroup: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +65,14 @@ class Food_menu : Fragment() {
         editMenuDialoge = Dialog(requireContext())
         editMenuDialoge.setContentView(R.layout.edit_food_menu_popup)
         editMenuLayout = editMenuDialoge.findViewById(R.id.edit_menu_layout)
+        itemOptionsDialog = Dialog(requireContext())
+        itemOptionsDialog.setContentView(R.layout.item_option_popup)
+        nameOfTheItem = itemOptionsDialog.findViewById(R.id.name_of_the_item)
+        priceOfTheItem = itemOptionsDialog.findViewById(R.id.price_of_the_item)
+        descriptionOfTheItem = itemOptionsDialog.findViewById(R.id.discription_of_the_item)
+        groupOptionsDialog = Dialog(requireContext())
+        groupOptionsDialog.setContentView(R.layout.group_option_popup)
+        nameOfTheGroup = groupOptionsDialog.findViewById(R.id.name_of_the_group)
         // Inflate the layout for this fragment
         return view
     }
@@ -320,23 +334,17 @@ class Food_menu : Fragment() {
         val itemName = item?.name
         val itemPrice = item?.price
         val itemDescription = item?.description
-        // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.item_option_popup)
 
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        itemOptionsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
             (resources.displayMetrics.heightPixels * 0.9).toInt()
         )
         // Reference na prvky v popup layoutu
-        val nameOfTheItem = dialog.findViewById<TextView>(R.id.name_of_the_item)
         nameOfTheItem.text = itemName
-        val priceOfTheItem = dialog.findViewById<TextView>(R.id.price_of_the_item)
         priceOfTheItem.text = itemPrice.toString()
-        val descriptionOfTheItem = dialog.findViewById<TextView>(R.id.discription_of_the_item)
         descriptionOfTheItem.text = itemDescription
-        val saveButton = dialog.findViewById<Button>(R.id.save_item_options_button)
+        val saveButton = itemOptionsDialog.findViewById<Button>(R.id.save_item_options_button)
         saveButton.setOnClickListener {
             if (newItemname == null && itemName != null){
                 item.name = itemName
@@ -356,19 +364,20 @@ class Food_menu : Fragment() {
             if (newItemDescription != null){
                 item?.description = newItemDescription.toString()
             }
+            updateEditMenuUI(editMenuLayout, editMenu)
             newItemname = null
             newItemPrice = null
             newItemDescription = null
-            dialog.dismiss()
+            itemOptionsDialog.dismiss()
         }
-        val cancelButton = dialog.findViewById<Button>(R.id.cancel_item_options_button)
+        val cancelButton = itemOptionsDialog.findViewById<Button>(R.id.cancel_item_options_button)
         cancelButton.setOnClickListener {
             newItemname = null
             newItemPrice = null
             newItemDescription = null
-            dialog.dismiss()
+            itemOptionsDialog.dismiss()
         }
-        val deleteButton = dialog.findViewById<Button>(R.id.delete_item_options_button)
+        val deleteButton = itemOptionsDialog.findViewById<Button>(R.id.delete_item_options_button)
         deleteButton.setOnClickListener {
             newItemname = null
             newItemPrice = null
@@ -380,21 +389,21 @@ class Food_menu : Fragment() {
             if (layout is LinearLayout){
                 layout.removeView(viewToRemove)
             }
-            dialog.dismiss()
+            itemOptionsDialog.dismiss()
         }
-        val changeNameButton = dialog.findViewById<Button>(R.id.change_item_name)
+        val changeNameButton = itemOptionsDialog.findViewById<Button>(R.id.change_item_name)
         changeNameButton.setOnClickListener {
             changeItemName()
         }
-        val changePriceButton = dialog.findViewById<Button>(R.id.change_item_price)
+        val changePriceButton = itemOptionsDialog.findViewById<Button>(R.id.change_item_price)
         changePriceButton.setOnClickListener {
             changeItemPrice()
         }
-        val changeDescriptionButton = dialog.findViewById<Button>(R.id.change_item_discription)
+        val changeDescriptionButton = itemOptionsDialog.findViewById<Button>(R.id.change_item_discription)
         changeDescriptionButton.setOnClickListener {
             changeItemDescription()
         }
-        dialog.show()
+        itemOptionsDialog.show()
     }
     private fun changeItemName(){
         // Vytvoření dialogu
@@ -420,6 +429,7 @@ class Food_menu : Fragment() {
                 return@setOnClickListener
             }
             newItemname = newName
+            nameOfTheItem.text = newItemname
             dialog.dismiss()
         }
         dialog.show()
@@ -454,6 +464,7 @@ class Food_menu : Fragment() {
                 return@setOnClickListener
             }
             newItemPrice = itemPrice
+            priceOfTheItem.text = newItemPrice.toString()
             dialog.dismiss()
         }
         dialog.show()
@@ -482,6 +493,33 @@ class Food_menu : Fragment() {
                 return@setOnClickListener
             }
             newItemDescription = newDescription
+            descriptionOfTheItem.text = newItemDescription
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun itemDisplayPopup(){
+        val item = findItemById(menu, selectedItemID!!)
+        val itemName = item?.name
+        val itemPrice = item?.price
+        val itemDescription = item?.description
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.display_item_layout)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.9).toInt(),
+            (resources.displayMetrics.heightPixels * 0.9).toInt()
+        )
+
+        val displayName = dialog.findViewById<TextView>(R.id.item_name_display)
+        displayName.text = itemName
+        val displayPrice = dialog.findViewById<TextView>(R.id.item_price_display)
+        displayPrice.text = itemPrice.toString()
+        val displayDescription = dialog.findViewById<TextView>(R.id.item_discription_display)
+        displayDescription.text = itemDescription
+        val closeButton = dialog.findViewById<Button>(R.id.close_item_display)
+        closeButton.setOnClickListener {
             dialog.dismiss()
         }
         dialog.show()
@@ -491,19 +529,14 @@ class Food_menu : Fragment() {
         val menuGroup = findGroupById(editMenu, groupId)
         val menuGroupName = menuGroup?.name
 
-        // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
-        dialog.setContentView(R.layout.group_option_popup)
-
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        groupOptionsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.7).toInt(),
             (resources.displayMetrics.heightPixels * 0.6).toInt()
         )
         // Reference na prvky v popup layoutu
-        val nameOfTheGroup = dialog.findViewById<TextView>(R.id.name_of_the_group)
         nameOfTheGroup.text = menuGroupName
-        val saveButton = dialog.findViewById<Button>(R.id.save_group_options_button)
+        val saveButton = groupOptionsDialog.findViewById<Button>(R.id.save_group_options_button)
         saveButton.setOnClickListener {
             if (newGroupname == null && menuGroupName != null){
                 menuGroup.name = menuGroupName
@@ -516,14 +549,14 @@ class Food_menu : Fragment() {
                 headerToUpdate.text = newGroupname
             }
             newGroupname = null
-            dialog.dismiss()
+            groupOptionsDialog.dismiss()
         }
-        val cancelButton = dialog.findViewById<Button>(R.id.cancel_group_options_button)
+        val cancelButton = groupOptionsDialog.findViewById<Button>(R.id.cancel_group_options_button)
         cancelButton.setOnClickListener {
             newGroupname = null
-            dialog.dismiss()
+            groupOptionsDialog.dismiss()
         }
-        val deleteButton = dialog.findViewById<Button>(R.id.delete_group_options_button)
+        val deleteButton = groupOptionsDialog.findViewById<Button>(R.id.delete_group_options_button)
         deleteButton.setOnClickListener {
             newGroupname = null
             editMenu.deleteGroup(groupId)
@@ -536,13 +569,13 @@ class Food_menu : Fragment() {
                     layout.removeView(layoutToRemove)
                 }
             }
-            dialog.dismiss()
+            groupOptionsDialog.dismiss()
         }
-        val changeNameButton = dialog.findViewById<Button>(R.id.change_group_name)
+        val changeNameButton = groupOptionsDialog.findViewById<Button>(R.id.change_group_name)
         changeNameButton.setOnClickListener {
             changeGroupName()
         }
-        dialog.show()
+        groupOptionsDialog.show()
     }
     private fun changeGroupName(){
         // Vytvoření dialogu
@@ -568,6 +601,7 @@ class Food_menu : Fragment() {
                 return@setOnClickListener
             }
             newGroupname = newName
+            nameOfTheGroup.text = newGroupname
             dialog.dismiss()
         }
         dialog.show()
@@ -797,7 +831,7 @@ class Food_menu : Fragment() {
                         },
                         onDoubleClick = {
                             selectedItemID = itemView.tag.toString()
-                            itemOptionPopup(selectedItemID!!)
+                            itemDisplayPopup()
                         }
                     )
                 )
@@ -866,7 +900,7 @@ class Food_menu : Fragment() {
             }
             itemView.setOnClickListener { view ->
                 selectedItemID = itemView.tag.toString()
-                itemOptionPopup(selectedItemID!!)
+                itemDisplayPopup()
             }
             childContainer.addView(itemView)
         }
