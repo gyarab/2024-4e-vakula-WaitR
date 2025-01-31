@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3F51B5">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline175"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline178"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline179"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline180"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#fff"
+        app:layout_constraintBottom_toTopOf="@+id/guideline180"
+        app:layout_constraintEnd_toStartOf="@+id/guideline178"
+        app:layout_constraintStart_toStartOf="@+id/guideline175"
+        app:layout_constraintTop_toTopOf="@+id/guideline179">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline181"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline182"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline183"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.05" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline184"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.95" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center"
+            android:text="@string/choose_the_number_of_customers"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline182"
+            app:layout_constraintStart_toStartOf="@+id/guideline181"
+            app:layout_constraintTop_toTopOf="@+id/guideline183" />
+
+        <Spinner
+            android:id="@+id/number_of_customers_spinner"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:background="#D1CDCD"
+            android:spinnerMode="dropdown"
+            app:layout_constraintBottom_toTopOf="@+id/guideline184"
+            app:layout_constraintEnd_toStartOf="@+id/guideline182"
+            app:layout_constraintStart_toStartOf="@+id/guideline181"
+            app:layout_constraintTop_toTopOf="@+id/guideline183" />
+
+        <Button
+            android:id="@+id/confirm_number_of_customers_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toTopOf="@+id/guideline184"
+            app:layout_constraintEnd_toStartOf="@+id/guideline182"
+            app:layout_constraintStart_toStartOf="@+id/guideline181"
+            app:layout_constraintTop_toBottomOf="@+id/number_of_customers_spinner" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

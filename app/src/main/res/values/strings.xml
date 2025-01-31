@@ -70,4 +70,8 @@
     <string name="helper">Helper</string>
     <string name="scene">Scene</string>
     <string name="Close">Close</string>
+    <string name="table_is_currently_empty">Table is currently empty</string>
+    <string name="new_customers">New customers</string>
+    <string name="choose_the_number_of_customers">Choose the number of customers</string>
+    <string name="confirm">Confirm</string>
 </resources>

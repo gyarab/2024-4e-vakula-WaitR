@@ -14,12 +14,14 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
@@ -87,6 +89,7 @@ class Model_view : Fragment() {
     private lateinit var widthOfTheHelper: TextView
     private lateinit var sceneOptionsDialog: Dialog
     private lateinit var nameOfTheScene: TextView
+    private lateinit var tableManagingDialog: Dialog
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -123,6 +126,7 @@ class Model_view : Fragment() {
     sceneOptionsDialog = Dialog(requireContext())
     sceneOptionsDialog.setContentView(R.layout.scene_options_popup)
     nameOfTheScene = sceneOptionsDialog.findViewById(R.id.name_of_the_scene)
+    tableManagingDialog = Dialog(requireContext())
 
     confirmTableChanges.setOnClickListener {
         if (tableEditMode){
@@ -205,6 +209,77 @@ class Model_view : Fragment() {
         // nacte model z database ktery nasledne vykresli
         fetchModel()
         checkIfSceneExists()
+    }
+
+    private fun manageTablePopup(state: String){
+        val table = findTableById(model, selectedTableId!!)
+
+        if (state.equals("empty")){
+            val name = findTableById(model, selectedTableId!!)?.name
+            tableManagingDialog.setContentView(R.layout.managing_table_empty_state)
+
+            tableManagingDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+            val tableName = tableManagingDialog.findViewById<TextView>(R.id.name_of_the_table_to_manage)
+            tableName.text = name
+            val newCustomersButton = tableManagingDialog.findViewById<Button>(R.id.new_customers_button)
+            newCustomersButton.setOnClickListener {
+                tableManagingDialog.setContentView(R.layout.managing_table_set_customers)
+                val spinner = tableManagingDialog.findViewById<Spinner>(R.id.number_of_customers_spinner)
+                val options = listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner.adapter = adapter
+                val confirmButton = tableManagingDialog.findViewById<Button>(R.id.confirm_number_of_customers_button)
+                confirmButton.setOnClickListener {
+                    val selectedOption = spinner.selectedItem.toString()
+                    if (selectedOption.equals("Number of people", ignoreCase = true)) {
+                        Toast.makeText(requireContext(), "Please select the number of people", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    table?.numberOfPeople = convertStringToInt(spinner.selectedItem.toString())
+                    table?.state = "seated"
+                    //update database
+                    tableManagingDialog.dismiss()
+                    manageTablePopup("seated")
+                }
+            }
+            val closeButton = tableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
+            closeButton.setOnClickListener {
+                tableManagingDialog.dismiss()
+            }
+            tableManagingDialog.show()
+
+        }
+        if (state.equals("seated")){
+            tableManagingDialog.setContentView(R.layout.managing_table_empty_state)
+
+            tableManagingDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+
+
+            tableManagingDialog.show()
+        }
+    }
+
+    private fun convertStringToInt(input: String): Int {
+        return when (input) {
+            "1" -> 1
+            "2" -> 2
+            "3" -> 3
+            "4" -> 4
+            "5" -> 5
+            "6" -> 6
+            "7" -> 7
+            "8" -> 8
+            "9" -> 9
+            "10" -> 10
+            else -> throw IllegalArgumentException("Invalid input: $input")
+        }
     }
 
     private fun showEditModelPopUp(){
@@ -316,7 +391,7 @@ class Model_view : Fragment() {
             val table = Table(
                 randomID,
                 tableName,
-                "prazdny",
+                "empty",
                 0,
                 mutableListOf(),
                 0,
@@ -1605,11 +1680,12 @@ class Model_view : Fragment() {
                 scene = modelScene
             }
         }
+        var tableState = ""
         scene.listOfTables.forEach { table ->
             val textView = TextView(context).apply {
                 text = table.name
                 textSize = 18f
-                tag = table.id
+                tag = TableTag(table.id, table.state)
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.LTGRAY)
                 layoutParams = FrameLayout.LayoutParams(
@@ -1624,7 +1700,9 @@ class Model_view : Fragment() {
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        //TODO
+                        val tableParams = textView.tag as TableTag
+                        selectedTableId = tableParams.id
+                        manageTablePopup(tableParams.state)
                     },
                     onDoubleClick = {
 

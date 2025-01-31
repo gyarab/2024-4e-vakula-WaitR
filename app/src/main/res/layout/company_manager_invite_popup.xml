@@ -97,8 +97,8 @@
 
     <Spinner
         android:id="@+id/positionSpinner"
-        android:layout_width="164dp"
-        android:layout_height="48dp"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
         android:background="#fff"
         android:spinnerMode="dropdown"
         app:layout_constraintBottom_toTopOf="@+id/invite_user_button"
