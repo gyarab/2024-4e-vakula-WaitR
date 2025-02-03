@@ -12,7 +12,9 @@ data class MenuItem(
             "id" to id,
             "name" to name,
             "price" to price,
-            "description" to description
+            "description" to description,
+            "served" to served
+
         )
     }
 }

@@ -25,7 +25,6 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -89,7 +88,10 @@ class Model_view : Fragment() {
     private lateinit var widthOfTheHelper: TextView
     private lateinit var sceneOptionsDialog: Dialog
     private lateinit var nameOfTheScene: TextView
-    private lateinit var tableManagingDialog: Dialog
+    private lateinit var emptyTableManagingDialog: Dialog
+    private lateinit var seatedTableManagingDialog: Dialog
+    private lateinit var tableOrdersLayout: LinearLayout
+    private lateinit var tableTotalPriceTextView: TextView
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,7 +128,12 @@ class Model_view : Fragment() {
     sceneOptionsDialog = Dialog(requireContext())
     sceneOptionsDialog.setContentView(R.layout.scene_options_popup)
     nameOfTheScene = sceneOptionsDialog.findViewById(R.id.name_of_the_scene)
-    tableManagingDialog = Dialog(requireContext())
+    emptyTableManagingDialog = Dialog(requireContext())
+    emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
+    seatedTableManagingDialog = Dialog(requireContext())
+    seatedTableManagingDialog.setContentView(R.layout.managing_table_seated_state)
+    tableOrdersLayout = seatedTableManagingDialog.findViewById(R.id.manage_customers_layout)
+    tableTotalPriceTextView = seatedTableManagingDialog.findViewById(R.id.manage_table_view_total_price_of_the_table)
 
     confirmTableChanges.setOnClickListener {
         if (tableEditMode){
@@ -211,60 +218,185 @@ class Model_view : Fragment() {
         checkIfSceneExists()
     }
 
-    private fun manageTablePopup(state: String){
+    private fun manageEmptyTablePopup(){
         val table = findTableById(model, selectedTableId!!)
+        val name = table?.name
 
-        if (state.equals("empty")){
-            val name = findTableById(model, selectedTableId!!)?.name
-            tableManagingDialog.setContentView(R.layout.managing_table_empty_state)
-
-            tableManagingDialog.window?.setLayout(
-                (resources.displayMetrics.widthPixels * 0.95).toInt(),
-                (resources.displayMetrics.heightPixels * 0.95).toInt()
-            )
-            val tableName = tableManagingDialog.findViewById<TextView>(R.id.name_of_the_table_to_manage)
-            tableName.text = name
-            val newCustomersButton = tableManagingDialog.findViewById<Button>(R.id.new_customers_button)
-            newCustomersButton.setOnClickListener {
-                tableManagingDialog.setContentView(R.layout.managing_table_set_customers)
-                val spinner = tableManagingDialog.findViewById<Spinner>(R.id.number_of_customers_spinner)
-                val options = listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-                val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
-                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                spinner.adapter = adapter
-                val confirmButton = tableManagingDialog.findViewById<Button>(R.id.confirm_number_of_customers_button)
-                confirmButton.setOnClickListener {
-                    val selectedOption = spinner.selectedItem.toString()
-                    if (selectedOption.equals("Number of people", ignoreCase = true)) {
-                        Toast.makeText(requireContext(), "Please select the number of people", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-                    table?.numberOfPeople = convertStringToInt(spinner.selectedItem.toString())
-                    table?.state = "seated"
-                    //update database
-                    tableManagingDialog.dismiss()
-                    manageTablePopup("seated")
+        emptyTableManagingDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+        val tableName = emptyTableManagingDialog.findViewById<TextView>(R.id.name_of_the_table_to_manage)
+        tableName.text = name
+        val newCustomersButton = emptyTableManagingDialog.findViewById<Button>(R.id.new_customers_button)
+        newCustomersButton.setOnClickListener {
+            emptyTableManagingDialog.setContentView(R.layout.managing_table_set_customers)
+            val spinner = emptyTableManagingDialog.findViewById<Spinner>(R.id.number_of_customers_spinner)
+            val options = listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinner.adapter = adapter
+            val confirmButton = emptyTableManagingDialog.findViewById<Button>(R.id.confirm_number_of_customers_button)
+            confirmButton.setOnClickListener {
+                val selectedOption = spinner.selectedItem.toString()
+                if (selectedOption.equals("Number of people", ignoreCase = true)) {
+                    Toast.makeText(requireContext(), "Please select the number of people", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
                 }
+                val numberOfPeople = convertStringToInt(spinner.selectedItem.toString())
+                table?.numberOfPeople = numberOfPeople
+                table?.state = "seated"
+                for (i in 1..numberOfPeople) {
+                    val randomID = UUID.randomUUID().toString()
+                    val newCustomer = Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
+                    table?.listOfCustomers?.add(newCustomer)
+                }
+                updateModel()
+                emptyTableManagingDialog.dismiss()
             }
-            val closeButton = tableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
-            closeButton.setOnClickListener {
-                tableManagingDialog.dismiss()
-            }
-            tableManagingDialog.show()
+        }
+        val closeButton = emptyTableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
+        closeButton.setOnClickListener {
+            emptyTableManagingDialog.dismiss()
+        }
+        emptyTableManagingDialog.show()
+
+    }
+    private fun manageSeatedTablePopup(){
+        val table = findTableById(model, selectedTableId!!)
+        val name = table?.name
+
+        seatedTableManagingDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+        // Reference na prvky
+        val displayName = seatedTableManagingDialog.findViewById<TextView>(R.id.manage_table_view_name_of_the_table)
+        displayName.text = name
+        val checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
+        checkOutButton.setOnClickListener {
 
         }
-        if (state.equals("seated")){
-            tableManagingDialog.setContentView(R.layout.managing_table_empty_state)
-
-            tableManagingDialog.window?.setLayout(
-                (resources.displayMetrics.widthPixels * 0.95).toInt(),
-                (resources.displayMetrics.heightPixels * 0.95).toInt()
-            )
+        drawTableOrders(table!!)
 
 
+        seatedTableManagingDialog.show()
 
-            tableManagingDialog.show()
+    }
+
+    private fun drawTableOrders(table: Table){
+       table.listOfCustomers.forEach { customer ->
+           val customerLayout = LinearLayout(context).apply {
+               layoutParams = LinearLayout.LayoutParams(
+                   LinearLayout.LayoutParams.WRAP_CONTENT,
+                   LinearLayout.LayoutParams.WRAP_CONTENT
+               ).apply {
+                   setMargins(32, 0, 0, 0)
+               }
+               orientation = LinearLayout.VERTICAL
+           }
+
+           val customerHeaderLayout = LinearLayout(context).apply {
+               layoutParams = LinearLayout.LayoutParams(
+                   LinearLayout.LayoutParams.WRAP_CONTENT,
+                   LinearLayout.LayoutParams.WRAP_CONTENT
+               )
+               orientation = LinearLayout.HORIZONTAL
+           }
+
+           val customerView = TextView(context).apply {
+               text = customer.name
+               textSize = 25f
+               setPadding(16, 16, 16, 16)
+               tag = customer.id
+                   layoutParams = LinearLayout.LayoutParams(
+                   LinearLayout.LayoutParams.WRAP_CONTENT,
+                   LinearLayout.LayoutParams.WRAP_CONTENT
+               ).apply {
+                   setMargins(0, 0, 16, 8)
+               }
+           }
+           customerView.setOnClickListener{
+                //TODO
+           }
+
+           val addItemsImageButton = ImageButton(context).apply {
+               setImageResource(R.drawable.baseline_add_24)
+               tag = customer.id
+               layoutParams = LinearLayout.LayoutParams(
+                   LinearLayout.LayoutParams.WRAP_CONTENT,
+                   LinearLayout.LayoutParams.WRAP_CONTENT
+               )
+               setPadding(16, 16, 16, 16)
+               scaleType = ImageView.ScaleType.CENTER_INSIDE
+               setBackgroundColor(Color.GREEN)
+           }
+           addItemsImageButton.setOnClickListener {
+               //TODO
+           }
+           customerHeaderLayout.addView(customerView)
+           customerHeaderLayout.addView(addItemsImageButton)
+           customerLayout.addView(customerHeaderLayout)
+
+           customer.order.menuItems.forEach { menuItem ->
+               val itemHeaderLayout = LinearLayout(context).apply {
+                   layoutParams = LinearLayout.LayoutParams(
+                       LinearLayout.LayoutParams.WRAP_CONTENT,
+                       LinearLayout.LayoutParams.WRAP_CONTENT
+                   ).apply {
+                       setMargins(64, 0, 0, 0)
+                   }
+                   orientation = LinearLayout.HORIZONTAL
+               }
+
+               val itemView = TextView(context).apply {
+                   text = "${menuItem.name} - ${menuItem.price} Kč"
+                   textSize = 25f
+                   setPadding(16, 16, 16, 16)
+                   tag = menuItem.id
+                   layoutParams = LinearLayout.LayoutParams(
+                       LinearLayout.LayoutParams.WRAP_CONTENT,
+                       LinearLayout.LayoutParams.WRAP_CONTENT
+                   )
+               }
+               itemView.setOnClickListener {
+                   //TODO
+               }
+
+               val waitingImageButton = ImageButton(context).apply {
+                   setImageResource(R.drawable.baseline_add_24)
+                   layoutParams = LinearLayout.LayoutParams(
+                       LinearLayout.LayoutParams.WRAP_CONTENT,
+                       LinearLayout.LayoutParams.WRAP_CONTENT
+                   )
+                   setPadding(16, 16, 16, 16)
+                   scaleType = ImageView.ScaleType.CENTER_INSIDE
+                   setBackgroundColor(Color.YELLOW)
+               }
+               itemHeaderLayout.addView(itemView)
+               itemHeaderLayout.addView(waitingImageButton)
+               customerLayout.addView(itemHeaderLayout)
+           }
+           tableOrdersLayout.addView(customerLayout)
+       }
+       val totalTablePrice = calculateTotalTablePrice(table)
+       tableTotalPriceTextView.text = "Total table price: ${totalTablePrice} Kč"
+    }
+
+    private fun calculateTotalTablePrice(table: Table): Double {
+        var price = 0.0
+        table.listOfCustomers.forEach { customer ->
+            price += calculateTotalOrderPrice(customer)
         }
+        return price
+    }
+
+    private fun calculateTotalOrderPrice(customer: Customer): Double {
+        var price = 0.0
+        customer.order.menuItems.forEach { menuItem ->
+            price += menuItem.price
+        }
+        return price
     }
 
     private fun convertStringToInt(input: String): Int {
@@ -395,7 +527,7 @@ class Model_view : Fragment() {
                 "empty",
                 0,
                 mutableListOf(),
-                0,
+                0.0,
                 150,
                 150,
                 0,
@@ -1726,7 +1858,8 @@ class Model_view : Fragment() {
                     onClick = {
                         val tableParams = textView.tag as TableTag
                         selectedTableId = tableParams.id
-                        manageTablePopup(tableParams.state)
+                        //TODO udel switch na volani ruznych metod
+                        manageEmptyTablePopup()
                     },
                     onDoubleClick = {
 

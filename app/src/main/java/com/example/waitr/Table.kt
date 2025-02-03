@@ -6,7 +6,7 @@ data class Table(
     var state: String ="",
     var numberOfPeople: Int = 0,
     var listOfCustomers: MutableList<Customer> = mutableListOf(),
-    var totalTablePrice: Int = 0,
+    var totalTablePrice: Double = 0.0,
     var height: Int = 0,
     var width: Int = 0,
     var xPosition: Int = 0,
