@@ -77,4 +77,5 @@
     <string name="Check_out">Check out</string>
     <string name="Mark_as_served">Mark as Served</string>
     <string name="remove_item">Remove Item</string>
+    <string name="add_item">Add item</string>
 </resources>

@@ -6,7 +6,9 @@ import android.app.Dialog
 import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
 import android.util.Log
 import android.view.Gravity
 import androidx.fragment.app.Fragment
@@ -16,6 +18,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageButton
@@ -25,6 +28,8 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -94,6 +99,7 @@ class Model_view : Fragment() {
     private lateinit var tableTotalPriceTextView: TextView
     private var selectedCustomerId: String? = null
     private var selectedItemFromOrderId: String? = null
+    private lateinit var allMenuItems: MutableList<MenuItem>
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -218,6 +224,8 @@ class Model_view : Fragment() {
         // nacte model z database ktery nasledne vykresli
         fetchModel()
         checkIfSceneExists()
+        // nacte vsechny MenuItem polozky z Menu
+        fetchAllMenuItems()
     }
 
     private fun manageEmptyTablePopup(){
@@ -336,7 +344,8 @@ class Model_view : Fragment() {
                setBackgroundColor(Color.GREEN)
            }
            addItemsImageButton.setOnClickListener {
-               //TODO
+               selectedCustomerId = addItemsImageButton.tag.toString()
+               addItemsToOrderPopup(table)
            }
            customerHeaderLayout.addView(customerView)
            customerHeaderLayout.addView(addItemsImageButton)
@@ -472,6 +481,30 @@ class Model_view : Fragment() {
         dialog.show()
     }
 
+    private fun addItemsToOrderPopup(table: Table){
+        val customer = findCustomerById(table, selectedCustomerId)
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.add_item_to_order_layout)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+
+        val editTextSearch = dialog.findViewById<EditText>(R.id.editTextSearch)
+        val recyclerView = dialog.findViewById<RecyclerView>(R.id.recyclerView)
+        if (customer != null) {
+            liveSearch(editTextSearch, recyclerView, allMenuItems, customer.order)
+        }
+        val doneButton = dialog.findViewById<Button>(R.id.done_adding_items_button)
+        doneButton.setOnClickListener {
+            updateModel()
+            drawTableOrders(table)
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
     private fun checkIfAllOrdersServed(){
         //TODO
     }
@@ -524,6 +557,28 @@ class Model_view : Fragment() {
             "10" -> 10
             else -> throw IllegalArgumentException("Invalid input: $input")
         }
+    }
+
+    private fun liveSearch(editTextSearch: EditText, recyclerView: RecyclerView, menuItems: List<MenuItem>, order: Order) {
+        val adapter = MenuAdapter(menuItems) { selectedItem ->
+            // Akce při kliknutí na "Add"
+            order.menuItems.add(selectedItem)
+            Toast.makeText(recyclerView.context, "${selectedItem.name} added", Toast.LENGTH_SHORT).show()
+        }
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(recyclerView.context)
+
+        editTextSearch.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val query = s.toString().lowercase().trim()
+                val filteredList = menuItems.filter { it.name.lowercase().contains(query) }
+                adapter.updateData(filteredList)
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 
     private fun showEditModelPopUp(){
@@ -2042,6 +2097,60 @@ class Model_view : Fragment() {
         }
     }
 
+    private fun fetchAllMenuItems(){
+        val companyMenuRef = CompanyID?.let {
+            db.child("companies").child(it).child("Menu")
+        }
+
+        companyMenuRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // Deserialize snapshot into MenuGroup object
+                    val fetchedMenu = snapshot.getValue(MenuGroup::class.java)
+                    if (fetchedMenu != null) {
+                        // Assign to local variable or state
+                        val menu = fetchedMenu
+                        menu.items.forEach { menuItem ->
+                            allMenuItems.add(menuItem)
+                        }
+                        menu.subGroups.forEach { subGroup ->
+                            recursiveMenuBrowse(subGroup)
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Failed to parse menu data.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Menu not found.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Toast.makeText(
+                    context,
+                    "Error loading menu: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+
+    private fun recursiveMenuBrowse(menuGroup: MenuGroup){
+        menuGroup.items.forEach { menuItem ->
+            allMenuItems.add(menuItem)
+        }
+        menuGroup.subGroups.forEach { subGroup ->
+            recursiveMenuBrowse(subGroup)
+        }
+    }
+
     private fun findTableById(model: Model, id: String): Table?{
         val scene = findSceneById(model, selectedStageId!!)
         scene?.listOfTables?.forEach { table ->
@@ -2076,11 +2185,6 @@ class Model_view : Fragment() {
         }
         return null
     }
-
-
-
-
-
 
     // metoda ktera zkotroluje jestli jsou vytvorene sceny pro zobrazeni
     private fun checkIfSceneExists(){
