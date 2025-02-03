@@ -286,10 +286,14 @@ class Model_view : Fragment() {
         displayName.text = name
         val checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
         checkOutButton.setOnClickListener {
-
+                
         }
         drawTableOrders(table!!)
 
+        if (!table.state.equals("eating")){
+            checkOutButton.isEnabled = false
+            checkOutButton.alpha = 0.5f
+        }
 
         seatedTableManagingDialog.show()
 
@@ -378,25 +382,25 @@ class Model_view : Fragment() {
                    selectedCustomerId = params.CustomerId
                    displayDataOfTheItemInOrderPopup(table)
                }
-
-               val waitingImageButton = ImageButton(context).apply {
-                   setImageResource(R.drawable.baseline_add_24)
-                   layoutParams = LinearLayout.LayoutParams(
-                       LinearLayout.LayoutParams.WRAP_CONTENT,
-                       LinearLayout.LayoutParams.WRAP_CONTENT
-                   )
-                   setPadding(16, 16, 16, 16)
-                   scaleType = ImageView.ScaleType.CENTER_INSIDE
-                   setBackgroundColor(Color.YELLOW)
+               if (!menuItem.served){
+                   val waitingImageButton = ImageButton(context).apply {
+                       setImageResource(R.drawable.baseline_add_24)
+                       layoutParams = LinearLayout.LayoutParams(
+                           LinearLayout.LayoutParams.WRAP_CONTENT,
+                           LinearLayout.LayoutParams.WRAP_CONTENT
+                       )
+                       setPadding(16, 16, 16, 16)
+                       scaleType = ImageView.ScaleType.CENTER_INSIDE
+                       setBackgroundColor(Color.YELLOW)
+                   }
+                   itemHeaderLayout.addView(waitingImageButton)
                }
                itemHeaderLayout.addView(itemView)
-               itemHeaderLayout.addView(waitingImageButton)
                customerLayout.addView(itemHeaderLayout)
            }
            tableOrdersLayout.addView(customerLayout)
        }
-       val totalTablePrice = calculateTotalTablePrice(table)
-       tableTotalPriceTextView.text = "Total table price: ${totalTablePrice} Kč"
+       tableTotalPriceTextView.text = "Total table price: ${table.totalTablePrice} Kč"
     }
 
     private fun displayDataOfACustomerPopup(table: Table){
@@ -455,19 +459,23 @@ class Model_view : Fragment() {
         displayName.text = name
         val displayPrice = dialog.findViewById<TextView>(R.id.display_price_of_the_item)
         displayPrice.text = "Price: ${price} Kč"
-        val servedButton = dialog.findViewById<Button>(R.id.mark_item_as_served_button)
-        servedButton.setOnClickListener {
-            item?.served = true
-            checkIfAllOrdersServed()
-            updateModel()
-            drawTableOrders(table)
-            dialog.dismiss()
-        }
         val removeItemButton = dialog.findViewById<Button>(R.id.remove_item_from_order_button)
         removeItemButton.setOnClickListener {
             if (item != null) {
                 customer.order.deleteItem(item.id)
+                customer.order.totalPrice -= item.price
+                table.totalTablePrice -= item.price
             }
+            updateModel()
+            drawTableOrders(table)
+            dialog.dismiss()
+        }
+        val servedButton = dialog.findViewById<Button>(R.id.mark_item_as_served_button)
+        servedButton.setOnClickListener {
+            item?.served = true
+            if (checkIfAllOrdersServed(table)) table.state = "eating"
+            servedButton.visibility = View.GONE
+            removeItemButton.visibility = View.GONE
             updateModel()
             drawTableOrders(table)
             dialog.dismiss()
@@ -477,6 +485,12 @@ class Model_view : Fragment() {
             selectedCustomerId = null
             selectedItemFromOrderId = null
             dialog.dismiss()
+        }
+        if (item != null) {
+            if (item.served){
+                servedButton.visibility = View.GONE
+                removeItemButton.visibility = View.GONE
+            }
         }
         dialog.show()
     }
@@ -494,10 +508,11 @@ class Model_view : Fragment() {
         val editTextSearch = dialog.findViewById<EditText>(R.id.editTextSearch)
         val recyclerView = dialog.findViewById<RecyclerView>(R.id.recyclerView)
         if (customer != null) {
-            liveSearch(editTextSearch, recyclerView, allMenuItems, customer.order)
+            liveSearch(editTextSearch, recyclerView, allMenuItems, customer.order, table)
         }
         val doneButton = dialog.findViewById<Button>(R.id.done_adding_items_button)
         doneButton.setOnClickListener {
+            if (table.state.equals("seated")) table.state = "ordered"
             updateModel()
             drawTableOrders(table)
             dialog.dismiss()
@@ -505,24 +520,13 @@ class Model_view : Fragment() {
         dialog.show()
     }
 
-    private fun checkIfAllOrdersServed(){
-        //TODO
-    }
-
-    private fun calculateTotalTablePrice(table: Table): Double {
-        var price = 0.0
+    private fun checkIfAllOrdersServed(table: Table): Boolean{
         table.listOfCustomers.forEach { customer ->
-            price += calculateTotalOrderPrice(customer)
+            customer.order.menuItems.forEach { menuItem ->
+                if (!menuItem.served) return false
+            }
         }
-        return price
-    }
-
-    private fun calculateTotalOrderPrice(customer: Customer): Double {
-        var price = 0.0
-        customer.order.menuItems.forEach { menuItem ->
-            price += menuItem.price
-        }
-        return price
+        return true
     }
 
     private fun findCustomerById(table: Table, id: String?): Customer? {
@@ -559,10 +563,12 @@ class Model_view : Fragment() {
         }
     }
 
-    private fun liveSearch(editTextSearch: EditText, recyclerView: RecyclerView, menuItems: List<MenuItem>, order: Order) {
+    private fun liveSearch(editTextSearch: EditText, recyclerView: RecyclerView, menuItems: List<MenuItem>, order: Order, table: Table) {
         val adapter = MenuAdapter(menuItems) { selectedItem ->
             // Akce při kliknutí na "Add"
             order.menuItems.add(selectedItem)
+            order.totalPrice += selectedItem.price
+            table.totalTablePrice += selectedItem.price
             Toast.makeText(recyclerView.context, "${selectedItem.name} added", Toast.LENGTH_SHORT).show()
         }
 
