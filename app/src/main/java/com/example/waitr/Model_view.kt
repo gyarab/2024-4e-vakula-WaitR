@@ -415,12 +415,18 @@ class Model_view : Fragment() {
                     width = 150 // Výchozí šířka
                     height = 150 // Výchozí výška
                 }
-                tag = randomID
+                tag = TableTag(randomID, "empty")
             }
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        selectedTableId = textView.tag.toString()
+                        val tableParams = textView.tag as TableTag
+                        selectedTableId = tableParams.id
+                        val state = tableParams.state
+                        if (!state.equals("empty")){
+                            Toast.makeText(dialog.context, "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                            return@CustomClickListener
+                        }
                         if (!tableEditMode) {
                             tableEditMode = true
                             currentTableToEdit = textView
@@ -434,7 +440,13 @@ class Model_view : Fragment() {
                         }
                     },
                     onDoubleClick = {
-                        selectedTableId = textView.tag.toString()
+                        val tableParams = textView.tag as TableTag
+                        selectedTableId = tableParams.id
+                        val state = tableParams.state
+                        if (!state.equals("empty")){
+                            Toast.makeText(dialog.context, "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                            return@CustomClickListener
+                        }
                         tableOptionsPopup()
                     }
                 )
@@ -714,7 +726,7 @@ class Model_view : Fragment() {
             val textView = TextView(context).apply {
                 text = table.name
                 textSize = 18f
-                tag = table.id
+                tag = TableTag(table.id, table.state)
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.LTGRAY)
                 layoutParams = FrameLayout.LayoutParams(
@@ -729,7 +741,13 @@ class Model_view : Fragment() {
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        selectedTableId = textView.tag.toString()
+                        val tableParams = textView.tag as TableTag
+                        selectedTableId = tableParams.id
+                        val state = tableParams.state
+                        if (!state.equals("empty")){
+                            Toast.makeText(requireContext(), "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                            return@CustomClickListener
+                        }
                         if (!tableEditMode) {
                             tableEditMode = true
                             currentTableToEdit = textView
@@ -743,7 +761,13 @@ class Model_view : Fragment() {
                         }
                     },
                     onDoubleClick = {
-                        selectedTableId = textView.tag.toString()
+                        val tableParams = textView.tag as TableTag
+                        selectedTableId = tableParams.id
+                        val state = tableParams.state
+                        if (!state.equals("empty")){
+                            Toast.makeText(requireContext(), "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                            return@CustomClickListener
+                        }
                         tableOptionsPopup()
                     }
                 )
@@ -1680,7 +1704,6 @@ class Model_view : Fragment() {
                 scene = modelScene
             }
         }
-        var tableState = ""
         scene.listOfTables.forEach { table ->
             val textView = TextView(context).apply {
                 text = table.name
