@@ -10,5 +10,16 @@ data class Order(
             "totalPrice" to totalPrice
         )
     }
+    fun deleteItem(targetItemId: String): Boolean {
+        // Pokud items je null nebo prázdné, není co mazat
+        if (menuItems.isEmpty()) return false
+
+        // Odstranění položky s odpovídajícím ID v aktuální skupině
+        val removed = menuItems.removeIf { it.id == targetItemId } ?: false
+        if (removed) return true
+
+        // Pokud položka nebyla nalezena ani odstraněna
+        return false
+    }
 
 }

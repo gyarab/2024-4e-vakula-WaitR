@@ -16,7 +16,7 @@ data class MenuGroup(
     }
     fun deleteGroup(targetId: String): Boolean {
         // Pokud subGroups je null nebo prázdné, není co mazat
-        if (subGroups.isNullOrEmpty()) return false
+        if (subGroups.isEmpty()) return false
 
         // Odstranění přímé podskupiny s odpovídajícím ID
         val removed = subGroups.removeIf { it.id == targetId }

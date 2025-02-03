@@ -92,6 +92,8 @@ class Model_view : Fragment() {
     private lateinit var seatedTableManagingDialog: Dialog
     private lateinit var tableOrdersLayout: LinearLayout
     private lateinit var tableTotalPriceTextView: TextView
+    private var selectedCustomerId: String? = null
+    private var selectedItemFromOrderId: String? = null
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -262,6 +264,7 @@ class Model_view : Fragment() {
         emptyTableManagingDialog.show()
 
     }
+    //TODO
     private fun manageSeatedTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
@@ -317,7 +320,8 @@ class Model_view : Fragment() {
                }
            }
            customerView.setOnClickListener{
-                //TODO
+               selectedCustomerId = customerView.tag.toString()
+               displayDataOfACustomerPopup(table)
            }
 
            val addItemsImageButton = ImageButton(context).apply {
@@ -353,14 +357,17 @@ class Model_view : Fragment() {
                    text = "${menuItem.name} - ${menuItem.price} Kč"
                    textSize = 25f
                    setPadding(16, 16, 16, 16)
-                   tag = menuItem.id
+                   tag = ItemInOrderTag(menuItem.id, customer.id)
                    layoutParams = LinearLayout.LayoutParams(
                        LinearLayout.LayoutParams.WRAP_CONTENT,
                        LinearLayout.LayoutParams.WRAP_CONTENT
                    )
                }
                itemView.setOnClickListener {
-                   //TODO
+                   val params = itemView.tag as ItemInOrderTag
+                   selectedItemFromOrderId = params.menuId
+                   selectedCustomerId = params.CustomerId
+                   displayDataOfTheItemInOrderPopup(table)
                }
 
                val waitingImageButton = ImageButton(context).apply {
@@ -383,6 +390,92 @@ class Model_view : Fragment() {
        tableTotalPriceTextView.text = "Total table price: ${totalTablePrice} Kč"
     }
 
+    private fun displayDataOfACustomerPopup(table: Table){
+        val customer = findCustomerById(table, selectedCustomerId)
+        val name = customer?.name
+        val orderPrice = customer?.order?.totalPrice
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.display_data_of_a_customer_layout)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+
+        val displayName = dialog.findViewById<TextView>(R.id.display_customer_name)
+        displayName.text = name
+        val displayTotalOrderPrice = dialog.findViewById<TextView>(R.id.display_total_price_of_the_order)
+        displayTotalOrderPrice.text = "Total price: ${orderPrice} Kč"
+        val layoutToDisplayOrder = dialog.findViewById<LinearLayout>(R.id.display_orders_layout)
+        customer?.order?.menuItems?.forEach { menuItem ->
+            val itemView = TextView(context).apply {
+                text = "${menuItem.name} - ${menuItem.price} Kč"
+                textSize = 25f
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(16, 0, 0,0)
+                }
+            }
+            layoutToDisplayOrder.addView(itemView)
+        }
+        val closeButton = dialog.findViewById<Button>(R.id.close_display_of_the_customer_button)
+        closeButton.setOnClickListener {
+            selectedCustomerId = null
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun displayDataOfTheItemInOrderPopup(table: Table){
+        val customer = findCustomerById(table, selectedCustomerId)
+        val item = findItemInOrderById(customer!!, selectedItemFromOrderId)
+        val name = item?.name
+        val price = item?.price
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.display_item_data_of_a_order_layout)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+
+        val displayName = dialog.findViewById<TextView>(R.id.display_the_name_of_the_item_in_order)
+        displayName.text = name
+        val displayPrice = dialog.findViewById<TextView>(R.id.display_price_of_the_item)
+        displayPrice.text = "Price: ${price} Kč"
+        val servedButton = dialog.findViewById<Button>(R.id.mark_item_as_served_button)
+        servedButton.setOnClickListener {
+            item?.served = true
+            checkIfAllOrdersServed()
+            updateModel()
+            drawTableOrders(table)
+            dialog.dismiss()
+        }
+        val removeItemButton = dialog.findViewById<Button>(R.id.remove_item_from_order_button)
+        removeItemButton.setOnClickListener {
+            if (item != null) {
+                customer.order.deleteItem(item.id)
+            }
+            updateModel()
+            drawTableOrders(table)
+            dialog.dismiss()
+        }
+        val closeButton = dialog.findViewById<Button>(R.id.close_display_of_the_item_button)
+        closeButton.setOnClickListener {
+            selectedCustomerId = null
+            selectedItemFromOrderId = null
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+
+    private fun checkIfAllOrdersServed(){
+        //TODO
+    }
+
     private fun calculateTotalTablePrice(table: Table): Double {
         var price = 0.0
         table.listOfCustomers.forEach { customer ->
@@ -397,6 +490,24 @@ class Model_view : Fragment() {
             price += menuItem.price
         }
         return price
+    }
+
+    private fun findCustomerById(table: Table, id: String?): Customer? {
+        table.listOfCustomers.forEach { customer ->
+            if (customer.id == id){
+                return customer
+            }
+        }
+        return null
+    }
+
+    private fun findItemInOrderById(customer: Customer, id: String?): MenuItem? {
+        customer.order.menuItems.forEach { menuItem ->
+            if (menuItem.id == id){
+                return menuItem
+            }
+        }
+        return null
     }
 
     private fun convertStringToInt(input: String): Int {
