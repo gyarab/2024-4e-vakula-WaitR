@@ -75,4 +75,6 @@
     <string name="choose_the_number_of_customers">Choose the number of customers</string>
     <string name="confirm">Confirm</string>
     <string name="Check_out">Check out</string>
+    <string name="Mark_as_served">Mark as Served</string>
+    <string name="remove_item">Remove Item</string>
 </resources>
