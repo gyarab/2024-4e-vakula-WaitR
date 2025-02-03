@@ -262,6 +262,7 @@ class Model_view : Fragment() {
             )
 
 
+
             tableManagingDialog.show()
         }
     }
