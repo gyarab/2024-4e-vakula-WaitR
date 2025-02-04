@@ -3,7 +3,7 @@ package com.example.waitr
 data class Customer(
     val id: String = "",
     var name: String = "",
-    var order: Order
+    var order: Order = Order()
 
 ){
     fun toMap(): Map<String, Any?> {

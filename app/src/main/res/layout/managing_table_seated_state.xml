@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#3F51B5">
@@ -86,6 +87,20 @@
             android:orientation="horizontal"
             app:layout_constraintGuide_percent="0.8" />
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline250"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.52" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline251"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.48" />
+
         <TextView
             android:id="@+id/manage_table_view_name_of_the_table"
             android:layout_width="0dp"
@@ -124,11 +139,11 @@
             android:id="@+id/manage_table_view_total_price_of_the_table"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total table price:"
             android:layout_marginStart="5dp"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
+            android:text="Total table price:"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/manage_table_check_out_button"
             app:layout_constraintStart_toStartOf="@+id/guideline190"
@@ -139,15 +154,28 @@
             android:id="@+id/manage_table_check_out_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
             android:text="@string/Check_out"
+            app:layout_constraintBottom_toTopOf="@+id/guideline193"
+            app:layout_constraintEnd_toStartOf="@+id/guideline191"
+            app:layout_constraintStart_toStartOf="@+id/guideline250"
+            app:layout_constraintTop_toBottomOf="@+id/manage_table_view_total_price_of_the_table"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <Button
+            android:id="@+id/close_seated_table_manager"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Close"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@+id/guideline193"
-            app:layout_constraintEnd_toStartOf="@+id/guideline191"
+            app:layout_constraintEnd_toStartOf="@+id/guideline251"
             app:layout_constraintStart_toStartOf="@+id/guideline190"
-            app:layout_constraintTop_toBottomOf="@+id/manage_table_view_total_price_of_the_table"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintTop_toBottomOf="@+id/manage_table_view_total_price_of_the_table" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

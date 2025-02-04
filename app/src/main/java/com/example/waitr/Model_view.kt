@@ -30,6 +30,7 @@ import android.widget.Toast
 import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -99,7 +100,7 @@ class Model_view : Fragment() {
     private lateinit var tableTotalPriceTextView: TextView
     private var selectedCustomerId: String? = null
     private var selectedItemFromOrderId: String? = null
-    private lateinit var allMenuItems: MutableList<MenuItem>
+    private var allMenuItems: MutableList<MenuItem> = mutableListOf()
     private lateinit var paidTableManagingDialog: Dialog
 
 // zde psat pouze kod nesouvisejici s UI
@@ -294,6 +295,10 @@ class Model_view : Fragment() {
             }
             seatedTableManagingDialog.dismiss()
         }
+        val closeButton = seatedTableManagingDialog.findViewById<Button>(R.id.close_seated_table_manager)
+        closeButton.setOnClickListener {
+            seatedTableManagingDialog.dismiss()
+        }
         drawTableOrders(table!!)
 
         if (!table.state.equals("eating")){
@@ -306,6 +311,7 @@ class Model_view : Fragment() {
     }
 
     private fun drawTableOrders(table: Table){
+        tableOrdersLayout.removeAllViews()
        table.listOfCustomers.forEach { customer ->
            val customerLayout = LinearLayout(context).apply {
                layoutParams = LinearLayout.LayoutParams(
@@ -367,14 +373,14 @@ class Model_view : Fragment() {
                        LinearLayout.LayoutParams.WRAP_CONTENT,
                        LinearLayout.LayoutParams.WRAP_CONTENT
                    ).apply {
-                       setMargins(64, 0, 0, 0)
+                       setMargins(32, 0, 5, 0)
                    }
                    orientation = LinearLayout.HORIZONTAL
                }
 
                val itemView = TextView(context).apply {
                    text = "${menuItem.name} - ${menuItem.price} Kč"
-                   textSize = 25f
+                   textSize = 20f
                    setPadding(16, 16, 16, 16)
                    tag = ItemInOrderTag(menuItem.id, customer.id)
                    layoutParams = LinearLayout.LayoutParams(
@@ -390,7 +396,7 @@ class Model_view : Fragment() {
                }
                if (!menuItem.served){
                    val waitingImageButton = ImageButton(context).apply {
-                       setImageResource(R.drawable.baseline_add_24)
+                       setImageResource(R.drawable.baseline_access_time_24)
                        layoutParams = LinearLayout.LayoutParams(
                            LinearLayout.LayoutParams.WRAP_CONTENT,
                            LinearLayout.LayoutParams.WRAP_CONTENT
@@ -473,7 +479,7 @@ class Model_view : Fragment() {
                 table.totalTablePrice -= item.price
             }
             updateModel()
-            drawTableOrders(table)
+            manageSeatedTablePopup()
             dialog.dismiss()
         }
         val servedButton = dialog.findViewById<Button>(R.id.mark_item_as_served_button)
@@ -483,7 +489,7 @@ class Model_view : Fragment() {
             servedButton.visibility = View.GONE
             removeItemButton.visibility = View.GONE
             updateModel()
-            drawTableOrders(table)
+            manageSeatedTablePopup()
             dialog.dismiss()
         }
         val closeButton = dialog.findViewById<Button>(R.id.close_display_of_the_item_button)
@@ -519,9 +525,11 @@ class Model_view : Fragment() {
         val doneButton = dialog.findViewById<Button>(R.id.done_adding_items_button)
         doneButton.setOnClickListener {
             if (table.state.equals("seated")) table.state = "ordered"
+            if (table.state.equals("eating")) table.state = "ordered"
             updateModel()
-            drawTableOrders(table)
+            manageSeatedTablePopup()
             dialog.dismiss()
+            Log.e(selectedTableId, "idecko")
         }
         dialog.show()
     }
@@ -711,7 +719,14 @@ class Model_view : Fragment() {
     private fun liveSearch(editTextSearch: EditText, recyclerView: RecyclerView, menuItems: List<MenuItem>, order: Order, table: Table) {
         val adapter = MenuAdapter(menuItems) { selectedItem ->
             // Akce při kliknutí na "Add"
-            order.menuItems.add(selectedItem)
+            val randomId = UUID.randomUUID().toString()
+            val menuItem = MenuItem(
+                randomId,
+                selectedItem.name,
+                selectedItem.price,
+                selectedItem.description,
+                false)
+            order.menuItems.add(menuItem)
             order.totalPrice += selectedItem.price
             table.totalTablePrice += selectedItem.price
             Toast.makeText(recyclerView.context, "${selectedItem.name} added", Toast.LENGTH_SHORT).show()

@@ -10,11 +10,10 @@
     <!-- Název položky -->
     <TextView
         android:id="@+id/textViewName"
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:textStyle="bold"/>
+        android:textSize="15sp"
+        />
 
     <!-- Cena položky -->
     <TextView
@@ -29,5 +28,8 @@
         android:id="@+id/buttonAdd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add"/>
+        android:autoSizeMaxTextSize="1000dp"
+        android:autoSizeMinTextSize="1dp"
+        android:autoSizeTextType="uniform"
+        android:text="@string/add"/>
 </LinearLayout>
