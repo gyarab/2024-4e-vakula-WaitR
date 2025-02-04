@@ -286,7 +286,7 @@ class Model_view : Fragment() {
         displayName.text = name
         val checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
         checkOutButton.setOnClickListener {
-                
+
         }
         drawTableOrders(table!!)
 
