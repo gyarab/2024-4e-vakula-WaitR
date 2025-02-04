@@ -541,6 +541,11 @@ class Model_view : Fragment() {
         val continueButton = dialog.findViewById<Button>(R.id.checkout_continue_button)
         continueButton.setOnClickListener {
             table.state = "paid"
+            val iterator = table.listOfCustomers.iterator()
+            while (iterator.hasNext()) {
+                iterator.next()
+                iterator.remove()
+            }
             updateModel()
             dialog.dismiss()
         }
@@ -2149,14 +2154,12 @@ class Model_view : Fragment() {
                 scene = modelScene
             }
         }
-        //TODO change colors for different states
         scene.listOfTables.forEach { table ->
             val textView = TextView(context).apply {
                 text = table.name
                 textSize = 18f
                 tag = TableTag(table.id, table.state)
                 gravity = Gravity.CENTER
-                setBackgroundColor(Color.LTGRAY)
                 layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.WRAP_CONTENT,
                     FrameLayout.LayoutParams.WRAP_CONTENT
@@ -2166,6 +2169,7 @@ class Model_view : Fragment() {
                     setMargins(table.xPosition, table.yPosition, 0, 0)
                 }
             }
+            setColorForState(table, textView)
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
@@ -2207,6 +2211,18 @@ class Model_view : Fragment() {
             "paid" -> managePaidTablePopup()
             else -> return
         }
+    }
+
+    private fun setColorForState(table: Table, textView: TextView){
+        val color = when (table.state) {
+            "empty" -> Color.LTGRAY
+            "seated" -> Color.YELLOW
+            "ordered" -> Color.parseColor("#FFA500")
+            "eating" -> Color.GREEN
+            "paid" -> Color.BLUE
+            else -> Color.WHITE
+        }
+        textView.setBackgroundColor(color)
     }
 
     private fun drawScenesToBar(){
