@@ -2149,6 +2149,7 @@ class Model_view : Fragment() {
                 scene = modelScene
             }
         }
+        //TODO change colors for different states
         scene.listOfTables.forEach { table ->
             val textView = TextView(context).apply {
                 text = table.name
