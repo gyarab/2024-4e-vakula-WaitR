@@ -100,6 +100,7 @@ class Model_view : Fragment() {
     private var selectedCustomerId: String? = null
     private var selectedItemFromOrderId: String? = null
     private lateinit var allMenuItems: MutableList<MenuItem>
+    private lateinit var paidTableManagingDialog: Dialog
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -142,6 +143,8 @@ class Model_view : Fragment() {
     seatedTableManagingDialog.setContentView(R.layout.managing_table_seated_state)
     tableOrdersLayout = seatedTableManagingDialog.findViewById(R.id.manage_customers_layout)
     tableTotalPriceTextView = seatedTableManagingDialog.findViewById(R.id.manage_table_view_total_price_of_the_table)
+    paidTableManagingDialog = Dialog(requireContext())
+    paidTableManagingDialog.setContentView(R.layout.managing_table_paid_state)
 
     confirmTableChanges.setOnClickListener {
         if (tableEditMode){
@@ -619,6 +622,29 @@ class Model_view : Fragment() {
         }
         checkIfAllCustomersPaid(table, continueButton)
         dialog.show()
+    }
+
+    private fun managePaidTablePopup(){
+        val table = findTableById(model, selectedTableId!!)
+        val name = table?.name
+
+        paidTableManagingDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+        val displayName = paidTableManagingDialog.findViewById<TextView>(R.id.paid_table_name)
+        displayName.text = name
+        val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
+        doneButton.setOnClickListener {
+            table?.state = "empty"
+            updateModel()
+            paidTableManagingDialog.dismiss()
+        }
+        val closeButton = paidTableManagingDialog.findViewById<Button>(R.id.close_paid_table)
+        closeButton.setOnClickListener {
+            paidTableManagingDialog.dismiss()
+        }
+        paidTableManagingDialog.show()
     }
 
     private fun checkIfAllCustomersPaid(table: Table, button: Button): Boolean{
@@ -2144,8 +2170,7 @@ class Model_view : Fragment() {
                     onClick = {
                         val tableParams = textView.tag as TableTag
                         selectedTableId = tableParams.id
-                        //TODO udel switch na volani ruznych metod
-                        manageEmptyTablePopup()
+                        tableManager(tableParams.state)
                     },
                     onDoubleClick = {
 
@@ -2169,6 +2194,17 @@ class Model_view : Fragment() {
                 }
             }
             currentScene.addView(textView)
+        }
+    }
+
+    private fun tableManager(state: String){
+        when (state) {
+            "empty" -> manageEmptyTablePopup()
+            "seated" -> manageSeatedTablePopup()
+            "ordered" -> manageSeatedTablePopup()
+            "eating" -> manageSeatedTablePopup()
+            "paid" -> managePaidTablePopup()
+            else -> return
         }
     }
 
