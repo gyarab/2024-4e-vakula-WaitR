@@ -286,7 +286,10 @@ class Model_view : Fragment() {
         displayName.text = name
         val checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
         checkOutButton.setOnClickListener {
-
+            if (table != null) {
+                proceedToCheckoutPopup(table)
+            }
+            seatedTableManagingDialog.dismiss()
         }
         drawTableOrders(table!!)
 
@@ -518,6 +521,117 @@ class Model_view : Fragment() {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun proceedToCheckoutPopup(table: Table){
+        val price = table.totalTablePrice
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.managing_table_proceed_to_checkout)
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.95).toInt()
+        )
+
+        val displayPrice = dialog.findViewById<TextView>(R.id.checkout_total_table_price)
+        displayPrice.text = "Total table price: ${price} Kč"
+        val continueButton = dialog.findViewById<Button>(R.id.checkout_continue_button)
+        continueButton.setOnClickListener {
+            table.state = "paid"
+            updateModel()
+            dialog.dismiss()
+        }
+        val displayLayout = dialog.findViewById<LinearLayout>(R.id.check_out_customers_layout)
+        table.listOfCustomers.forEach { customer ->
+            // HashMap pro sledování počtu výskytů jednotlivých menuItem.id
+            val itemCounts = mutableMapOf<String, Int>()
+            // Nejprve spočítáme výskyty
+            customer.order.menuItems.forEach { menuItem ->
+                itemCounts[menuItem.id] = itemCounts.getOrDefault(menuItem.id, 0) + 1
+            }
+
+            val customerLayout = LinearLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(32, 0, 0, 0)
+                }
+                orientation = LinearLayout.VERTICAL
+            }
+            val customerHeaderLayout = LinearLayout(context).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                orientation = LinearLayout.HORIZONTAL
+            }
+            val customerView = TextView(context).apply {
+                text = "${customer.name}: ${customer.order.totalPrice} Kč"
+                textSize = 20f
+                setPadding(16, 16, 16, 16)
+                tag = customer.id
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(0, 0, 16, 8)
+                }
+            }
+            val paidButton = Button(context).apply {
+                tag = customer.id
+                text = "Paid"
+                textSize = 20f
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                setPadding(16, 16, 16, 16)
+                setBackgroundColor(Color.GREEN)
+            }
+            paidButton.setOnClickListener {
+                selectedCustomerId = paidButton.tag.toString()
+                val cust = findCustomerById(table, selectedCustomerId)
+                cust?.order?.paid = true
+                checkIfAllCustomersPaid(table, continueButton)
+            }
+            customerHeaderLayout.addView(customerView)
+            customerHeaderLayout.addView(paidButton)
+            customerLayout.addView(customerHeaderLayout)
+            itemCounts.forEach { (menuItemId, count) ->
+                val menuItem = customer.order.menuItems.first { it.id == menuItemId }
+
+                val itemView = TextView(context).apply {
+                    text = "${count}x ${menuItem.name}"  // Nastavení textu s počtem výskytů
+                    textSize = 25f
+                    setPadding(16, 16, 16, 16)
+                    tag = ItemInOrderTag(menuItem.id, customer.id)
+                    layoutParams = LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(64, 0, 0, 0)
+                    }
+                }
+                customerLayout.addView(itemView)
+            }
+            displayLayout.addView(customerView)
+        }
+        checkIfAllCustomersPaid(table, continueButton)
+        dialog.show()
+    }
+
+    private fun checkIfAllCustomersPaid(table: Table, button: Button): Boolean{
+        table.listOfCustomers.forEach { customer ->
+            if (!customer.order.paid){
+                button.alpha = 0.5f
+                button.isEnabled = false
+                return false
+            }
+        }
+        button.alpha = 1f
+        button.isEnabled = true
+        return true
     }
 
     private fun checkIfAllOrdersServed(table: Table): Boolean{

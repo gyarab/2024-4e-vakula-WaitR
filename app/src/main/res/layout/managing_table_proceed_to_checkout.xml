@@ -114,7 +114,7 @@
             app:layout_constraintTop_toTopOf="@+id/guideline234" />
 
         <Button
-            android:id="@+id/button"
+            android:id="@+id/checkout_continue_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/Continue"
@@ -124,16 +124,16 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline235"
             app:layout_constraintEnd_toStartOf="@+id/guideline239"
             app:layout_constraintStart_toStartOf="@+id/guideline238"
-            app:layout_constraintTop_toBottomOf="@+id/textView10"
+            app:layout_constraintTop_toBottomOf="@+id/checkout_total_table_price"
             app:layout_constraintVertical_bias="0.5" />
 
         <TextView
-            android:id="@+id/textView10"
+            android:id="@+id/checkout_total_table_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Total table price:"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/checkout_continue_button"
             app:layout_constraintStart_toStartOf="@+id/guideline232"
             app:layout_constraintTop_toTopOf="@+id/guideline237"
             app:layout_constraintVertical_bias="0.5" />

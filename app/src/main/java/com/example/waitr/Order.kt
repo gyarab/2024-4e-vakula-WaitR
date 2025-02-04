@@ -2,12 +2,14 @@ package com.example.waitr
 
 data class Order(
     var menuItems: MutableList<MenuItem> = mutableListOf(),
-    var totalPrice: Double = 0.0
+    var totalPrice: Double = 0.0,
+    var paid: Boolean = false
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "menuItems" to menuItems.map { it.toMap() },
-            "totalPrice" to totalPrice
+            "totalPrice" to totalPrice,
+            "paid" to paid
         )
     }
     fun deleteItem(targetItemId: String): Boolean {
