@@ -38,6 +38,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.UUID
+import kotlin.math.log
 
 //nadefinovane objekty...
 
@@ -226,8 +227,9 @@ class Model_view : Fragment() {
             //TODO dodelat help tlacitko
         }
         // nacte model z database ktery nasledne vykresli
-        fetchModel()
-        checkIfSceneExists()
+        fetchModel{
+            checkIfSceneExists()
+        }
         // nacte vsechny MenuItem polozky z Menu
         fetchAllMenuItems()
     }
@@ -265,8 +267,9 @@ class Model_view : Fragment() {
                     val newCustomer = Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
                     table?.listOfCustomers?.add(newCustomer)
                 }
-                updateModel()
-                emptyTableManagingDialog.dismiss()
+                updateModel{
+                    emptyTableManagingDialog.dismiss()
+                }
             }
         }
         val closeButton = emptyTableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
@@ -299,9 +302,9 @@ class Model_view : Fragment() {
         closeButton.setOnClickListener {
             seatedTableManagingDialog.dismiss()
         }
-        drawTableOrders(table!!)
+        drawTableOrders()
 
-        if (!table.state.equals("eating")){
+        if (!table?.state.equals("eating")){
             checkOutButton.isEnabled = false
             checkOutButton.alpha = 0.5f
         }
@@ -310,9 +313,10 @@ class Model_view : Fragment() {
 
     }
 
-    private fun drawTableOrders(table: Table){
+    private fun drawTableOrders(){
+        val table = findTableById(model, selectedTableId!!)
         tableOrdersLayout.removeAllViews()
-       table.listOfCustomers.forEach { customer ->
+       table?.listOfCustomers?.forEach { customer ->
            val customerLayout = LinearLayout(context).apply {
                layoutParams = LinearLayout.LayoutParams(
                    LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -412,7 +416,7 @@ class Model_view : Fragment() {
            }
            tableOrdersLayout.addView(customerLayout)
        }
-       tableTotalPriceTextView.text = "Total table price: ${table.totalTablePrice} Kč"
+       tableTotalPriceTextView.text = "Total table price: ${table?.totalTablePrice} Kč"
     }
 
     private fun displayDataOfACustomerPopup(table: Table){
@@ -478,9 +482,10 @@ class Model_view : Fragment() {
                 customer.order.totalPrice -= item.price
                 table.totalTablePrice -= item.price
             }
-            updateModel()
-            manageSeatedTablePopup()
-            dialog.dismiss()
+            updateModel{
+                drawTableOrders()
+                dialog.dismiss()
+            }
         }
         val servedButton = dialog.findViewById<Button>(R.id.mark_item_as_served_button)
         servedButton.setOnClickListener {
@@ -488,9 +493,10 @@ class Model_view : Fragment() {
             if (checkIfAllOrdersServed(table)) table.state = "eating"
             servedButton.visibility = View.GONE
             removeItemButton.visibility = View.GONE
-            updateModel()
-            manageSeatedTablePopup()
-            dialog.dismiss()
+            updateModel{
+                drawTableOrders()
+                dialog.dismiss()
+            }
         }
         val closeButton = dialog.findViewById<Button>(R.id.close_display_of_the_item_button)
         closeButton.setOnClickListener {
@@ -526,10 +532,12 @@ class Model_view : Fragment() {
         doneButton.setOnClickListener {
             if (table.state.equals("seated")) table.state = "ordered"
             if (table.state.equals("eating")) table.state = "ordered"
-            updateModel()
-            manageSeatedTablePopup()
-            dialog.dismiss()
-            Log.e(selectedTableId, "idecko")
+            Log.e("model", model.toString())
+            Log.e("table", table.toString())
+            updateModel{
+                drawTableOrders()
+                dialog.dismiss()
+            }
         }
         dialog.show()
     }
@@ -554,8 +562,9 @@ class Model_view : Fragment() {
                 iterator.next()
                 iterator.remove()
             }
-            updateModel()
-            dialog.dismiss()
+            updateModel{
+                dialog.dismiss()
+            }
         }
         val displayLayout = dialog.findViewById<LinearLayout>(R.id.check_out_customers_layout)
         table.listOfCustomers.forEach { customer ->
@@ -650,8 +659,9 @@ class Model_view : Fragment() {
         val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
         doneButton.setOnClickListener {
             table?.state = "empty"
-            updateModel()
-            paidTableManagingDialog.dismiss()
+            updateModel{
+                paidTableManagingDialog.dismiss()
+            }
         }
         val closeButton = paidTableManagingDialog.findViewById<Button>(R.id.close_paid_table)
         closeButton.setOnClickListener {
@@ -795,8 +805,9 @@ class Model_view : Fragment() {
         addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
         saveButton.setOnClickListener {
             model = editModel
-            updateModel()
-            editModelDialoge.dismiss()
+            updateModel{
+                editModelDialoge.dismiss()
+            }
         }
         cancelButton.setOnClickListener {
             val builder = AlertDialog.Builder(requireContext())
@@ -2083,7 +2094,7 @@ class Model_view : Fragment() {
         return true
     }
 
-    private fun updateModel(){
+    private fun updateModel(onComplete: () -> Unit){
         val companyModelRef = CompanyID?.let {
             db.child("companies").child(it).child("Model")
         }
@@ -2095,6 +2106,7 @@ class Model_view : Fragment() {
                     "Changes saved!",
                     Toast.LENGTH_SHORT
                 ).show()
+                fetchModel(onComplete)
             }
             ?.addOnFailureListener {
                 Toast.makeText(
@@ -2103,10 +2115,9 @@ class Model_view : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        fetchModel()
     }
 
-    private fun fetchModel(){
+    private fun fetchModel(onComplete: () -> Unit){
         val companyModelRef = CompanyID?.let {
             db.child("companies").child(it).child("Model")
         }
@@ -2122,7 +2133,7 @@ class Model_view : Fragment() {
                         editModel = fetchedModel
                         updateModelUI()
                         updateEditModelUI()
-
+                        onComplete()
                     } else {
                         Toast.makeText(
                             context,
