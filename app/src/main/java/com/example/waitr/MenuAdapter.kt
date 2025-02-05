@@ -14,7 +14,6 @@ class MenuAdapter(
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.textViewName)
-        val price: TextView = itemView.findViewById(R.id.textViewPrice)
         val buttonAdd: Button = itemView.findViewById(R.id.buttonAdd)
     }
 
@@ -26,8 +25,7 @@ class MenuAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.name.text = item.name
-        holder.price.text = "${item.price} Kč"
+        holder.name.text = "${item.name} - ${item.price} Kč"
 
         // Kliknutí na tlačítko "Add"
         holder.buttonAdd.setOnClickListener {

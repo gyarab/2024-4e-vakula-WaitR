@@ -119,7 +119,7 @@
             android:id="@+id/manage_customers_scrollable_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#E6E0E0"
+            android:background="#E9E4E4"
             android:contentDescription="@string/scrollable_menu_list"
             app:layout_constraintBottom_toTopOf="@+id/guideline195"
             app:layout_constraintEnd_toStartOf="@+id/guideline191"
