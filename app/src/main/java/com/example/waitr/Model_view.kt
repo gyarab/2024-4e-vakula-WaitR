@@ -97,6 +97,7 @@ class Model_view : Fragment() {
     private lateinit var nameOfTheScene: TextView
     private lateinit var emptyTableManagingDialog: Dialog
     private lateinit var seatedTableManagingDialog: Dialog
+    private lateinit var checkOutButton: Button
     private lateinit var tableOrdersLayout: LinearLayout
     private lateinit var tableTotalPriceTextView: TextView
     private var selectedCustomerId: String? = null
@@ -143,6 +144,7 @@ class Model_view : Fragment() {
     emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
     seatedTableManagingDialog = Dialog(requireContext())
     seatedTableManagingDialog.setContentView(R.layout.managing_table_seated_state)
+    checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
     tableOrdersLayout = seatedTableManagingDialog.findViewById(R.id.manage_customers_layout)
     tableTotalPriceTextView = seatedTableManagingDialog.findViewById(R.id.manage_table_view_total_price_of_the_table)
     paidTableManagingDialog = Dialog(requireContext())
@@ -291,7 +293,6 @@ class Model_view : Fragment() {
         // Reference na prvky
         val displayName = seatedTableManagingDialog.findViewById<TextView>(R.id.manage_table_view_name_of_the_table)
         displayName.text = name
-        val checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
         checkOutButton.setOnClickListener {
             if (table != null) {
                 proceedToCheckoutPopup(table)
@@ -302,12 +303,8 @@ class Model_view : Fragment() {
         closeButton.setOnClickListener {
             seatedTableManagingDialog.dismiss()
         }
+        setCheckoutButton(checkOutButton, table!!)
         drawTableOrders()
-
-        if (!table?.state.equals("eating")){
-            checkOutButton.isEnabled = false
-            checkOutButton.alpha = 0.5f
-        }
 
         seatedTableManagingDialog.show()
 
@@ -416,7 +413,18 @@ class Model_view : Fragment() {
            }
            tableOrdersLayout.addView(customerLayout)
        }
+        setCheckoutButton(checkOutButton, table!!)
        tableTotalPriceTextView.text = "Total table price: ${table?.totalTablePrice} Kč"
+    }
+
+    private fun setCheckoutButton(button: Button, table: Table){
+        if (table.state.equals("eating")) {
+            button.isEnabled = true
+            button.alpha = 1.0f
+        } else {
+            button.isEnabled = false
+            button.alpha = 0.5f
+        }
     }
 
     private fun displayDataOfACustomerPopup(table: Table){
