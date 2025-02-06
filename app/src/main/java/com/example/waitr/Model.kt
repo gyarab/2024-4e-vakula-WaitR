@@ -19,4 +19,15 @@ data class Model(
         // Pokud položka nebyla nalezena ani odstraněna
         return false
     }
+    fun updateTableInScene(sceneId: String, updatedTable: Table) {
+        // Najdeme scénu podle ID
+        val scene = listOfScenes.find { it.id == sceneId } ?: return
+
+        // Najdeme index existujícího stolu podle ID
+        val tableIndex = scene.listOfTables.indexOfFirst { it.id == updatedTable.id }
+        if (tableIndex != -1) {
+            // 🔥 Pokud existuje, přepíšeme ho novými daty
+            scene.listOfTables[tableIndex] = updatedTable
+        }
+    }
 }

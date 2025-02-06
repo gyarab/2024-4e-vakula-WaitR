@@ -33,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -234,6 +235,8 @@ class Model_view : Fragment() {
         }
         // nacte vsechny MenuItem polozky z Menu
         fetchAllMenuItems()
+        //nastavi listener
+        listenForTableChanges()
     }
 
     private fun manageEmptyTablePopup(){
@@ -270,7 +273,7 @@ class Model_view : Fragment() {
                     val newCustomer = Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
                     table?.listOfCustomers?.add(newCustomer)
                 }
-                updateModel{
+                updateTable{
                     emptyTableManagingDialog.dismiss()
                 }
             }
@@ -492,7 +495,7 @@ class Model_view : Fragment() {
                 if (!checkIfTableHasOrdered(table)) table.state = "seated"
                 if (checkIfAllOrdersServed(table)) table.state = "eating"
             }
-            updateModel{
+            updateTable{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -503,7 +506,7 @@ class Model_view : Fragment() {
             if (checkIfAllOrdersServed(table)) table.state = "eating"
             servedButton.visibility = View.GONE
             removeItemButton.visibility = View.GONE
-            updateModel{
+            updateTable{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -544,7 +547,7 @@ class Model_view : Fragment() {
             if (table.state.equals("eating")) table.state = "ordered"
             Log.e("model", model.toString())
             Log.e("table", table.toString())
-            updateModel{
+            updateTable{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -582,7 +585,7 @@ class Model_view : Fragment() {
                 }
                 table.numberOfPeople = 0
             }
-            updateModel{
+            updateTable{
                 dialog.dismiss()
             }
         }
@@ -685,7 +688,7 @@ class Model_view : Fragment() {
         val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
         doneButton.setOnClickListener {
             table?.state = "empty"
-            updateModel{
+            updateTable{
                 paidTableManagingDialog.dismiss()
             }
         }
@@ -2424,6 +2427,83 @@ class Model_view : Fragment() {
             currentScene.removeAllViews()
             currentScene.addView(dynamicLinearLayout)
         }
+    }
+
+    private fun listenForTableChanges() {
+        val scenesRef = CompanyID?.let {
+            db.child("companies").child(it).child("Model").child("listOfScenes")
+        }
+
+        scenesRef?.addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                val sceneId = snapshot.key ?: return
+                listenForTableUpdates(sceneId) // Spustíme listener pro změny stolů v této scéně
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    private fun listenForTableUpdates(sceneId: String) {
+        val tablesRef = CompanyID?.let {
+            db.child("companies").child(it).child("Model").child("listOfScenes").child(sceneId).child("listOfTables")
+        }
+
+        tablesRef?.addChildEventListener(object : ChildEventListener {
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val updatedTable = snapshot.getValue(Table::class.java) ?: return
+                model.updateTableInScene(sceneId, updatedTable) // 🔥 Updatne jen změněný stůl!
+                 // Překreslí jen tento jeden stůl
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildRemoved(snapshot: DataSnapshot) {}
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onCancelled(error: DatabaseError) {}
+        })
+    }
+
+    private fun updateTable( onComplete: () -> Unit) {
+        val table = findTableById(model, selectedTableId!!)
+        val numberOfSceneInList = findNumberOfSceneInList()
+        val numberOfTableInList = findNumberOfTableInList(numberOfSceneInList)
+        val companyModelRef = CompanyID?.let {
+            db.child("companies").child(it).child("Model").child("listOfScenes").child(numberOfSceneInList.toString()).child("listOfTables")
+        }
+
+        val updates = mapOf(
+            "$numberOfTableInList" to table?.toMap()  // Změní jen konkrétní table
+        )
+
+        companyModelRef
+            ?.updateChildren(updates)
+            ?.addOnSuccessListener {
+                Toast.makeText(context, "Changes saved!", Toast.LENGTH_SHORT).show()
+                onComplete()
+            }
+            ?.addOnFailureListener {
+                Toast.makeText(context, "Failed to save changes!", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun findNumberOfSceneInList(): Int{
+        var number = 0
+        model.listOfScenes.forEach { modelScene ->
+            if (modelScene.id == selectedStageId) return number
+            number+=1
+        }
+        return -1
+    }
+    private fun findNumberOfTableInList(sceneIndex: Int): Int{
+        var number = 0
+        model.listOfScenes.get(sceneIndex).listOfTables.forEach { table ->
+            if (table.id == selectedTableId) return number
+            number+=1
+        }
+        return -1
     }
 
     companion object {
