@@ -2455,8 +2455,9 @@ class Model_view : Fragment() {
         tablesRef?.addChildEventListener(object : ChildEventListener {
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
                 val updatedTable = snapshot.getValue(Table::class.java) ?: return
-                model.updateTableInScene(sceneId, updatedTable) // 🔥 Updatne jen změněný stůl!
-                 // Překreslí jen tento jeden stůl
+                model.updateTableInScene(sceneId, updatedTable)
+                updateModelUI()
+                updateEditModelUI()
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -2475,7 +2476,7 @@ class Model_view : Fragment() {
         }
 
         val updates = mapOf(
-            "$numberOfTableInList" to table?.toMap()  // Změní jen konkrétní table
+            "$numberOfTableInList" to table?.toMap()
         )
 
         companyModelRef
