@@ -1,11 +1,13 @@
 package com.example.waitr
 
 data class Model(
-    var listOfScenes: MutableList<ModelScene> = mutableListOf()
+    var listOfScenes: MutableList<ModelScene> = mutableListOf(),
+    var locked: String? = null
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
-            "listOfScenes" to listOfScenes.map { it.toMap() }
+            "listOfScenes" to listOfScenes.map { it.toMap() },
+            "locked" to locked
         )
     }
     fun deleteScene(targetSceneId: String): Boolean {

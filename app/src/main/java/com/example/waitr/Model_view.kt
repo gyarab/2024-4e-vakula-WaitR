@@ -28,6 +28,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
+import androidx.privacysandbox.ads.adservices.adid.AdId
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Task
@@ -234,9 +235,7 @@ class Model_view : Fragment() {
             checkIfSceneExists()
         }
         // nacte vsechny MenuItem polozky z Menu
-        fetchAllMenuItems()
-        //nastavi listener
-        listenForTableChanges()
+        fetchAllMenuItems{}
     }
 
     private fun manageEmptyTablePopup(){
@@ -244,11 +243,15 @@ class Model_view : Fragment() {
         val name = table?.name
         emptyTableManagingDialog.setOnDismissListener {
             table?.locked = null
-            updateTable {}
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null && table != null) {
+                tableToUpdate.locked = table.locked
+            }
+            updateModel {}
         }
         if (table?.locked == null) {
             table?.locked = userId
-            updateTable {}
+            updateModel {}
             emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
             emptyTableManagingDialog.window?.setLayout(
                 (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -290,7 +293,13 @@ class Model_view : Fragment() {
                             Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
                         table?.listOfCustomers?.add(newCustomer)
                     }
-                    updateTable {
+                    val tableToUpdate = findTableById(model, selectedTableId!!)
+                    if (tableToUpdate != null && table != null) {
+                        tableToUpdate.state = table.state
+                        tableToUpdate.numberOfPeople = table.numberOfPeople
+                        tableToUpdate.listOfCustomers = table.listOfCustomers
+                    }
+                    updateModel {
                         emptyTableManagingDialog.dismiss()
                     }
                 }
@@ -314,11 +323,16 @@ class Model_view : Fragment() {
         val name = table?.name
         seatedTableManagingDialog.setOnDismissListener {
             table?.locked = null
-            updateTable {}
+
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null && table != null) {
+                tableToUpdate.locked = table.locked
+            }
+            updateModel {}
         }
         if (table?.locked == null){
             table?.locked = userId
-            updateTable {}
+            updateModel {}
             seatedTableManagingDialog.window?.setLayout(
                 (resources.displayMetrics.widthPixels * 0.95).toInt(),
                 (resources.displayMetrics.heightPixels * 0.95).toInt()
@@ -352,7 +366,7 @@ class Model_view : Fragment() {
     private fun drawTableOrders(){
         val table = findTableById(model, selectedTableId!!)
         tableOrdersLayout.removeAllViews()
-       table?.listOfCustomers?.forEach { customer ->
+        table?.listOfCustomers?.forEach { customer ->
            val customerLayout = LinearLayout(context).apply {
                layoutParams = LinearLayout.LayoutParams(
                    LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -525,13 +539,20 @@ class Model_view : Fragment() {
         val removeItemButton = dialog.findViewById<Button>(R.id.remove_item_from_order_button)
         removeItemButton.setOnClickListener {
             if (item != null) {
+
                 customer.order.deleteItem(item.id)
                 customer.order.totalPrice -= item.price
                 table.totalTablePrice -= item.price
                 if (!checkIfTableHasOrdered(table)) table.state = "seated"
                 if (checkIfAllOrdersServed(table)) table.state = "eating"
+
+                val tableToUpdate = findTableById(model, selectedTableId!!)
+                if (tableToUpdate != null){
+                    tableToUpdate.totalTablePrice = table.totalTablePrice
+                    tableToUpdate.listOfCustomers = table.listOfCustomers
+                }
             }
-            updateTable{
+            updateModel{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -542,7 +563,13 @@ class Model_view : Fragment() {
             if (checkIfAllOrdersServed(table)) table.state = "eating"
             servedButton.visibility = View.GONE
             removeItemButton.visibility = View.GONE
-            updateTable{
+
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null){
+                tableToUpdate.state = table.state
+                tableToUpdate.listOfCustomers = table.listOfCustomers
+            }
+            updateModel{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -581,9 +608,14 @@ class Model_view : Fragment() {
         doneButton.setOnClickListener {
             if (table.state.equals("seated")) table.state = "ordered"
             if (table.state.equals("eating")) table.state = "ordered"
-            Log.e("model", model.toString())
-            Log.e("table", table.toString())
-            updateTable{
+
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null){
+                tableToUpdate.state = table.state
+                tableToUpdate.listOfCustomers = table.listOfCustomers
+                tableToUpdate.totalTablePrice = table.totalTablePrice
+            }
+            updateModel{
                 drawTableOrders()
                 dialog.dismiss()
             }
@@ -621,7 +653,16 @@ class Model_view : Fragment() {
                 }
                 table.numberOfPeople = 0
             }
-            updateTable{
+
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null && table != null){
+                tableToUpdate.locked = null
+                tableToUpdate.state = table.state
+                tableToUpdate.listOfCustomers = table.listOfCustomers
+                tableToUpdate.totalTablePrice = table.totalTablePrice
+                tableToUpdate.numberOfPeople = table.numberOfPeople
+            }
+            updateModel{
                 dialog.dismiss()
             }
         }
@@ -716,9 +757,16 @@ class Model_view : Fragment() {
         val name = table?.name
         paidTableManagingDialog.setOnDismissListener {
             table?.locked = null
-            updateTable {}
+
+            val tableToUpdate = findTableById(model, selectedTableId!!)
+            if (tableToUpdate != null && table != null){
+                tableToUpdate.locked = table.locked
+            }
+            updateModel {}
         }
         if (table?.locked == null) {
+            table?.locked = userId
+            updateModel {}
             paidTableManagingDialog.window?.setLayout(
                 (resources.displayMetrics.widthPixels * 0.95).toInt(),
                 (resources.displayMetrics.heightPixels * 0.95).toInt()
@@ -728,7 +776,12 @@ class Model_view : Fragment() {
             val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
             doneButton.setOnClickListener {
                 table?.state = "empty"
-                updateTable {
+
+                val tableToUpdate = findTableById(model, selectedTableId!!)
+                if (tableToUpdate != null && table != null){
+                    tableToUpdate.state = table.state
+                }
+                updateModel {
                     paidTableManagingDialog.dismiss()
                 }
             }
@@ -841,84 +894,107 @@ class Model_view : Fragment() {
     }
 
     private fun showEditModelPopUp(){
-        editModel = model
-        //vykresleni scen
-        drawEditScenesToBar()
-        // nacteni sceny
-        if (editModel.listOfScenes.isNotEmpty()){
-            selectedStageId = editModel.listOfScenes.get(0).id
-            drawEditScene()
+        editModelDialoge.setOnDismissListener {
+            model.locked = null
+            updateModel {}
+        }
+        if (model.locked == null) {
+            if (checkIfAllTablesEmpty()) {
+                model.locked = userId
+                updateModel {
+                    editModel = model
+                }
+                //vykresleni scen
+                drawEditScenesToBar()
+                // nacteni sceny
+                if (editModel.listOfScenes.isNotEmpty()) {
+                    selectedStageId = editModel.listOfScenes.get(0).id
+                    drawEditScene()
+                } else {
+                    val textView = TextView(context).apply {
+                        this.text = "No Scene"
+                        this.textSize = 18f // Velikost textu
+                        this.setTextColor(Color.LTGRAY) // Barva textu
+                    }
+                    val params = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.WRAP_CONTENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                    )
+
+                    editModelSceneLayout.addView(textView, params)
+
+                    textView.post {
+                        val parentWidth = editModelSceneLayout.width
+                        val parentHeight = editModelSceneLayout.height
+                        val textViewWidth = textView.width
+                        val textViewHeight = textView.height
+                        val leftMargin = (parentWidth - textViewWidth) / 2
+                        val topMargin = (parentHeight - textViewHeight) / 2
+
+                        params.leftMargin = leftMargin
+                        params.topMargin = topMargin
+
+                        textView.layoutParams = params
+                    }
+                }
+                // Nastavení velikosti dialogu
+                editModelDialoge.window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                    (resources.displayMetrics.heightPixels * 0.95).toInt()
+                )
+                // Reference na prvky v popup layoutu
+                saveButton = editModelDialoge.findViewById(R.id.save_model_edit)
+                cancelButton = editModelDialoge.findViewById(R.id.cancel_model_edit)
+                addTableButton = editModelDialoge.findViewById(R.id.add_table)
+                addSceneButton = editModelDialoge.findViewById(R.id.add_scene)
+                addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
+                saveButton.setOnClickListener {
+                    model = editModel
+                    updateModel {
+                        editModelDialoge.dismiss()
+                    }
+                }
+                cancelButton.setOnClickListener {
+                    val builder = AlertDialog.Builder(requireContext())
+                    builder.setTitle("Cancel changes")
+                    builder.setMessage("Are you sure you want to cancel all the changes?")
+
+                    builder.setPositiveButton("Yes") { dialog, _ ->
+                        dialog.dismiss()
+                        editModelDialoge.dismiss()
+                    }
+                    builder.setNegativeButton("No") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+
+                    val alertDialog = builder.create()
+                    alertDialog.show()
+                }
+                addTableButton.setOnClickListener {
+                    addTablePopup()
+                }
+                addSceneButton.setOnClickListener {
+                    addScenePopup()
+                }
+                addHelperButton.setOnClickListener {
+                    addHelperPopup()
+                }
+
+                editModelDialoge.show()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "All tables must be empty in order to edit!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         } else {
-            val textView = TextView(context).apply {
-                this.text = "No Scene"
-                this.textSize = 18f // Velikost textu
-                this.setTextColor(Color.LTGRAY) // Barva textu
-            }
-            val params = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.WRAP_CONTENT
-            )
-
-            editModelSceneLayout.addView(textView, params)
-
-            textView.post {
-                val parentWidth = editModelSceneLayout.width
-                val parentHeight = editModelSceneLayout.height
-                val textViewWidth = textView.width
-                val textViewHeight = textView.height
-                val leftMargin = (parentWidth - textViewWidth) / 2
-                val topMargin = (parentHeight - textViewHeight) / 2
-
-                params.leftMargin = leftMargin
-                params.topMargin = topMargin
-
-                textView.layoutParams = params
-            }
+            Toast.makeText(
+                requireContext(),
+                "model is already being edited by someone!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        // Nastavení velikosti dialogu
-        editModelDialoge.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.95).toInt()
-        )
-        // Reference na prvky v popup layoutu
-        saveButton = editModelDialoge.findViewById(R.id.save_model_edit)
-        cancelButton = editModelDialoge.findViewById(R.id.cancel_model_edit)
-        addTableButton = editModelDialoge.findViewById(R.id.add_table)
-        addSceneButton = editModelDialoge.findViewById(R.id.add_scene)
-        addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
-        saveButton.setOnClickListener {
-            model = editModel
-            updateModel{
-                editModelDialoge.dismiss()
-            }
-        }
-        cancelButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Cancel changes")
-            builder.setMessage("Are you sure you want to cancel all the changes?")
-
-            builder.setPositiveButton("Yes") { dialog, _ ->
-                dialog.dismiss()
-                editModelDialoge.dismiss()
-            }
-            builder.setNegativeButton("No") { dialog, _ ->
-                dialog.dismiss()
-            }
-
-            val alertDialog = builder.create()
-            alertDialog.show()
-        }
-        addTableButton.setOnClickListener {
-            addTablePopup()
-        }
-        addSceneButton.setOnClickListener {
-            addScenePopup()
-        }
-        addHelperButton.setOnClickListener {
-            addHelperPopup()
-        }
-
-        editModelDialoge.show()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -2200,44 +2276,30 @@ class Model_view : Fragment() {
             }
     }
 
-    private fun fetchModel(onComplete: () -> Unit){
+    private fun fetchModel(onComplete: () -> Unit) {
         val companyModelRef = CompanyID?.let {
             db.child("companies").child(it).child("Model")
-        }
+        } ?: return
 
-        companyModelRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+        companyModelRef.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    // Deserialize snapshot into Model object
                     val fetchedModel = snapshot.getValue(Model::class.java)
                     if (fetchedModel != null) {
-                        // Assign to local variable or state
-                        model = fetchedModel
-                        editModel = fetchedModel
+                        model.listOfScenes = fetchedModel.listOfScenes
+                        editModel.listOfScenes = fetchedModel.listOfScenes
                         updateModelUI()
                         updateEditModelUI()
                         onComplete()
                     } else {
-                        Toast.makeText(
-                            context,
-                            "Failed to parse model data.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(context, "Failed to parse model data.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    Toast.makeText(
-                        context,
-                        "Model not found.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(context, "Model not found.", Toast.LENGTH_SHORT).show()
                 }
             }
             override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(
-                    context,
-                    "Error loading model: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "Error fetching model: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         })
     }
@@ -2379,12 +2441,12 @@ class Model_view : Fragment() {
         }
     }
 
-    private fun fetchAllMenuItems(){
+    private fun fetchAllMenuItems(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
         }
 
-        companyMenuRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+        companyMenuRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     // Deserialize snapshot into MenuGroup object
@@ -2398,6 +2460,7 @@ class Model_view : Fragment() {
                         menu.subGroups.forEach { subGroup ->
                             recursiveMenuBrowse(subGroup)
                         }
+                        onComplete()
                     } else {
                         Toast.makeText(
                             context,
@@ -2476,82 +2539,30 @@ class Model_view : Fragment() {
         }
     }
 
-    private fun listenForTableChanges() {
-        val scenesRef = CompanyID?.let {
-            db.child("companies").child(it).child("Model").child("listOfScenes")
-        }
-
-        scenesRef?.addChildEventListener(object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                val sceneId = snapshot.key ?: return
-                listenForTableUpdates(sceneId) // Spustíme listener pro změny stolů v této scéně
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildRemoved(snapshot: DataSnapshot) {}
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-    private fun listenForTableUpdates(sceneId: String) {
-        val tablesRef = CompanyID?.let {
-            db.child("companies").child(it).child("Model").child("listOfScenes").child(sceneId).child("listOfTables")
-        }
-
-        tablesRef?.addChildEventListener(object : ChildEventListener {
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                val updatedTable = snapshot.getValue(Table::class.java) ?: return
-                model.updateTableInScene(sceneId, updatedTable)
-                updateModelUI()
-                updateEditModelUI()
-            }
-
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onChildRemoved(snapshot: DataSnapshot) {}
-            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
-            override fun onCancelled(error: DatabaseError) {}
-        })
-    }
-
-    private fun updateTable( onComplete: () -> Unit) {
-        val table = findTableById(model, selectedTableId!!)
-        val numberOfSceneInList = findNumberOfSceneInList()
-        val numberOfTableInList = findNumberOfTableInList(numberOfSceneInList)
-        val companyModelRef = CompanyID?.let {
-            db.child("companies").child(it).child("Model").child("listOfScenes").child(numberOfSceneInList.toString()).child("listOfTables")
-        }
-
-        val updates = mapOf(
-            "$numberOfTableInList" to table?.toMap()
-        )
-
-        companyModelRef
-            ?.updateChildren(updates)
-            ?.addOnSuccessListener {
-                Toast.makeText(context, "Changes saved!", Toast.LENGTH_SHORT).show()
-                onComplete()
-            }
-            ?.addOnFailureListener {
-                Toast.makeText(context, "Failed to save changes!", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun findNumberOfSceneInList(): Int{
+    private fun findNumberOfSceneInList(sceneId: String): Int{
         var number = 0
         model.listOfScenes.forEach { modelScene ->
-            if (modelScene.id == selectedStageId) return number
+            if (modelScene.id == sceneId) return number
             number+=1
         }
         return -1
     }
-    private fun findNumberOfTableInList(sceneIndex: Int): Int{
+    private fun findNumberOfTableInList(sceneIndex: Int, tableId: String): Int{
         var number = 0
         model.listOfScenes.get(sceneIndex).listOfTables.forEach { table ->
-            if (table.id == selectedTableId) return number
+            if (table.id == tableId) return number
             number+=1
         }
         return -1
+    }
+
+    private fun checkIfAllTablesEmpty(): Boolean {
+        model.listOfScenes.forEach { modelScene ->
+            modelScene.listOfTables.forEach { table ->
+                if (!table.state.equals("empty")) return false
+            }
+        }
+        return true
     }
 
     companion object {

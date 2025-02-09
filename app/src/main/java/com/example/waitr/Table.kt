@@ -24,7 +24,8 @@ data class Table(
             "height" to height,
             "width" to width,
             "xPosition" to xPosition,
-            "yPosition" to yPosition
+            "yPosition" to yPosition,
+            "locked" to locked
         )
     }
 

@@ -18,6 +18,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -47,6 +48,9 @@ class Food_menu : Fragment() {
     private lateinit var descriptionOfTheItem: TextView
     private lateinit var groupOptionsDialog: Dialog
     private lateinit var nameOfTheGroup: TextView
+    private val auth = FirebaseAuth.getInstance()
+    private val currentUser = auth.currentUser
+    private val userId = currentUser?.uid
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +107,7 @@ class Food_menu : Fragment() {
         editButton.setOnClickListener {
             showEditMenuPopup()
         }
-        fetchMenu()
+        fetchMenu{}
     }
 
     companion object {
@@ -117,48 +121,63 @@ class Food_menu : Fragment() {
     }
 
     private fun showEditMenuPopup(){
-        editMenu = menu
-        //updateMenu()
 
-        // Nastavení velikosti dialogu
-        editMenuDialoge.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.95).toInt()
-        )
-        // Reference na prvky v popup layoutu
-        val saveButton = editMenuDialoge.findViewById<TextView>(R.id.save_menu_edit)
-        val cancelButton = editMenuDialoge.findViewById<TextView>(R.id.cancel_menu_edit)
-        val addItemButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_item)
-        val addGroupButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_group)
-        saveButton.setOnClickListener {
-            Log.e("editMenu", editMenu.toString())
-            menu = editMenu
-            updateMenu()
-            editMenuDialoge.dismiss()
+        editMenuDialoge.setOnDismissListener {
+            menu.locked = null
+            updateMenu {}
         }
-        cancelButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
-            builder.setTitle("Cancel changes")
-            builder.setMessage("Are you sure you want to cancel all the changes?")
-
-            builder.setPositiveButton("Yes") { dialog, _ ->
-                dialog.dismiss()
-                editMenuDialoge.dismiss()
+        if (menu.locked == null) {
+            menu.locked = userId
+            updateMenu {
+                editMenu = menu
             }
-            builder.setNegativeButton("No") { dialog, _ ->
-                dialog.dismiss()
+            // Nastavení velikosti dialogu
+            editMenuDialoge.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+            // Reference na prvky v popup layoutu
+            val saveButton = editMenuDialoge.findViewById<TextView>(R.id.save_menu_edit)
+            val cancelButton = editMenuDialoge.findViewById<TextView>(R.id.cancel_menu_edit)
+            val addItemButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_item)
+            val addGroupButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_group)
+            saveButton.setOnClickListener {
+                Log.e("editMenu", editMenu.toString())
+                menu = editMenu
+                updateMenu {
+                    editMenuDialoge.dismiss()
+                }
             }
+            cancelButton.setOnClickListener {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Cancel changes")
+                builder.setMessage("Are you sure you want to cancel all the changes?")
 
-            val alertDialog = builder.create()
-            alertDialog.show()
+                builder.setPositiveButton("Yes") { dialog, _ ->
+                    dialog.dismiss()
+                    editMenuDialoge.dismiss()
+                }
+                builder.setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val alertDialog = builder.create()
+                alertDialog.show()
+            }
+            addItemButton.setOnClickListener {
+                addItemPopup()
+            }
+            addGroupButton.setOnClickListener {
+                addGroupPopup()
+            }
+            editMenuDialoge.show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "model is already being edited by someone!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        addItemButton.setOnClickListener {
-            addItemPopup()
-        }
-        addGroupButton.setOnClickListener {
-            addGroupPopup()
-        }
-        editMenuDialoge.show()
     }
     private fun addItemPopup(){
         // Vytvoření dialogu
@@ -632,7 +651,7 @@ class Food_menu : Fragment() {
         // Pokud nic nenalezeno
         return null
     }
-    private fun updateMenu(){
+    private fun updateMenu(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
         }
@@ -644,6 +663,7 @@ class Food_menu : Fragment() {
                     "Changes saved!",
                     Toast.LENGTH_SHORT
                 ).show()
+                fetchMenu(onComplete)
             }
             ?.addOnFailureListener {
                 Toast.makeText(
@@ -652,14 +672,13 @@ class Food_menu : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
-        fetchMenu()
     }
-    private fun fetchMenu(){
+    private fun fetchMenu(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
         }
 
-        companyMenuRef?.addListenerForSingleValueEvent(object : ValueEventListener {
+        companyMenuRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
                     // Deserialize snapshot into MenuGroup object
@@ -670,6 +689,7 @@ class Food_menu : Fragment() {
                         editMenu = fetchedMenu
                         updateMenuUI(menuLayout, menu)
                         updateEditMenuUI(editMenuLayout, editMenu)
+                        onComplete()
 
                     } else {
                         Toast.makeText(

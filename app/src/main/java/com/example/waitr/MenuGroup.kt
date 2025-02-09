@@ -4,14 +4,16 @@ data class MenuGroup(
     val id: String = "",
     var name: String = "",
     val items: MutableList<MenuItem> = mutableListOf(),
-    val subGroups: MutableList<MenuGroup> = mutableListOf()
+    val subGroups: MutableList<MenuGroup> = mutableListOf(),
+    var locked: String? = null
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,
             "name" to name,
             "items" to items.map { it.toMap() },
-            "subGroups" to subGroups.map { it.toMap() }
+            "subGroups" to subGroups.map { it.toMap() },
+            "locked" to locked
         )
     }
     fun deleteGroup(targetId: String): Boolean {
