@@ -242,75 +242,111 @@ class Model_view : Fragment() {
     private fun manageEmptyTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
-
-        emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
-        emptyTableManagingDialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.95).toInt()
-        )
-        val tableName = emptyTableManagingDialog.findViewById<TextView>(R.id.name_of_the_table_to_manage)
-        tableName.text = name
-        val newCustomersButton = emptyTableManagingDialog.findViewById<Button>(R.id.new_customers_button)
-        newCustomersButton.setOnClickListener {
-            emptyTableManagingDialog.setContentView(R.layout.managing_table_set_customers)
-            val spinner = emptyTableManagingDialog.findViewById<Spinner>(R.id.number_of_customers_spinner)
-            val options = listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
-            val confirmButton = emptyTableManagingDialog.findViewById<Button>(R.id.confirm_number_of_customers_button)
-            confirmButton.setOnClickListener {
-                val selectedOption = spinner.selectedItem.toString()
-                if (selectedOption.equals("Number of people", ignoreCase = true)) {
-                    Toast.makeText(requireContext(), "Please select the number of people", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-                val numberOfPeople = convertStringToInt(spinner.selectedItem.toString())
-                table?.numberOfPeople = numberOfPeople
-                table?.state = "seated"
-                for (i in 1..numberOfPeople) {
-                    val randomID = UUID.randomUUID().toString()
-                    val newCustomer = Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
-                    table?.listOfCustomers?.add(newCustomer)
-                }
-                updateTable{
-                    emptyTableManagingDialog.dismiss()
+        emptyTableManagingDialog.setOnDismissListener {
+            table?.locked = null
+            updateTable {}
+        }
+        if (table?.locked == null) {
+            table?.locked = userId
+            updateTable {}
+            emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
+            emptyTableManagingDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+            val tableName =
+                emptyTableManagingDialog.findViewById<TextView>(R.id.name_of_the_table_to_manage)
+            tableName.text = name
+            val newCustomersButton =
+                emptyTableManagingDialog.findViewById<Button>(R.id.new_customers_button)
+            newCustomersButton.setOnClickListener {
+                emptyTableManagingDialog.setContentView(R.layout.managing_table_set_customers)
+                val spinner =
+                    emptyTableManagingDialog.findViewById<Spinner>(R.id.number_of_customers_spinner)
+                val options =
+                    listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+                val adapter =
+                    ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinner.adapter = adapter
+                val confirmButton =
+                    emptyTableManagingDialog.findViewById<Button>(R.id.confirm_number_of_customers_button)
+                confirmButton.setOnClickListener {
+                    val selectedOption = spinner.selectedItem.toString()
+                    if (selectedOption.equals("Number of people", ignoreCase = true)) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Please select the number of people",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@setOnClickListener
+                    }
+                    val numberOfPeople = convertStringToInt(spinner.selectedItem.toString())
+                    table?.numberOfPeople = numberOfPeople
+                    table?.state = "seated"
+                    for (i in 1..numberOfPeople) {
+                        val randomID = UUID.randomUUID().toString()
+                        val newCustomer =
+                            Customer(randomID, "Person ${i}", Order(mutableListOf(), 0.0))
+                        table?.listOfCustomers?.add(newCustomer)
+                    }
+                    updateTable {
+                        emptyTableManagingDialog.dismiss()
+                    }
                 }
             }
+            val closeButton =
+                emptyTableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
+            closeButton.setOnClickListener {
+                emptyTableManagingDialog.dismiss()
+            }
+            emptyTableManagingDialog.show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "This table is currently being edited by someone!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        val closeButton = emptyTableManagingDialog.findViewById<Button>(R.id.close_empty_table_button)
-        closeButton.setOnClickListener {
-            emptyTableManagingDialog.dismiss()
-        }
-        emptyTableManagingDialog.show()
-
     }
     private fun manageSeatedTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
-
-        seatedTableManagingDialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.95).toInt()
-        )
-        // Reference na prvky
-        val displayName = seatedTableManagingDialog.findViewById<TextView>(R.id.manage_table_view_name_of_the_table)
-        displayName.text = name
-        checkOutButton.setOnClickListener {
-            if (table != null) {
-                proceedToCheckoutPopup()
+        seatedTableManagingDialog.setOnDismissListener {
+            table?.locked = null
+            updateTable {}
+        }
+        if (table?.locked == null){
+            table?.locked = userId
+            updateTable {}
+            seatedTableManagingDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+            // Reference na prvky
+            val displayName = seatedTableManagingDialog.findViewById<TextView>(R.id.manage_table_view_name_of_the_table)
+            displayName.text = name
+            checkOutButton.setOnClickListener {
+                if (table != null) {
+                    proceedToCheckoutPopup()
+                }
+                seatedTableManagingDialog.dismiss()
             }
-            seatedTableManagingDialog.dismiss()
-        }
-        val closeButton = seatedTableManagingDialog.findViewById<Button>(R.id.close_seated_table_manager)
-        closeButton.setOnClickListener {
-            seatedTableManagingDialog.dismiss()
-        }
-        setCheckoutButton(checkOutButton, table!!)
-        drawTableOrders()
+            val closeButton = seatedTableManagingDialog.findViewById<Button>(R.id.close_seated_table_manager)
+            closeButton.setOnClickListener {
+                seatedTableManagingDialog.dismiss()
+            }
+            setCheckoutButton(checkOutButton, table!!)
+            drawTableOrders()
 
-        seatedTableManagingDialog.show()
-
+            seatedTableManagingDialog.show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "This table is currently being edited by someone!",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun drawTableOrders(){
@@ -678,25 +714,36 @@ class Model_view : Fragment() {
     private fun managePaidTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
-
-        paidTableManagingDialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.95).toInt()
-        )
-        val displayName = paidTableManagingDialog.findViewById<TextView>(R.id.paid_table_name)
-        displayName.text = name
-        val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
-        doneButton.setOnClickListener {
-            table?.state = "empty"
-            updateTable{
+        paidTableManagingDialog.setOnDismissListener {
+            table?.locked = null
+            updateTable {}
+        }
+        if (table?.locked == null) {
+            paidTableManagingDialog.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                (resources.displayMetrics.heightPixels * 0.95).toInt()
+            )
+            val displayName = paidTableManagingDialog.findViewById<TextView>(R.id.paid_table_name)
+            displayName.text = name
+            val doneButton = paidTableManagingDialog.findViewById<Button>(R.id.done_with_table_managing)
+            doneButton.setOnClickListener {
+                table?.state = "empty"
+                updateTable {
+                    paidTableManagingDialog.dismiss()
+                }
+            }
+            val closeButton = paidTableManagingDialog.findViewById<Button>(R.id.close_paid_table)
+            closeButton.setOnClickListener {
                 paidTableManagingDialog.dismiss()
             }
+            paidTableManagingDialog.show()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "This table is currently being edited by someone!",
+                Toast.LENGTH_SHORT
+            ).show()
         }
-        val closeButton = paidTableManagingDialog.findViewById<Button>(R.id.close_paid_table)
-        closeButton.setOnClickListener {
-            paidTableManagingDialog.dismiss()
-        }
-        paidTableManagingDialog.show()
     }
 
     private fun checkIfAllCustomersPaid(table: Table, button: Button): Boolean{

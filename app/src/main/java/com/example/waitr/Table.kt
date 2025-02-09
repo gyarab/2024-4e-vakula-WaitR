@@ -10,7 +10,8 @@ data class Table(
     var height: Int = 0,
     var width: Int = 0,
     var xPosition: Int = 0,
-    var yPosition: Int = 0
+    var yPosition: Int = 0,
+    var locked: String? = null
 ){
     fun toMap(): Map<String, Any?> {
         return mapOf(
