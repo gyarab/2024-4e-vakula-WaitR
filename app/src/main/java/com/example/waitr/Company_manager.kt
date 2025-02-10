@@ -55,6 +55,9 @@ class Company_manager : AppCompatActivity() {
     private lateinit var displayOnlineUsers: LinearLayout
     private lateinit var displayOfflineUsers: LinearLayout
     private lateinit var constrainedLayoutForCurrentUsers: ConstraintLayout
+    private lateinit var tableNotificationDialog: Dialog
+    private lateinit var notificationsLayout: LinearLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -107,6 +110,9 @@ class Company_manager : AppCompatActivity() {
         yourUsername = headerView.findViewById(R.id.yourUsername_company_manager)
         yourEmail = headerView.findViewById(R.id.yourEmail_company_manager)
         yourAuthStatus = headerView.findViewById(R.id.auth_status_company_manager)
+        tableNotificationDialog = Dialog(this)
+        tableNotificationDialog.setContentView(R.layout.tabel_notifications_popup)
+        notificationsLayout = tableNotificationDialog.findViewById(R.id.table_notifications_layout)
 
         // nacteni dat do headeru
         userId?.let {
@@ -133,7 +139,7 @@ class Company_manager : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.manager_notifications_button -> {
-                    //TODO
+                    tableNotificationPopup()
                     true
                 }
                 R.id.manager_settings_button -> {
@@ -183,6 +189,21 @@ class Company_manager : AppCompatActivity() {
         // zavolani metody pro nastaveni listeneru
         setupRealtimeListener()
     }
+
+    private fun tableNotificationPopup(){
+        tableNotificationDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+        val closeButton = tableNotificationDialog.findViewById<Button>(R.id.close_table_notifications_button)
+        closeButton.setOnClickListener {
+            tableNotificationDialog.dismiss()
+        }
+
+
+        tableNotificationDialog.show()
+    }
+
     private fun showInviteUserPopUp(){
         // Vytvoření dialogu
         val dialog = Dialog(this)
