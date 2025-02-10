@@ -894,100 +894,93 @@ class Model_view : Fragment() {
     }
 
     private fun showEditModelPopUp(){
+        Log.e("locked", model.locked.toString())
         editModelDialoge.setOnDismissListener {
             model.locked = null
             updateModel {}
         }
         if (model.locked == null) {
-            if (checkIfAllTablesEmpty()) {
-                model.locked = userId
-                updateModel {
-                    editModel = model
-                }
-                //vykresleni scen
-                drawEditScenesToBar()
-                // nacteni sceny
-                if (editModel.listOfScenes.isNotEmpty()) {
-                    selectedStageId = editModel.listOfScenes.get(0).id
-                    drawEditScene()
-                } else {
-                    val textView = TextView(context).apply {
-                        this.text = "No Scene"
-                        this.textSize = 18f // Velikost textu
-                        this.setTextColor(Color.LTGRAY) // Barva textu
-                    }
-                    val params = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.WRAP_CONTENT,
-                        FrameLayout.LayoutParams.WRAP_CONTENT
-                    )
-
-                    editModelSceneLayout.addView(textView, params)
-
-                    textView.post {
-                        val parentWidth = editModelSceneLayout.width
-                        val parentHeight = editModelSceneLayout.height
-                        val textViewWidth = textView.width
-                        val textViewHeight = textView.height
-                        val leftMargin = (parentWidth - textViewWidth) / 2
-                        val topMargin = (parentHeight - textViewHeight) / 2
-
-                        params.leftMargin = leftMargin
-                        params.topMargin = topMargin
-
-                        textView.layoutParams = params
-                    }
-                }
-                // Nastavení velikosti dialogu
-                editModelDialoge.window?.setLayout(
-                    (resources.displayMetrics.widthPixels * 0.95).toInt(),
-                    (resources.displayMetrics.heightPixels * 0.95).toInt()
-                )
-                // Reference na prvky v popup layoutu
-                saveButton = editModelDialoge.findViewById(R.id.save_model_edit)
-                cancelButton = editModelDialoge.findViewById(R.id.cancel_model_edit)
-                addTableButton = editModelDialoge.findViewById(R.id.add_table)
-                addSceneButton = editModelDialoge.findViewById(R.id.add_scene)
-                addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
-                saveButton.setOnClickListener {
-                    model = editModel
-                    updateModel {
-                        editModelDialoge.dismiss()
-                    }
-                }
-                cancelButton.setOnClickListener {
-                    val builder = AlertDialog.Builder(requireContext())
-                    builder.setTitle("Cancel changes")
-                    builder.setMessage("Are you sure you want to cancel all the changes?")
-
-                    builder.setPositiveButton("Yes") { dialog, _ ->
-                        dialog.dismiss()
-                        editModelDialoge.dismiss()
-                    }
-                    builder.setNegativeButton("No") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-
-                    val alertDialog = builder.create()
-                    alertDialog.show()
-                }
-                addTableButton.setOnClickListener {
-                    addTablePopup()
-                }
-                addSceneButton.setOnClickListener {
-                    addScenePopup()
-                }
-                addHelperButton.setOnClickListener {
-                    addHelperPopup()
-                }
-
-                editModelDialoge.show()
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "All tables must be empty in order to edit!",
-                    Toast.LENGTH_SHORT
-                ).show()
+            model.locked = userId
+            updateModel {
+                editModel = model
             }
+            //vykresleni scen
+            drawEditScenesToBar()
+            // nacteni sceny
+            if (editModel.listOfScenes.isNotEmpty()) {
+                selectedStageId = editModel.listOfScenes.get(0).id
+                drawEditScene()
+            } else {
+                val textView = TextView(context).apply {
+                    this.text = "No Scene"
+                    this.textSize = 18f // Velikost textu
+                    this.setTextColor(Color.LTGRAY) // Barva textu
+                }
+                val params = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+
+                editModelSceneLayout.addView(textView, params)
+
+                textView.post {
+                    val parentWidth = editModelSceneLayout.width
+                    val parentHeight = editModelSceneLayout.height
+                    val textViewWidth = textView.width
+                    val textViewHeight = textView.height
+                    val leftMargin = (parentWidth - textViewWidth) / 2
+                    val topMargin = (parentHeight - textViewHeight) / 2
+
+                    params.leftMargin = leftMargin
+                    params.topMargin = topMargin
+
+                    textView.layoutParams = params
+                }
+            }
+            // Nastavení velikosti dialogu
+            editModelDialoge.window?.setLayout(
+                (resources.displayMetrics.widthPixels * 1).toInt(),
+                (resources.displayMetrics.heightPixels * 1).toInt()
+            )
+            // Reference na prvky v popup layoutu
+            saveButton = editModelDialoge.findViewById(R.id.save_model_edit)
+            cancelButton = editModelDialoge.findViewById(R.id.cancel_model_edit)
+            addTableButton = editModelDialoge.findViewById(R.id.add_table)
+            addSceneButton = editModelDialoge.findViewById(R.id.add_scene)
+            addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
+            saveButton.setOnClickListener {
+                model = editModel
+                updateModel {
+                    editModelDialoge.dismiss()
+                }
+            }
+            cancelButton.setOnClickListener {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Cancel changes")
+                builder.setMessage("Are you sure you want to cancel all the changes?")
+
+                builder.setPositiveButton("Yes") { dialog, _ ->
+                    dialog.dismiss()
+                    editModelDialoge.dismiss()
+                }
+                builder.setNegativeButton("No") { dialog, _ ->
+                    dialog.dismiss()
+                }
+
+                val alertDialog = builder.create()
+                alertDialog.show()
+            }
+            addTableButton.setOnClickListener {
+                addTablePopup()
+            }
+            addSceneButton.setOnClickListener {
+                addScenePopup()
+            }
+            addHelperButton.setOnClickListener {
+                addHelperPopup()
+            }
+
+            editModelDialoge.show()
         } else {
             Toast.makeText(
                 requireContext(),
@@ -2265,7 +2258,7 @@ class Model_view : Fragment() {
                     "Changes saved!",
                     Toast.LENGTH_SHORT
                 ).show()
-                fetchModel(onComplete)
+                onComplete()
             }
             ?.addOnFailureListener {
                 Toast.makeText(
@@ -2288,6 +2281,7 @@ class Model_view : Fragment() {
                     if (fetchedModel != null) {
                         model.listOfScenes = fetchedModel.listOfScenes
                         editModel.listOfScenes = fetchedModel.listOfScenes
+                        model.locked = fetchedModel.locked
                         updateModelUI()
                         updateEditModelUI()
                         onComplete()
@@ -2344,9 +2338,15 @@ class Model_view : Fragment() {
             textView.setOnClickListener(
                 CustomClickListener(
                     onClick = {
-                        val tableParams = textView.tag as TableTag
-                        selectedTableId = tableParams.id
-                        tableManager(tableParams.state)
+                        if (model.locked == null) {
+                            val tableParams = textView.tag as TableTag
+                            selectedTableId = tableParams.id
+                            tableManager(tableParams.state)
+                        } else { Toast.makeText(
+                            context,
+                            "Model is currently being edited! Please wait",
+                            Toast.LENGTH_SHORT
+                        ).show() }
                     },
                     onDoubleClick = {
 
