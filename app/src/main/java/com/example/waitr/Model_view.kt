@@ -106,6 +106,7 @@ class Model_view : Fragment() {
     private var selectedItemFromOrderId: String? = null
     private var allMenuItems: MutableList<MenuItem> = mutableListOf()
     private lateinit var paidTableManagingDialog: Dialog
+    private val tableStateListeners = mutableMapOf<String, ValueEventListener>()
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -2282,6 +2283,7 @@ class Model_view : Fragment() {
                         model.listOfScenes = fetchedModel.listOfScenes
                         editModel.listOfScenes = fetchedModel.listOfScenes
                         model.locked = fetchedModel.locked
+                        setListenerForTableState()
                         updateModelUI()
                         updateEditModelUI()
                         onComplete()
@@ -2563,6 +2565,85 @@ class Model_view : Fragment() {
             }
         }
         return true
+    }
+
+    private fun setListenerForTableState(){
+        val companyId = CompanyID ?: return
+
+        model.listOfScenes.forEachIndexed { sceneIndex, modelScene ->
+            modelScene.listOfTables.forEachIndexed { tableIndex, modelTable ->
+                val tableId = modelTable.id
+                val tableStateRef = db.child("companies").child(companyId).child("Model")
+                    .child("listOfScenes").child(sceneIndex.toString()).child("listOfTables")
+                    .child(tableIndex.toString()).child("state")
+
+                val existingListener = tableStateListeners[tableId]
+                if (existingListener != null) {
+                    tableStateRef.removeEventListener(existingListener)
+                    tableStateListeners.remove(tableId)
+                }
+
+                val newListener = object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val newState = snapshot.getValue(String::class.java) ?: return
+
+                        val notificationsRef = db.child("companies").child(companyId).child("Notifications")
+
+                        notificationsRef.orderByChild("tableId").equalTo(tableId).get().addOnSuccessListener { data ->
+                            data.children.forEach { it.ref.removeValue() }
+                        }
+
+                        val newNotificationRef = notificationsRef.push()
+                        val notification = Notification(
+                            id = newNotificationRef.key!!,
+                            tableId = tableId,
+                            type = newState,
+                            timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), //prvni rika kolik minut
+                            send = false
+                        )
+                        newNotificationRef.setValue(notification)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        // Handle errors appropriately, e.g., log the error
+                        println("Error listening for table state changes: ${error.message}")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun removeTableStateListeners() {
+        val companyId = CompanyID ?: return
+
+        tableStateListeners.forEach { (tableId, listener) ->
+            val indices = findTableIndices(model, tableId)
+            if (indices != null){
+                val (sceneIndex, tableIndex) = indices
+                val tableStateRef = db.child("companies").child(companyId).child("Model")
+                    .child("listOfScenes").child(sceneIndex.toString())
+                    .child("listOfTables").child(tableIndex.toString())
+                    .child("state")
+                tableStateRef.removeEventListener(listener)
+            }
+        }
+        tableStateListeners.clear()
+    }
+
+    private fun findTableIndices(model: Model, tableId: String): Pair<Int, Int>? {
+        model.listOfScenes.forEachIndexed { sceneIndex, scene ->
+            scene.listOfTables.forEachIndexed { tableIndex, table ->
+                if (table.id == tableId) {
+                    return Pair(sceneIndex, tableIndex)
+                }
+            }
+        }
+        return null // Return null if the tableId is not found
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        removeTableStateListeners()
     }
 
     companion object {
