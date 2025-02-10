@@ -132,7 +132,12 @@ class Company_manager : AppCompatActivity() {
 // TODO funkcnost polozek v drawermenu
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
+                R.id.manager_notifications_button -> {
+                    //TODO
+                    true
+                }
                 R.id.manager_settings_button -> {
+                    //TODO
                     true
                 }
                 R.id.manager_show_members_button -> {
