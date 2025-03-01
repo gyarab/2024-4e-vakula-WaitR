@@ -1,14 +1,25 @@
 package com.example.waitr
 
+import android.Manifest
 import android.app.Dialog
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.SubMenu
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
@@ -17,6 +28,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -57,6 +71,25 @@ class Company_manager : AppCompatActivity() {
     private lateinit var constrainedLayoutForCurrentUsers: ConstraintLayout
     private lateinit var tableNotificationDialog: Dialog
     private lateinit var notificationsLayout: LinearLayout
+    private val notificationsList = mutableListOf<Notification>()
+    private val handler = Handler(Looper.getMainLooper())
+    private val checkNotificationsRunnable = object : Runnable {
+        override fun run() {
+            checkAndSendNotifications() // Zavolá tvou funkci
+            handler.postDelayed(this, 5000) // Naplánuje další spuštění za 5 sekund
+        }
+    }
+
+    // Spustí opakovanou úlohu
+    fun startCheckingNotifications() {
+        handler.post(checkNotificationsRunnable)
+    }
+
+    // Zastaví opakovanou úlohu
+    fun stopCheckingNotifications() {
+        handler.removeCallbacks(checkNotificationsRunnable)
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -187,7 +220,10 @@ class Company_manager : AppCompatActivity() {
             }
         }
         // zavolani metody pro nastaveni listeneru
+        createNotificationChannel(this)
         setupRealtimeListener()
+        startListeningForNotifications()
+        startCheckingNotifications()
     }
 
     private fun tableNotificationPopup(){
@@ -199,9 +235,69 @@ class Company_manager : AppCompatActivity() {
         closeButton.setOnClickListener {
             tableNotificationDialog.dismiss()
         }
-
-
+        drawNotifications()
         tableNotificationDialog.show()
+    }
+
+    private fun drawNotifications(){
+        notificationsLayout.removeAllViews()
+        notificationsList.forEach { notification ->
+            if (notification.send){
+                when(notification.type){
+                    "seated" -> createNotification("Check table ${notification.tableName} if customers have picked their order!")
+                    "eating" -> createNotification("Check table ${notification.tableName} if customers want something else!")
+                    "paid" -> createNotification("Table ${notification.tableName} needs to be cleaned!")
+                }
+            }
+        }
+    }
+    private fun createNotification(message: String){
+        val linearLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 5, 0)
+            }
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val confirmButton = ImageButton(this).apply {
+            setImageResource(R.drawable.baseline_done_24)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            setPadding(16, 16, 16, 16)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
+            setBackgroundColor(Color.GREEN)
+        }
+        confirmButton.setOnClickListener {
+            //TODO
+        }
+        val itemView = TextView(this).apply {
+            text = message
+            textSize = 15f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        linearLayout.addView(confirmButton)
+        linearLayout.addView(itemView)
+        notificationsLayout.addView(linearLayout)
+    }
+
+    private fun createNotificationChannel(context: Context) {
+        val name = "WaitR Channel"
+        val descriptionText = "Notifikace pro WaitR"
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel("waitr_channel_id", name, importance).apply {
+            description = descriptionText
+        }
+        val notificationManager: NotificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun showInviteUserPopUp(){
@@ -328,6 +424,68 @@ class Company_manager : AppCompatActivity() {
         }
         dialog.show()
     }
+
+    //Metoda pro poslani notifikace
+    private fun sendNotification(context: Context,tableName: String, type: String) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+        val notification = NotificationCompat.Builder(context, "waitr_channel_id")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(tableName)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)  // Zmizí po kliknutí
+
+        when (type){
+            "seated" -> notification.setContentText("Check table ${tableName} if customers have picked their order!")
+            "eating" -> notification.setContentText("Check table ${tableName} if customers want something else!")
+            "paid" -> notification.setContentText("Table ${tableName} needs to be cleaned!")
+            else -> {}
+        }
+
+        NotificationManagerCompat.from(context).notify(System.currentTimeMillis().toInt(), notification.build())
+    }
+
+    //Listener pro notifikace
+    private fun startListeningForNotifications() {
+        val ref = db.child("companies").child(CompanyID).child("notifications")
+        ref.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                notificationsList.clear()
+                for (child in snapshot.children) {
+                    val notification = child.getValue(Notification::class.java)
+                    notification?.let { notificationsList.add(it) }
+                }
+                checkAndSendNotifications()
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Error loading notifications: ${error.message}")
+            }
+        })
+    }
+
+    //Zkontroluje jestli je cas poslat notifikaci
+    fun checkAndSendNotifications() {
+        val currentTime = System.currentTimeMillis()
+        notificationsList.forEach { notification ->
+            if (notification.timeToSend <= currentTime) {
+                sendNotification(this, notification.tableName, notification.type)
+                // Aktualizace hodnoty "send" na true v Firebase
+                val notificationRef = db.child("companies")
+                    .child(CompanyID)
+                    .child("notifications")
+                    .child(notification.id)
+                notificationRef.child("send").setValue(true)
+            }
+        }
+    }
+
+    //vymaze notifikaci
+    private fun removeNotificationFromFirebase(id: String) {
+        db.child("companies").child(CompanyID).child("notifications").child(id).removeValue()
+    }
+
     // Metoda pro meneni fragmentu
     private fun setCurrentFragment(fragment: Fragment) {
         val transaction = supportFragmentManager.beginTransaction()
@@ -378,6 +536,7 @@ class Company_manager : AppCompatActivity() {
                     }
             } ?: Log.e("StatusChange", "User ID is null")
         } ?: Log.e("StatusChange", "Company ID is null")
+        stopCheckingNotifications()
     }
     //získání useru z menu a rozdělení na online a offline
     private fun fetchUsers(){

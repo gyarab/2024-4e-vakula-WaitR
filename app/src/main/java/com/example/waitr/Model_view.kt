@@ -2573,6 +2573,7 @@ class Model_view : Fragment() {
         model.listOfScenes.forEachIndexed { sceneIndex, modelScene ->
             modelScene.listOfTables.forEachIndexed { tableIndex, modelTable ->
                 val tableId = modelTable.id
+                val tableName = modelTable.name
                 val tableStateRef = db.child("companies").child(companyId).child("Model")
                     .child("listOfScenes").child(sceneIndex.toString()).child("listOfTables")
                     .child(tableIndex.toString()).child("state")
@@ -2597,6 +2598,7 @@ class Model_view : Fragment() {
                         val notification = Notification(
                             id = newNotificationRef.key!!,
                             tableId = tableId,
+                            tableName = tableName,
                             type = newState,
                             timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), //prvni rika kolik minut
                             send = false
@@ -2609,6 +2611,8 @@ class Model_view : Fragment() {
                         println("Error listening for table state changes: ${error.message}")
                     }
                 }
+                tableStateRef.addValueEventListener(newListener)
+                tableStateListeners[tableId] = newListener
             }
         }
     }
