@@ -80,6 +80,9 @@ class Company_manager : AppCompatActivity() {
     private lateinit var UserName: String
     private lateinit var Email: String
     private lateinit var Authorization:String
+    private var seatedTableNotificationPeriod = 5
+    private var eatingTableNotificationPeriod = 5
+    private var paidTableNotificationPeriod = 5
     private lateinit var companyListener: ValueEventListener
     private val userCompaniesRef = userId?.let { db.child("users").child(it).child("companies") }
     private val handler = Handler(Looper.getMainLooper())
@@ -239,6 +242,7 @@ class Company_manager : AppCompatActivity() {
         startListeningForNotifications()
         startCheckingNotifications()
         startCompanyListener()
+        listenForSettingsChanges()
     }
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
@@ -1194,5 +1198,24 @@ class Company_manager : AppCompatActivity() {
         }
 
         userCompaniesRef?.addValueEventListener(companyListener)
+    }
+    //listener pro zmeny v settings
+    private fun listenForSettingsChanges() {
+        val databaseRef = db.child("companies").child(CompanyID).child("settings")
+
+        databaseRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                seatedTableNotificationPeriod = snapshot.child("seatedNotification").getValue(Int::class.java) ?: 5
+                eatingTableNotificationPeriod = snapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
+                paidTableNotificationPeriod = snapshot.child("paidNotification").getValue(Int::class.java) ?: 5
+
+                // Debug log (pokud chceš vidět změny v Logcat)
+                Log.d("SettingsListener", "Updated settings: Seated=$seatedTableNotificationPeriod, Eating=$eatingTableNotificationPeriod, Paid=$paidTableNotificationPeriod")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("SettingsListener", "Failed to read settings", error.toException())
+            }
+        })
     }
 }
