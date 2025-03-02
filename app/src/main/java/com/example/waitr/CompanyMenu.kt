@@ -228,6 +228,11 @@ class CompanyMenu : AppCompatActivity() {
                                     "email" to email,
                                     "username" to username
                                 )
+                            ),
+                            "settings" to mapOf(
+                                "seatedNotification" to 5,
+                                "eatingNotification" to 5,
+                                "paidNotification" to 5
                             )
                         )
 

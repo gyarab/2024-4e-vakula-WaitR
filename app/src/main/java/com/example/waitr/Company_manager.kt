@@ -258,6 +258,12 @@ class Company_manager : AppCompatActivity() {
 
     private fun drawSettings(){
         val companyName = settings.companyName
+        val seatedNotificationTimePeriod = settings.seatedNotSendPeriod
+        val eatingNotificationTimePeriod = settings.eatingNotSendPeriod
+        val paidNotificationTimePeriod = settings.paidNotSendPeriod
+
+        settingsLayout.removeAllViews()
+
         val companySetLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -386,6 +392,211 @@ class Company_manager : AppCompatActivity() {
             usersSetLayout.addView(manageUserLayout)
         }
         settingsLayout.addView(usersSetLayout)
+
+        val notificationsSetLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+        }
+        val notificationsTextView = TextView(this).apply {
+            text = "Notifications:"
+            textSize = 30f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        notificationsSetLayout.addView(notificationsTextView)
+        val notificationLayout1 = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val seatedNotTextView = TextView(this).apply {
+            text = "Time period for seated table Notifications:"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val seatedNotPeriodTextView = TextView(this).apply {
+            text = seatedNotificationTimePeriod.toString()
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        val changeSeatedNotPeriodButton = Button(this).apply {
+            text = "Change"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        changeSeatedNotPeriodButton.setOnClickListener {
+            changeNotificationPeriod("seated")
+        }
+        notificationLayout1.addView(seatedNotTextView)
+        notificationLayout1.addView(seatedNotPeriodTextView)
+        notificationLayout1.addView(changeSeatedNotPeriodButton)
+        notificationsSetLayout.addView(notificationLayout1)
+
+        val notificationLayout2 = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val eatingNotTextView = TextView(this).apply {
+            text = "Time period for eating table Notifications:"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val eatingNotPeriodTextView = TextView(this).apply {
+            text = eatingNotificationTimePeriod.toString()
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        val changeEatingNotPeriodButton = Button(this).apply {
+            text = "Change"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        changeEatingNotPeriodButton.setOnClickListener {
+            changeNotificationPeriod("eating")
+        }
+        notificationLayout1.addView(eatingNotTextView)
+        notificationLayout1.addView(eatingNotPeriodTextView)
+        notificationLayout1.addView(changeEatingNotPeriodButton)
+        notificationsSetLayout.addView(notificationLayout2)
+
+        val notificationLayout3 = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val paidNotTextView = TextView(this).apply {
+            text = "Time period for paid table Notifications:"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val paidNotPeriodTextView = TextView(this).apply {
+            text = paidNotificationTimePeriod.toString()
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        val changePaidNotPeriodButton = Button(this).apply {
+            text = "Change"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        changePaidNotPeriodButton.setOnClickListener {
+            changeNotificationPeriod("paid")
+        }
+        notificationLayout1.addView(paidNotTextView)
+        notificationLayout1.addView(paidNotPeriodTextView)
+        notificationLayout1.addView(changePaidNotPeriodButton)
+        notificationsSetLayout.addView(notificationLayout3)
+
+        settingsLayout.addView(notificationsSetLayout)
+    }
+
+    private fun changeNotificationPeriod(type: String){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.change_parameters_for_menu_elements)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.5).toInt(),
+            (resources.displayMetrics.heightPixels * 0.4).toInt()
+        )
+        // Reference na prvky v popup layoutu
+        val textView = dialog.findViewById<TextView>(R.id.parametr_view)
+        when(type){
+            "seated" -> textView.text = "seated table notification period"
+            "eating" -> textView.text = "eating table notification period"
+            "paid" -> textView.text = "paid table notification period"
+        }
+        val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
+        parametrToChange.hint = "New period"
+        val changePeriodButton = dialog.findViewById<Button>(R.id.change_group_name_button)
+        changePeriodButton.text = "Change period"
+        changePeriodButton.setOnClickListener {
+
+            val newPeriod = parametrToChange.text.toString().toIntOrNull()
+
+            if (newPeriod == null || newPeriod < 5 || newPeriod > 45) {
+                Toast.makeText(this, "Please enter a whole number between 5 and 45 minutes", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val databaseRef = db.child("companies").child(CompanyID).child("settings")
+
+            when (type) {
+                "seated" -> databaseRef.child("seatedNotification").setValue(newPeriod)
+                "eating" -> databaseRef.child("eatingNotification").setValue(newPeriod)
+                "paid" -> databaseRef.child("paidNotification").setValue(newPeriod)
+            }
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun manageUserSettings(userName: String, userId: String){
@@ -549,12 +760,19 @@ class Company_manager : AppCompatActivity() {
 
                     usersList.add(User(id = userId, name = username, authorization = authorization))
                 }
+                companyRef.child("settings").get().addOnSuccessListener { settingsSnapshot ->
+                    val seatedNot = settingsSnapshot.child("seatedNotification").getValue(Int::class.java) ?: 5
+                    val eatingNot = settingsSnapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
+                    val paidNot = settingsSnapshot.child("paidNotification").getValue(Int::class.java) ?: 5
 
-                // Aktualizace globální proměnné settings
-                settings = Settings(companyName, usersList)
+                    // Aktualizace globální proměnné settings
+                    settings = Settings(companyName, usersList, seatedNot, eatingNot, paidNot)
 
-                // Zavolání callbacku po úspěšném načtení dat
-                onComplete()
+                    // Zavolání callbacku po úspěšném načtení dat
+                    onComplete()
+                }.addOnFailureListener {
+                    Log.e("Firebase", "Chyba při načítání settings: ${it.message}")
+                }
             }.addOnFailureListener {
                 Log.e("Firebase", "Chyba při načítání uživatelů: ${it.message}")
             }
