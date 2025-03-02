@@ -1,6 +1,7 @@
 package com.example.waitr
 
 import android.Manifest
+import android.app.AlertDialog
 import android.app.Dialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -44,6 +45,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import kotlin.math.E
 
 class Company_manager : AppCompatActivity() {
     // promenne sem
@@ -75,6 +77,11 @@ class Company_manager : AppCompatActivity() {
     private lateinit var settingsLayout: LinearLayout
     private val notificationsList = mutableListOf<Notification>()
     private var settings = Settings()
+    private lateinit var UserName: String
+    private lateinit var Email: String
+    private lateinit var Authorization:String
+    private lateinit var companyListener: ValueEventListener
+    private val userCompaniesRef = userId?.let { db.child("users").child(it).child("companies") }
     private val handler = Handler(Looper.getMainLooper())
     private val checkNotificationsRunnable = object : Runnable {
         override fun run() {
@@ -108,7 +115,7 @@ class Company_manager : AppCompatActivity() {
         CompanyID = intentmain.getStringExtra("COMPANY_ID").toString()
 
         // Vytvoření fragmentů a předání CompanyID
-        CompanyID?.let {
+        CompanyID.let {
             modelView = Model_view.newInstance(it)
             foodMenu = Food_menu.newInstance(it)
             analytics = Analytics.newInstance(it)
@@ -159,15 +166,16 @@ class Company_manager : AppCompatActivity() {
             userRef.get()
                 .addOnSuccessListener { dataSnapshot ->
                     if (dataSnapshot.exists()) {
-                        val username = dataSnapshot.child("username").getValue(String::class.java)
-                        val email = dataSnapshot.child("email").getValue(String::class.java)
-                        val authorization = CompanyID?.let { it1 ->
-                            dataSnapshot.child("companies").child(it1).child("authorization").getValue(String::class.java)
+                         UserName = dataSnapshot.child("username").getValue(String::class.java).toString()
+                         Email = dataSnapshot.child("email").getValue(String::class.java).toString()
+                         Authorization = CompanyID.let { it1 ->
+                             dataSnapshot.child("companies").child(it1).child("authorization").getValue(String::class.java)
+                                 .toString()
                         }
                         // nastaveni textu v TextView
-                        yourUsername.text = username
-                        yourEmail.text = email
-                        yourAuthStatus.text = authorization
+                        yourUsername.text = UserName
+                        yourEmail.text = Email
+                        yourAuthStatus.text = Authorization
                     }
                 }
                 .addOnFailureListener { exception ->
@@ -203,8 +211,7 @@ class Company_manager : AppCompatActivity() {
                     val onlineStatusMap = mapOf(
                         "status" to "offline"
                     )
-                    CompanyID?.let {
-                            it1 ->
+                    CompanyID.let { it1 ->
                         if (userId != null) {
                             db.child("companies").child(it1).child("users").child(userId)
                                 .updateChildren(onlineStatusMap)
@@ -231,6 +238,7 @@ class Company_manager : AppCompatActivity() {
         setupRealtimeListener()
         startListeningForNotifications()
         startCheckingNotifications()
+        startCompanyListener()
     }
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
@@ -351,10 +359,12 @@ class Company_manager : AppCompatActivity() {
                     setMargins(5, 0, 0, 8)
                 }
             }
+            val manageUserSettingsTag = manageUserSettingsTag(user.id, user.name, user.authorization)
             val manageButton = Button(this).apply {
                 text = "manage user"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
+                tag = manageUserSettingsTag
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -363,14 +373,102 @@ class Company_manager : AppCompatActivity() {
                 }
             }
             manageButton.setOnClickListener {
-                //TODO
+                val tag = manageButton.tag as manageUserSettingsTag
+               manageUserSettings(tag.name, tag.id)
             }
             manageUserLayout.addView(userNameTextView)
             manageUserLayout.addView(userPositionTextView)
-            manageUserLayout.addView(manageButton)
+            if (Authorization.equals("owner")){
+                manageUserLayout.addView(manageButton)
+            } else if (user.authorization.equals("employee")){
+                manageUserLayout.addView(manageButton)
+            }
             usersSetLayout.addView(manageUserLayout)
         }
         settingsLayout.addView(usersSetLayout)
+    }
+
+    private fun manageUserSettings(userName: String, userId: String){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.manage_user_settings_layout)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.5).toInt(),
+            (resources.displayMetrics.heightPixels * 0.4).toInt()
+        )
+        val textView = dialog.findViewById<TextView>(R.id.textView12)
+        textView.text = userName
+        val promoteButton = dialog.findViewById<TextView>(R.id.promote_button)
+        promoteButton.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Promote user")
+            builder.setMessage("Are you sure you want to promote this user to manager?")
+
+            builder.setPositiveButton("Yes") { dialog1, _ ->
+                val companyRef = db.child("companies").child(CompanyID).child("users").child(userId).child("authorization")
+                companyRef.setValue("manager").addOnSuccessListener {
+                    Log.d("Firebase", "user position updated successfully")
+                    val positionRef = db.child("users").child(userId).child("companies").child(CompanyID).child("authorization")
+                    positionRef.setValue("manager").addOnSuccessListener {
+                        dialog1.dismiss()
+                        dialog.dismiss()
+                        fetchDataForSettings { drawSettings() }
+                        Log.d("Firebase", "user position updated successfully")
+                    }.addOnFailureListener {
+                        Log.e("Firebase", "Failed to update user position: ${it.message}")
+                    }
+                }.addOnFailureListener {
+                    Log.e("Firebase", "Failed to update user position: ${it.message}")
+                }
+            }
+
+            builder.setNegativeButton("No") { dialog1, _ ->
+                dialog1.dismiss()
+                dialog.dismiss()
+            }
+
+            val alertDialog = builder.create()
+            alertDialog.show()
+        }
+        val kickButton = dialog.findViewById<TextView>(R.id.kick_button)
+        kickButton.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Kick user")
+            builder.setMessage("Are you sure you want to kick this user from the company?")
+
+            builder.setPositiveButton("Yes") { dialog1, _ ->
+                val companyRef = db.child("companies").child(CompanyID).child("users").child(userId)
+                companyRef.removeValue().addOnSuccessListener {
+                    Log.d("Firebase", "user kicked successfully")
+                    val positionRef = db.child("users").child(userId).child("companies").child(CompanyID)
+                    positionRef.removeValue().addOnSuccessListener {
+                        dialog1.dismiss()
+                        dialog.dismiss()
+                        fetchDataForSettings { drawSettings() }
+                        Log.d("Firebase", "user kicked successfully")
+                    }.addOnFailureListener {
+                        Log.e("Firebase", "Failed to kick the user: ${it.message}")
+                    }
+                }.addOnFailureListener {
+                    Log.e("Firebase", "Failed to kick the user: ${it.message}")
+                }
+            }
+
+            builder.setNegativeButton("No") { dialog1, _ ->
+                dialog1.dismiss()
+                dialog.dismiss()
+            }
+
+            val alertDialog = builder.create()
+            alertDialog.show()
+        }
+        val closeButton = dialog.findViewById<TextView>(R.id.close_user_settings_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
     }
 
     private fun changeCompanyName(){
@@ -401,7 +499,7 @@ class Company_manager : AppCompatActivity() {
             companyRef.setValue(newName).addOnSuccessListener {
                 Log.d("Firebase", "Company name updated successfully")
 
-                // Teď projdeme všechny uživatele a přepíšeme název společnosti u nich
+                //projdeme všechny uživatele a přepíšeme název společnosti u nich
                 db.child("users").get().addOnSuccessListener { usersSnapshot ->
                     for (userSnapshot in usersSnapshot.children) {
                         val userId = userSnapshot.key ?: continue
@@ -855,5 +953,28 @@ class Company_manager : AppCompatActivity() {
             }
         }
         usersRef.addValueEventListener(valueEventListener!!)
+    }
+    //listener jestli uzivatel nebyl vyhozen ze spolecnosti
+    private fun startCompanyListener() {
+        companyListener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (!snapshot.hasChild(CompanyID)) {
+                    // Uživatel už není členem této společnosti
+                    Toast.makeText(this@Company_manager, "You have been removed from the company.", Toast.LENGTH_LONG).show()
+
+                    // Přesměrování na CompanyMenu
+                    val intent = Intent(this@Company_manager, CompanyMenu::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
+                    finish()
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Failed to listen for company changes: ${error.message}")
+            }
+        }
+
+        userCompaniesRef?.addValueEventListener(companyListener)
     }
 }
