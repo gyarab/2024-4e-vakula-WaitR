@@ -74,6 +74,7 @@ class Company_manager : AppCompatActivity() {
     private lateinit var companySettingsDialog: Dialog
     private lateinit var settingsLayout: LinearLayout
     private val notificationsList = mutableListOf<Notification>()
+    private var settings = Settings()
     private val handler = Handler(Looper.getMainLooper())
     private val checkNotificationsRunnable = object : Runnable {
         override fun run() {
@@ -241,12 +242,227 @@ class Company_manager : AppCompatActivity() {
         closeButton.setOnClickListener {
             companySettingsDialog.dismiss()
         }
-        drawSettings()
+        fetchDataForSettings {
+            drawSettings()
+        }
         companySettingsDialog.show()
     }
 
     private fun drawSettings(){
+        val companyName = settings.companyName
+        val companySetLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+        }
+        val companyTextView = TextView(this).apply {
+            text = "Company:"
+            textSize = 30f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val companyNameLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(32, 0, 0, 0)
+            }
+            orientation = LinearLayout.HORIZONTAL
+        }
+        val companyNameTextView = TextView(this).apply {
+            text = "${companyName}"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        val changeNameButton = Button(this).apply {
+            text = "Change name"
+            textSize = 25f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(5, 0, 0, 8)
+            }
+        }
+        changeNameButton.setOnClickListener {
+            changeCompanyName()
+        }
+        companyNameLayout.addView(companyNameTextView)
+        companyNameLayout.addView(changeNameButton)
+        companySetLayout.addView(companyTextView)
+        companySetLayout.addView(companyNameLayout)
+        settingsLayout.addView(companySetLayout)
 
+        val usersSetLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            orientation = LinearLayout.VERTICAL
+        }
+        val usersTextView = TextView(this).apply {
+            text = "Users:"
+            textSize = 30f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+        }
+        usersSetLayout.addView(usersTextView)
+        settings.users.forEach { user ->
+            val manageUserLayout = LinearLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(32, 0, 0, 0)
+                }
+                orientation = LinearLayout.HORIZONTAL
+            }
+            val userNameTextView = TextView(this).apply {
+                text = "${user.name}"
+                textSize = 25f
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            }
+            val userPositionTextView = TextView(this).apply {
+                text = "${user.authorization}"
+                textSize = 25f
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(5, 0, 0, 8)
+                }
+            }
+            val manageButton = Button(this).apply {
+                text = "manage user"
+                textSize = 25f
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(5, 0, 0, 8)
+                }
+            }
+            manageButton.setOnClickListener {
+                //TODO
+            }
+            manageUserLayout.addView(userNameTextView)
+            manageUserLayout.addView(userPositionTextView)
+            manageUserLayout.addView(manageButton)
+            usersSetLayout.addView(manageUserLayout)
+        }
+        settingsLayout.addView(usersSetLayout)
+    }
+
+    private fun changeCompanyName(){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.change_parameters_for_menu_elements)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.5).toInt(),
+            (resources.displayMetrics.heightPixels * 0.4).toInt()
+        )
+        // Reference na prvky v popup layoutu
+        val textView = dialog.findViewById<TextView>(R.id.parametr_view)
+        textView.text = "Company name"
+        val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
+        parametrToChange.hint = "New company name"
+        val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
+        changeTextButton.text = "Change name"
+        changeTextButton.setOnClickListener {
+            val newName = parametrToChange.text.toString().trim()
+            if (newName.isEmpty()){
+                Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val companyRef = db.child("companies").child(CompanyID).child("name")
+            companyRef.setValue(newName).addOnSuccessListener {
+                Log.d("Firebase", "Company name updated successfully")
+
+                // Teď projdeme všechny uživatele a přepíšeme název společnosti u nich
+                db.child("users").get().addOnSuccessListener { usersSnapshot ->
+                    for (userSnapshot in usersSnapshot.children) {
+                        val userId = userSnapshot.key ?: continue
+                        val companiesNode = userSnapshot.child("companies")
+
+                        for (companySnapshot in companiesNode.children) {
+                            val storedCompanyId = companySnapshot.key
+                            if (storedCompanyId == CompanyID) {
+                                db.child("users").child(userId)
+                                    .child("companies").child(CompanyID).child("companyName")
+                                    .setValue(newName)
+                                    .addOnSuccessListener {
+                                        Log.d("Firebase", "Company name updated for user: $userId")
+                                    }
+                                    .addOnFailureListener {
+                                        Log.e("Firebase", "Failed to update company name for user: $userId")
+                                    }
+                            }
+                        }
+                    }
+                }.addOnFailureListener {
+                    Log.e("Firebase", "Failed to fetch users: ${it.message}")
+                }
+
+            }.addOnFailureListener {
+                Log.e("Firebase", "Failed to update company name: ${it.message}")
+            }
+
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
+    //metoda pro nacteni dat do objektu settings
+    private fun fetchDataForSettings(onComplete: () -> Unit){
+        val companyRef = db.child("companies").child(CompanyID)
+
+        companyRef.child("name").get().addOnSuccessListener { nameSnapshot ->
+            val companyName = nameSnapshot.getValue(String::class.java) ?: ""
+
+            companyRef.child("users").get().addOnSuccessListener { usersSnapshot ->
+                val usersList = mutableListOf<User>()
+
+                for (userSnapshot in usersSnapshot.children) {
+                    val userId = userSnapshot.key ?: continue
+                    val username = userSnapshot.child("username").getValue(String::class.java) ?: ""
+                    val authorization = userSnapshot.child("authorization").getValue(String::class.java) ?: ""
+
+                    usersList.add(User(id = userId, name = username, authorization = authorization))
+                }
+
+                // Aktualizace globální proměnné settings
+                settings = Settings(companyName, usersList)
+
+                // Zavolání callbacku po úspěšném načtení dat
+                onComplete()
+            }.addOnFailureListener {
+                Log.e("Firebase", "Chyba při načítání uživatelů: ${it.message}")
+            }
+        }.addOnFailureListener {
+            Log.e("Firebase", "Chyba při načítání názvu společnosti: ${it.message}")
+        }
     }
 
     private fun tableNotificationPopup(){
