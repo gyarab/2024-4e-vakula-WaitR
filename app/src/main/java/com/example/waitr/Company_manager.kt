@@ -47,6 +47,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlin.math.E
 
+//TODO debug notification + settings
 class Company_manager : AppCompatActivity() {
     // promenne sem
     private val auth = FirebaseAuth.getInstance()
