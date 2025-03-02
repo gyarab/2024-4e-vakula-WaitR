@@ -71,6 +71,8 @@ class Company_manager : AppCompatActivity() {
     private lateinit var constrainedLayoutForCurrentUsers: ConstraintLayout
     private lateinit var tableNotificationDialog: Dialog
     private lateinit var notificationsLayout: LinearLayout
+    private lateinit var companySettingsDialog: Dialog
+    private lateinit var settingsLayout: LinearLayout
     private val notificationsList = mutableListOf<Notification>()
     private val handler = Handler(Looper.getMainLooper())
     private val checkNotificationsRunnable = object : Runnable {
@@ -146,6 +148,9 @@ class Company_manager : AppCompatActivity() {
         tableNotificationDialog = Dialog(this)
         tableNotificationDialog.setContentView(R.layout.tabel_notifications_popup)
         notificationsLayout = tableNotificationDialog.findViewById(R.id.table_notifications_layout)
+        companySettingsDialog = Dialog(this)
+        companySettingsDialog.setContentView(R.layout.company_settings_popup)
+        settingsLayout = companySettingsDialog.findViewById(R.id.company_settings_layout)
 
         // nacteni dat do headeru
         userId?.let {
@@ -228,6 +233,19 @@ class Company_manager : AppCompatActivity() {
     }
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
+        companySettingsDialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+        val closeButton = companySettingsDialog.findViewById<Button>(R.id.close_company_settings_button)
+        closeButton.setOnClickListener {
+            companySettingsDialog.dismiss()
+        }
+        drawSettings()
+        companySettingsDialog.show()
+    }
+
+    private fun drawSettings(){
 
     }
 
@@ -277,10 +295,10 @@ class Company_manager : AppCompatActivity() {
             setBackgroundColor(Color.GREEN)
         }
         confirmButton.setOnClickListener {
-            val notificationRef = db.child("companies").child(CompanyID).child("notifications").child(notification.id)
+            val notificationRef = db.child("companies").child(CompanyID).child("Notifications").child(notification.id)
             notificationRef.removeValue().addOnSuccessListener {
                 // Vytvoření nové notifikace s časem posunutým o 5 minut
-                val newNotificationRef = db.child("companies").child(CompanyID).child("notifications").push()
+                val newNotificationRef = db.child("companies").child(CompanyID).child("Notifications").push()
                 val newNotification = notification.copy(
                     id = newNotificationRef.key!!,
                     timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), // Přidá 5 minut
@@ -466,7 +484,7 @@ class Company_manager : AppCompatActivity() {
 
     //Listener pro notifikace
     private fun startListeningForNotifications() {
-        val ref = db.child("companies").child(CompanyID).child("notifications")
+        val ref = db.child("companies").child(CompanyID).child("Notifications")
         ref.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 notificationsList.clear()
@@ -492,7 +510,7 @@ class Company_manager : AppCompatActivity() {
                 // Aktualizace hodnoty "send" na true v Firebase
                 val notificationRef = db.child("companies")
                     .child(CompanyID)
-                    .child("notifications")
+                    .child("Notifications")
                     .child(notification.id)
                 notificationRef.child("send").setValue(true)
             }
@@ -501,7 +519,7 @@ class Company_manager : AppCompatActivity() {
 
     //vymaze notifikaci
     private fun removeNotificationFromFirebase(id: String) {
-        db.child("companies").child(CompanyID).child("notifications").child(id).removeValue()
+        db.child("companies").child(CompanyID).child("Notifications").child(id).removeValue()
     }
 
     // Metoda pro meneni fragmentu

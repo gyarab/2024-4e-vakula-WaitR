@@ -114,7 +114,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ScrollView
-            android:id="@+id/table_notifications_scrollable_view"
+            android:id="@+id/company_settings_scrollable_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="#E9E4E4"
@@ -125,7 +125,7 @@
             app:layout_constraintTop_toTopOf="@+id/guideline271">
 
             <LinearLayout
-                android:id="@+id/table_notifications_layout"
+                android:id="@+id/company_settings_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" />
