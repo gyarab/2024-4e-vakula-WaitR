@@ -244,14 +244,14 @@ class Company_manager : AppCompatActivity() {
         notificationsList.forEach { notification ->
             if (notification.send){
                 when(notification.type){
-                    "seated" -> createNotification("Check table ${notification.tableName} if customers have picked their order!")
-                    "eating" -> createNotification("Check table ${notification.tableName} if customers want something else!")
-                    "paid" -> createNotification("Table ${notification.tableName} needs to be cleaned!")
+                    "seated" -> createNotification(notification,"Check table ${notification.tableName} if customers have picked their order!")
+                    "eating" -> createNotification(notification,"Check table ${notification.tableName} if customers want something else!")
+                    "paid" -> createNotification(notification, "Table ${notification.tableName} needs to be cleaned!")
                 }
             }
         }
     }
-    private fun createNotification(message: String){
+    private fun createNotification(notification: Notification, message: String){
         val linearLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -272,7 +272,20 @@ class Company_manager : AppCompatActivity() {
             setBackgroundColor(Color.GREEN)
         }
         confirmButton.setOnClickListener {
-            //TODO
+            val notificationRef = db.child("companies").child(CompanyID).child("notifications").child(notification.id)
+            notificationRef.removeValue().addOnSuccessListener {
+                // Vytvoření nové notifikace s časem posunutým o 5 minut
+                val newNotificationRef = db.child("companies").child(CompanyID).child("notifications").push()
+                val newNotification = notification.copy(
+                    id = newNotificationRef.key!!,
+                    timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), // Přidá 5 minut
+                    send = false
+                )
+
+                newNotificationRef.setValue(newNotification)
+            }.addOnFailureListener {
+                Log.e("Firebase", "Chyba při mazání notifikace: ${it.message}")
+            }
         }
         val itemView = TextView(this).apply {
             text = message
