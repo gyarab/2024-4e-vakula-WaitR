@@ -176,7 +176,7 @@ class Company_manager : AppCompatActivity() {
                     true
                 }
                 R.id.manager_settings_button -> {
-                    //TODO
+                    companySettingsPopup()
                     true
                 }
                 R.id.manager_show_members_button -> {
@@ -189,6 +189,7 @@ class Company_manager : AppCompatActivity() {
                     true
                 }
                 R.id.manager_info_button -> {
+                    //TODO
                     true
                 }
                 R.id.manager_logout_of_company_button -> {
@@ -224,6 +225,10 @@ class Company_manager : AppCompatActivity() {
         setupRealtimeListener()
         startListeningForNotifications()
         startCheckingNotifications()
+    }
+    //Trida pro zobrazeni nastaveni pro spolecnost
+    private fun companySettingsPopup(){
+
     }
 
     private fun tableNotificationPopup(){
