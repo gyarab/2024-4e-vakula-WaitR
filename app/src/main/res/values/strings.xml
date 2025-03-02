@@ -80,4 +80,6 @@
     <string name="add_item">Add item</string>
     <string name="Continue">Continue</string>
     <string name="notifications">Notifications</string>
+    <string name="promote_to_manager">Promote to manager</string>
+    <string name="kick">Kick</string>
 </resources>
