@@ -18,6 +18,8 @@ import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.SubMenu
+import android.view.View
+import android.widget.ActionMenuView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
@@ -57,6 +59,9 @@ class Company_manager : AppCompatActivity() {
     private val db = FirebaseDatabase.getInstance("https://waitr-dee9a-default-rtdb.europe-west1.firebasedatabase.app/").reference // Using Realtime Database reference
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
+    private lateinit var notificationMenuItem: MenuItem
+    private lateinit var actionView: View
+    private lateinit var badge: View
     private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var yourUsername: TextView
     private lateinit var yourEmail: TextView
@@ -165,6 +170,10 @@ class Company_manager : AppCompatActivity() {
         companySettingsDialog.setContentView(R.layout.company_settings_popup)
         settingsLayout = companySettingsDialog.findViewById(R.id.company_settings_layout)
 
+        notificationMenuItem = navigationView.menu.findItem(R.id.manager_notifications_button)
+        actionView = notificationMenuItem.actionView!!
+        badge = actionView.findViewById(R.id.badge)!!
+
         // nacteni dat do headeru
         userId?.let {
             val userRef = db.child("users").child(it)
@@ -246,6 +255,12 @@ class Company_manager : AppCompatActivity() {
         startCompanyListener()
         listenForSettingsChanges()
     }
+
+    // Funkce pro nastavení tečky
+    private fun showBadge(show: Boolean) {
+        badge.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
         companySettingsDialog.window?.setLayout(
@@ -807,6 +822,7 @@ class Company_manager : AppCompatActivity() {
             tableNotificationDialog.dismiss()
         }
         drawNotifications()
+        showBadge(false)
         tableNotificationDialog.show()
     }
 
@@ -1071,6 +1087,8 @@ class Company_manager : AppCompatActivity() {
     //Zkontroluje jestli je cas poslat notifikaci
     fun checkAndSendNotifications() {
         val currentTime = System.currentTimeMillis()
+        var hasUnsentNotifications = false
+
         notificationsList.forEach { notification ->
             if (notification.timeToSend <= currentTime && !notification.send) {
                 sendNotification(this, notification.tableName, notification.type)
@@ -1080,8 +1098,11 @@ class Company_manager : AppCompatActivity() {
                     .child("Notifications")
                     .child(notification.id)
                 notificationRef.child("send").setValue(true)
+                hasUnsentNotifications = true
             }
+            if (notification.send) hasUnsentNotifications = true
         }
+        showBadge(hasUnsentNotifications)
     }
 
     //vymaze notifikaci

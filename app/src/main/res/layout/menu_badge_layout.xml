@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <!-- Ikonka notifikací -->
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/baseline_circle_notifications_24"
+        android:layout_gravity="center"/>
+
+    <!-- Červená tečka -->
+    <View
+        android:id="@+id/badge"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:background="@drawable/badge_background"
+        android:layout_gravity="top|end"
+        android:visibility="gone"/>
+</FrameLayout>

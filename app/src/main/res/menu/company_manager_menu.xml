@@ -3,7 +3,8 @@
     <group android:checkableBehavior="single">
         <item android:id="@+id/manager_notifications_button"
             android:title="@string/notifications"
-            android:icon="@drawable/baseline_circle_notifications_24">
+            android:icon="@drawable/baseline_circle_notifications_24"
+            android:actionLayout="@layout/menu_badge_layout">
         </item>
         <item android:id="@+id/manager_settings_button"
             android:title="@string/settings"
