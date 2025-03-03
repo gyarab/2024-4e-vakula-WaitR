@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -271,31 +272,39 @@ class Company_manager : AppCompatActivity() {
 
         val companySetLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             orientation = LinearLayout.VERTICAL
+            setPadding(16, 16, 16, 16)
         }
         val companyTextView = TextView(this).apply {
             text = "Company:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
         val companyNameLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(32, 0, 0, 0)
+                setMargins(0, 8, 0, 8)
             }
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(16, 16, 16, 16)
         }
         val companyNameTextView = TextView(this).apply {
-            text = "${companyName}"
+            text = companyName
             textSize = 25f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
@@ -305,13 +314,13 @@ class Company_manager : AppCompatActivity() {
         }
         val changeNameButton = Button(this).apply {
             text = "Change name"
-            textSize = 25f
+            textSize = 20f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(5, 0, 0, 8)
+                setMargins(16, 0, 0, 8)
             }
         }
         changeNameButton.setOnClickListener {
@@ -325,17 +334,18 @@ class Company_manager : AppCompatActivity() {
 
         val usersSetLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             orientation = LinearLayout.VERTICAL
+            setPadding(16, 16, 16, 16)
         }
         val usersTextView = TextView(this).apply {
             text = "Users:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
@@ -343,15 +353,22 @@ class Company_manager : AppCompatActivity() {
         settings.users.forEach { user ->
             val manageUserLayout = LinearLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(32, 0, 0, 0)
+                    setMargins(0, 8, 0, 8)
                 }
-                orientation = LinearLayout.HORIZONTAL
+                orientation = LinearLayout.VERTICAL
+                val backgroundDrawable = GradientDrawable().apply {
+                    setColor(Color.WHITE) // Barva pozadí
+                    cornerRadius = 30f // Zaoblení rohů v pixelech
+                }
+                background = backgroundDrawable
+                gravity = Gravity.CENTER
+                setPadding(16, 16, 16, 16)
             }
             val userNameTextView = TextView(this).apply {
-                text = "${user.name}"
+                text = user.name
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
                 layoutParams = LinearLayout.LayoutParams(
@@ -360,27 +377,27 @@ class Company_manager : AppCompatActivity() {
                 )
             }
             val userPositionTextView = TextView(this).apply {
-                text = "${user.authorization}"
-                textSize = 25f
+                text = user.authorization
+                textSize = 20f
                 setPadding(16, 16, 16, 16)
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(5, 0, 0, 8)
+                    setMargins(16, 0, 0, 8)
                 }
             }
             val manageUserSettingsTag = manageUserSettingsTag(user.id, user.name, user.authorization)
             val manageButton = Button(this).apply {
                 text = "manage user"
-                textSize = 25f
+                textSize = 20f
                 setPadding(16, 16, 16, 16)
                 tag = manageUserSettingsTag
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    setMargins(5, 0, 0, 8)
+                    setMargins(16, 0, 0, 8)
                 }
             }
             manageButton.setOnClickListener {
@@ -400,166 +417,154 @@ class Company_manager : AppCompatActivity() {
 
         val notificationsSetLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             orientation = LinearLayout.VERTICAL
+            setPadding(16, 16, 16, 16)
         }
         val notificationsTextView = TextView(this).apply {
             text = "Notifications:"
             textSize = 30f
-            setPadding(16, 16, 16, 16)
+            setPadding(0, 0, 0, 16)
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT  ,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
         notificationsSetLayout.addView(notificationsTextView)
         val notificationLayout1 = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(32, 0, 0, 0)
+                setMargins(0, 8, 0, 8)
             }
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
         }
         val seatedNotTextView = TextView(this).apply {
-            text = "Time period for seated table Notifications:"
-            textSize = 20f
-            setPadding(16, 16, 16, 16)
+            text = "Time period for seated table Notifications: ${seatedNotificationTimePeriod}"
+            textSize = 22f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val seatedNotPeriodTextView = TextView(this).apply {
-            text = seatedNotificationTimePeriod.toString()
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(5, 0, 0, 8)
-            }
-        }
         val changeSeatedNotPeriodButton = Button(this).apply {
             text = "Change"
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
+            textSize = 20f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(5, 0, 0, 8)
+                setMargins(8, 0, 0, 8)
             }
         }
         changeSeatedNotPeriodButton.setOnClickListener {
             changeNotificationPeriod("seated")
         }
         notificationLayout1.addView(seatedNotTextView)
-        notificationLayout1.addView(seatedNotPeriodTextView)
         notificationLayout1.addView(changeSeatedNotPeriodButton)
         notificationsSetLayout.addView(notificationLayout1)
 
         val notificationLayout2 = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(32, 0, 0, 0)
+                setMargins(0, 8, 0, 8)
             }
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
         }
         val eatingNotTextView = TextView(this).apply {
-            text = "Time period for eating table Notifications:"
-            textSize = 20f
-            setPadding(16, 16, 16, 16)
+            text = "Time period for eating table Notifications: ${eatingNotificationTimePeriod}"
+            textSize = 22f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val eatingNotPeriodTextView = TextView(this).apply {
-            text = eatingNotificationTimePeriod.toString()
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(5, 0, 0, 8)
-            }
-        }
         val changeEatingNotPeriodButton = Button(this).apply {
             text = "Change"
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
+            textSize = 20f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(5, 0, 0, 8)
+                setMargins(8, 0, 0, 8)
             }
         }
         changeEatingNotPeriodButton.setOnClickListener {
             changeNotificationPeriod("eating")
         }
-        notificationLayout1.addView(eatingNotTextView)
-        notificationLayout1.addView(eatingNotPeriodTextView)
-        notificationLayout1.addView(changeEatingNotPeriodButton)
+        notificationLayout2.addView(eatingNotTextView)
+        notificationLayout2.addView(changeEatingNotPeriodButton)
         notificationsSetLayout.addView(notificationLayout2)
 
         val notificationLayout3 = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(32, 0, 0, 0)
+                setMargins(0, 8, 0, 8)
             }
-            orientation = LinearLayout.HORIZONTAL
+            orientation = LinearLayout.VERTICAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
         }
         val paidNotTextView = TextView(this).apply {
-            text = "Time period for paid table Notifications:"
-            textSize = 20f
-            setPadding(16, 16, 16, 16)
+            text = "Time period for paid table Notifications: ${paidNotificationTimePeriod}"
+            textSize = 22f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val paidNotPeriodTextView = TextView(this).apply {
-            text = paidNotificationTimePeriod.toString()
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            ).apply {
-                setMargins(5, 0, 0, 8)
-            }
-        }
         val changePaidNotPeriodButton = Button(this).apply {
             text = "Change"
-            textSize = 25f
-            setPadding(16, 16, 16, 16)
+            textSize = 20f
+            setPadding(8, 8, 8, 8)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(5, 0, 0, 8)
+                setMargins(8, 0, 0, 8)
             }
         }
         changePaidNotPeriodButton.setOnClickListener {
             changeNotificationPeriod("paid")
         }
-        notificationLayout1.addView(paidNotTextView)
-        notificationLayout1.addView(paidNotPeriodTextView)
-        notificationLayout1.addView(changePaidNotPeriodButton)
+        notificationLayout3.addView(paidNotTextView)
+        notificationLayout3.addView(changePaidNotPeriodButton)
         notificationsSetLayout.addView(notificationLayout3)
 
         settingsLayout.addView(notificationsSetLayout)
+
+
     }
 
     private fun changeNotificationPeriod(type: String){
@@ -569,8 +574,8 @@ class Company_manager : AppCompatActivity() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -600,6 +605,9 @@ class Company_manager : AppCompatActivity() {
                 "paid" -> databaseRef.child("paidNotification").setValue(newPeriod)
             }
             dialog.dismiss()
+            fetchDataForSettings {
+                drawSettings()
+            }
         }
         dialog.show()
     }
@@ -611,8 +619,8 @@ class Company_manager : AppCompatActivity() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         val textView = dialog.findViewById<TextView>(R.id.textView12)
         textView.text = userName
@@ -694,8 +702,8 @@ class Company_manager : AppCompatActivity() {
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.8).toInt(),
+            (resources.displayMetrics.heightPixels * 0.7).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -728,6 +736,9 @@ class Company_manager : AppCompatActivity() {
                                     .child("companies").child(CompanyID).child("companyName")
                                     .setValue(newName)
                                     .addOnSuccessListener {
+                                        fetchDataForSettings {
+                                            drawSettings()
+                                        }
                                         Log.d("Firebase", "Company name updated for user: $userId")
                                     }
                                     .addOnFailureListener {
@@ -811,15 +822,23 @@ class Company_manager : AppCompatActivity() {
             }
         }
     }
+    //TODO
     private fun createNotification(notification: Notification, message: String){
         val linearLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
                 setMargins(32, 0, 5, 0)
             }
             orientation = LinearLayout.HORIZONTAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
         }
         val confirmButton = ImageButton(this).apply {
             setImageResource(R.drawable.baseline_done_24)
@@ -834,27 +853,38 @@ class Company_manager : AppCompatActivity() {
         confirmButton.setOnClickListener {
             val notificationRef = db.child("companies").child(CompanyID).child("Notifications").child(notification.id)
             notificationRef.removeValue().addOnSuccessListener {
-                // Vytvoření nové notifikace s časem posunutým o 5 minut
+                // Vytvoření nové notifikace s časem posunutým o periodu
+                val period: Int
+                when(notification.type){
+                    "seated" -> period = seatedTableNotificationPeriod
+                    "eating" -> period = eatingTableNotificationPeriod
+                    "paid" -> period = paidTableNotificationPeriod
+                    else -> period = 5
+                }
                 val newNotificationRef = db.child("companies").child(CompanyID).child("Notifications").push()
                 val newNotification = notification.copy(
                     id = newNotificationRef.key!!,
-                    timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), // Přidá 5 minut
+                    timeToSend = System.currentTimeMillis() + (period * 60 * 1000), // Přidá 5 minut
                     send = false
                 )
 
-                newNotificationRef.setValue(newNotification)
+                newNotificationRef.setValue(newNotification).addOnSuccessListener {
+                    drawNotifications()
+                }
             }.addOnFailureListener {
                 Log.e("Firebase", "Chyba při mazání notifikace: ${it.message}")
             }
         }
         val itemView = TextView(this).apply {
             text = message
-            textSize = 15f
+            textSize = 18f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
-            )
+            ).apply {
+                setMargins(8,0,0,0)
+            }
         }
         linearLayout.addView(confirmButton)
         linearLayout.addView(itemView)
@@ -1042,7 +1072,7 @@ class Company_manager : AppCompatActivity() {
     fun checkAndSendNotifications() {
         val currentTime = System.currentTimeMillis()
         notificationsList.forEach { notification ->
-            if (notification.timeToSend <= currentTime) {
+            if (notification.timeToSend <= currentTime && !notification.send) {
                 sendNotification(this, notification.tableName, notification.type)
                 // Aktualizace hodnoty "send" na true v Firebase
                 val notificationRef = db.child("companies")
@@ -1097,7 +1127,7 @@ class Company_manager : AppCompatActivity() {
             "status" to "offline"
         )
 
-        CompanyID?.let { companyId ->
+        CompanyID.let { companyId ->
             userId?.let { userId ->
                 db.child("companies").child(companyId).child("users").child(userId)
                     .updateChildren(onlineStatusMap)

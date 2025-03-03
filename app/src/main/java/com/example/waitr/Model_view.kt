@@ -107,6 +107,9 @@ class Model_view : Fragment() {
     private var allMenuItems: MutableList<MenuItem> = mutableListOf()
     private lateinit var paidTableManagingDialog: Dialog
     private val tableStateListeners = mutableMapOf<String, ValueEventListener>()
+    private var seatedTableNotificationPeriod = 5
+    private var eatingTableNotificationPeriod = 5
+    private var paidTableNotificationPeriod = 5
 
 // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -116,6 +119,7 @@ class Model_view : Fragment() {
     arguments?.getString(COMPANY_ID)?.let {
         CompanyID = it
     }
+    listenForSettingsChanges()
     }
 // zde psat kod souvisejici s UI
     override fun onCreateView(
@@ -2590,8 +2594,24 @@ class Model_view : Fragment() {
 
                         val notificationsRef = db.child("companies").child(companyId).child("Notifications")
 
+                        if (newState !in listOf("seated", "eating", "paid")){
+                            notificationsRef.orderByChild("tableId").equalTo(tableId).get().addOnSuccessListener { data ->
+                                data.children.forEach { it.ref.removeValue() }
+                                return@addOnSuccessListener
+                            }
+                            return
+                        }
+
                         notificationsRef.orderByChild("tableId").equalTo(tableId).get().addOnSuccessListener { data ->
                             data.children.forEach { it.ref.removeValue() }
+                        }
+
+                        val period: Int
+                        when(newState){
+                            "seated" -> period = seatedTableNotificationPeriod
+                            "eating" -> period = eatingTableNotificationPeriod
+                            "paid" -> period = paidTableNotificationPeriod
+                            else -> period = 5
                         }
 
                         val newNotificationRef = notificationsRef.push()
@@ -2600,7 +2620,7 @@ class Model_view : Fragment() {
                             tableId = tableId,
                             tableName = tableName,
                             type = newState,
-                            timeToSend = System.currentTimeMillis() + (5 * 60 * 1000), //prvni rika kolik minut
+                            timeToSend = System.currentTimeMillis() + (period * 60 * 1000), //prvni rika kolik minut
                             send = false
                         )
                         newNotificationRef.setValue(notification)
@@ -2643,6 +2663,28 @@ class Model_view : Fragment() {
             }
         }
         return null // Return null if the tableId is not found
+    }
+
+    //listener pro zmeny v settings
+    private fun listenForSettingsChanges() {
+        val databaseRef = CompanyID?.let { db.child("companies").child(it).child("settings") }
+
+        if (databaseRef != null) {
+            databaseRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    seatedTableNotificationPeriod = snapshot.child("seatedNotification").getValue(Int::class.java) ?: 5
+                    eatingTableNotificationPeriod = snapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
+                    paidTableNotificationPeriod = snapshot.child("paidNotification").getValue(Int::class.java) ?: 5
+
+                    // Debug log (pokud chceš vidět změny v Logcat)
+                    Log.d("SettingsListener", "Updated settings: Seated=$seatedTableNotificationPeriod, Eating=$eatingTableNotificationPeriod, Paid=$paidTableNotificationPeriod")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("SettingsListener", "Failed to read settings", error.toException())
+                }
+            })
+        }
     }
 
     override fun onDestroy() {
