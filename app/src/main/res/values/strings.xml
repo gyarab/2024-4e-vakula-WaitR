@@ -82,4 +82,5 @@
     <string name="notifications">Notifications</string>
     <string name="promote_to_manager">Promote to manager</string>
     <string name="kick">Kick</string>
+    <string name="Analytics">Analytics</string>
 </resources>
