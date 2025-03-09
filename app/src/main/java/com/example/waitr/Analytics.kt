@@ -10,9 +10,8 @@ import android.view.ViewGroup
 var CompanyID: String? = null
 
 class Analytics : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    //globalni promenne
+    
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,20 +24,12 @@ class Analytics : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // inicializace ui prvku
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_analytics, container, false)
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment Analytics.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(companyId: String) =
             Analytics().apply {
