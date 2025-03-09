@@ -233,6 +233,16 @@ class CompanyMenu : AppCompatActivity() {
                                 "seatedNotification" to 5,
                                 "eatingNotification" to 5,
                                 "paidNotification" to 5
+                            ),
+                            "Analytics" to mapOf(
+                                "tables" to mapOf(),
+                                "items" to mapOf(),
+                                "users" to mapOf(
+                                    userId to mapOf(
+                                        "numberOfServedTables" to 0,
+                                        "activity" to 0
+                                    )
+                                )
                             )
                         )
 
@@ -399,6 +409,21 @@ class CompanyMenu : AppCompatActivity() {
                     }
                     .addOnFailureListener{ exception ->
                         Log.e("DatabaseUpdate", "Error adding user: ${exception.message}")
+                    }
+                // pridani uzivatele k analytics
+                val userAnalytics = mapOf(
+                    userId to mapOf(
+                        "numberOfServedTables" to 0,
+                        "activity" to 0
+                    )
+                )
+                db.child("companies").child(companyId).child("Analytics").child("users")
+                    .updateChildren(userAnalytics)
+                    .addOnSuccessListener {
+                        Log.d("DatabaseUpdate", "User added successfully to analytics")
+                    }
+                    .addOnFailureListener{ exception ->
+                        Log.e("DatabaseUpdate", "Error adding user to analytics: ${exception.message}")
                     }
                 // smazani poznamky po potvrzeni
                 removeInvite(companyId)

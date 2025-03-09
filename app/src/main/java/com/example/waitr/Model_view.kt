@@ -2263,6 +2263,7 @@ class Model_view : Fragment() {
                     "Changes saved!",
                     Toast.LENGTH_SHORT
                 ).show()
+                updateAnalytics()
                 onComplete()
             }
             ?.addOnFailureListener {
@@ -2272,6 +2273,53 @@ class Model_view : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+
+    private fun updateAnalytics(){
+        val analyticsTablesList = mutableListOf<String>()
+
+        val tablesRef = CompanyID?.let { db.child("companies").child(it).child("Analytics").child("tables") }
+        tablesRef?.get()?.addOnSuccessListener { snapshot ->
+            analyticsTablesList.clear() // Vyčištění listu
+
+            for (itemSnapshot in snapshot.children) {
+                val itemId = itemSnapshot.key // Každý klíč je ID položky
+                if (itemId != null) {
+                    analyticsTablesList.add(itemId)
+                }
+            }
+            Log.d("Analytics", "Načtené ID položek: $analyticsTablesList")
+
+            val finalAnalyticsTablesList = mutableListOf<String>()
+            analyticsTableTraversal(model, analyticsTablesList, finalAnalyticsTablesList)
+
+            analyticsTablesList.forEach { table ->
+                tablesRef.child(table).removeValue()
+            }
+            finalAnalyticsTablesList.forEach { table ->
+                val tableMap = mapOf(
+                    table to mapOf(
+                        "numberOfServedTimes" to 0
+                    )
+                )
+                tablesRef.updateChildren(tableMap)
+            }
+
+        }?.addOnFailureListener { error ->
+            Log.e("Firebase", "Chyba při načítání Analytics: ${error.message}")
+        }
+    }
+
+    private fun analyticsTableTraversal(model: Model, list: MutableList<String>, finalList: MutableList<String>){
+        model.listOfScenes.forEach { modelScene ->
+            modelScene.listOfTables.forEach { table ->
+                if (list.contains(table.id)){
+                    list.remove(table.id)
+                } else {
+                    finalList.add(table.id)
+                }
+            }
+        }
     }
 
     private fun fetchModel(onComplete: () -> Unit) {

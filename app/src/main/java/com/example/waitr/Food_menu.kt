@@ -663,6 +663,8 @@ class Food_menu : Fragment() {
                     "Changes saved!",
                     Toast.LENGTH_SHORT
                 ).show()
+                //update Analytics
+                updateAnalytics()
                 fetchMenu(onComplete)
             }
             ?.addOnFailureListener {
@@ -672,6 +674,53 @@ class Food_menu : Fragment() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+    }
+    private fun updateAnalytics(){
+        val analyticsItemsList = mutableListOf<String>()
+
+        val itemsRef = CompanyID?.let { db.child("companies").child(it).child("Analytics").child("items") }
+
+        itemsRef?.get()?.addOnSuccessListener { snapshot ->
+            analyticsItemsList.clear() // Vyčištění listu
+
+            for (itemSnapshot in snapshot.children) {
+                val itemId = itemSnapshot.key // Každý klíč je ID položky
+                if (itemId != null) {
+                    analyticsItemsList.add(itemId)
+                }
+            }
+            Log.d("Analytics", "Načtené ID položek: $analyticsItemsList")
+
+            val finalAnalyticsItemsList = mutableListOf<String>()
+            analyticsRecursiveTraversal(editMenu, analyticsItemsList, finalAnalyticsItemsList)
+
+            analyticsItemsList.forEach { item ->
+                itemsRef.child(item).removeValue()
+            }
+            finalAnalyticsItemsList.forEach { item ->
+                val itemMap = mapOf(
+                    item to mapOf(
+                        "numberOfServedTimes" to 0
+                    )
+                )
+                itemsRef.updateChildren(itemMap)
+            }
+
+        }?.addOnFailureListener { error ->
+            Log.e("Firebase", "Chyba při načítání Analytics: ${error.message}")
+        }
+    }
+    private fun analyticsRecursiveTraversal(menuGroup: MenuGroup, list: MutableList<String>, finalList: MutableList<String>){
+        menuGroup.items.forEach { menuItem ->
+            if (list.contains(menuItem.id)){
+                list.remove(menuItem.id)
+            } else {
+                finalList.add(menuItem.id)
+            }
+        }
+        menuGroup.subGroups.forEach { subGroup ->
+            analyticsRecursiveTraversal(subGroup, list, finalList)
+        }
     }
     private fun fetchMenu(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
