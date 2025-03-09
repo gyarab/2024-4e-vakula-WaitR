@@ -890,6 +890,8 @@ class Company_manager : AppCompatActivity() {
             }.addOnFailureListener {
                 Log.e("Firebase", "Chyba při mazání notifikace: ${it.message}")
             }
+            // update analytics
+            updateUserDataInAnalytics()
         }
         val itemView = TextView(this).apply {
             text = message
@@ -905,6 +907,20 @@ class Company_manager : AppCompatActivity() {
         linearLayout.addView(confirmButton)
         linearLayout.addView(itemView)
         notificationsLayout.addView(linearLayout)
+    }
+
+    private fun updateUserDataInAnalytics(){
+        val userRef = userId?.let {
+                db.child("companies").child(CompanyID).child("Analytics").child("users").child(it).child("activity")
+            }
+        userRef?.get()?.addOnSuccessListener { snapshot ->
+            val currentValue = snapshot.getValue(Int::class.java) ?: 0
+            val newValue = currentValue + 1
+
+            userRef.setValue(newValue)
+        }?.addOnFailureListener { error ->
+            Log.e("Firebase", "Chyba při načítání numberOfServedTimes: ${error.message}")
+        }
     }
 
     private fun createNotificationChannel(context: Context) {

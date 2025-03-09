@@ -28,19 +28,15 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
-import androidx.privacysandbox.ads.adservices.adid.AdId
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.tasks.Task
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.UUID
-import kotlin.math.log
 
 //nadefinovane objekty...
 
@@ -631,6 +627,8 @@ class Model_view : Fragment() {
     private fun proceedToCheckoutPopup(){
         val table = findTableById(model, selectedTableId!!)
         val price = table?.totalTablePrice
+        // HashMap pro sledování počtu výskytů jednotlivých menuItem.id
+        val itemCounts = mutableMapOf<String, Int>()
 
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.managing_table_proceed_to_checkout)
@@ -643,6 +641,9 @@ class Model_view : Fragment() {
         displayPrice.text = "Total table price: ${price} Kč"
         val continueButton = dialog.findViewById<Button>(R.id.checkout_continue_button)
         continueButton.setOnClickListener {
+            if (table != null) {
+                updateDataInAnalytics(table.id, itemCounts)
+            }
             table?.state = "paid"
             val iterator = table?.listOfCustomers?.iterator()
             if (iterator != null) {
@@ -673,8 +674,6 @@ class Model_view : Fragment() {
         }
         val displayLayout = dialog.findViewById<LinearLayout>(R.id.check_out_customers_layout)
         table?.listOfCustomers?.forEach { customer ->
-            // HashMap pro sledování počtu výskytů jednotlivých menuItem.id
-            val itemCounts = mutableMapOf<String, Int>()
             // Nejprve spočítáme výskyty
             customer.order.menuItems.forEach { menuItem ->
                 itemCounts[menuItem.name] = itemCounts.getOrDefault(menuItem.name, 0) + 1
@@ -2733,6 +2732,65 @@ class Model_view : Fragment() {
                 }
             })
         }
+    }
+
+    private fun updateDataInAnalytics(id: String, mutableMap: MutableMap<String, Int>){
+        //tables update
+        val tablesRef = CompanyID?.let {
+            db.child("companies").child(it).child("Analytics").child("tables").child(id).child("numberOfServedTimes")
+        }
+        tablesRef?.get()?.addOnSuccessListener { snapshot ->
+            val currentValue = snapshot.getValue(Int::class.java) ?: 0
+            val newValue = currentValue + 1
+
+            tablesRef.setValue(newValue)
+        }?.addOnFailureListener { error ->
+            Log.e("Firebase", "Chyba při načítání numberOfServedTimes: ${error.message}")
+        }
+
+        //user update
+        val userRef = if (userId != null) {
+            CompanyID?.let {
+                db.child("companies").child(it).child("Analytics").child("users").child(userId).child("numberOfServedTables")
+            }
+        } else {
+            null
+        }
+
+        userRef?.let { ref ->
+            ref.get().addOnSuccessListener { snapshot ->
+                val currentValue = snapshot.getValue(Int::class.java) ?: 0
+                val newValue = currentValue + 1
+
+                ref.setValue(newValue)
+            }.addOnFailureListener { error ->
+                Log.e("Firebase", "Chyba při načítání numberOfServedTables: ${error.message}")
+            }
+        }
+
+        //items update
+        val itemsRef = CompanyID?.let {
+            db.child("companies").child(it).child("Analytics").child("items")
+        }
+        mutableMap.forEach{ (key, value) ->
+            val itemId = findItemIdByName(key)
+            val ref = itemId?.let { itemsRef?.child(it)?.child("numberOfServedTimes") }
+            ref?.get()?.addOnSuccessListener { snapshot ->
+                val currentValue = snapshot.getValue(Int::class.java) ?: 0
+                val newValue = currentValue + value
+
+                ref.setValue(newValue)
+            }?.addOnFailureListener { error ->
+                Log.e("Firebase", "Chyba při načítání numberOfServedTimes: ${error.message}")
+            }
+        }
+    }
+
+    private fun findItemIdByName(name: String): String? {
+        allMenuItems.forEach { menuItem ->
+            if (menuItem.name.equals(name)) return menuItem.id
+        }
+        return null
     }
 
     override fun onDestroy() {
