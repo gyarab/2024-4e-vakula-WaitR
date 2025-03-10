@@ -1619,6 +1619,7 @@ class Model_view : Fragment() {
                     CustomClickListener(
                         onClick = {
                             selectedStageId = textViewForScene.tag.toString()
+                            setSelectedScene(textViewForScene)
                             drawEditScene()
                         },
                         onDoubleClick = {
@@ -1628,6 +1629,12 @@ class Model_view : Fragment() {
                     )
                 )
                 editModelScenesLayout.addView(textViewForScene)
+            }
+            if (selectedStageId!!.isNotEmpty()) {
+                val selectedTextView = modelScenesBar.findViewWithTag<TextView>(selectedStageId)
+                selectedTextView?.let {
+                    setSelectedScene(it)
+                }
             }
         }
     }
@@ -1679,6 +1686,7 @@ class Model_view : Fragment() {
                 //prepne na jinou scenu
                 if (editModel.listOfScenes.isNotEmpty()){
                     selectedStageId = editModel.listOfScenes.get(0).id
+                    drawEditScenesToBar()
                     drawEditScene()
                 } else {
                     val textView = TextView(context).apply {
@@ -2482,6 +2490,7 @@ class Model_view : Fragment() {
                 textViewForScene.setOnClickListener(
                     CustomClickListener(
                         onClick = {
+                            setSelectedScene(textViewForScene)
                             selectedStageId = textViewForScene.tag.toString()
                             drawScene()
                         },
@@ -2490,6 +2499,27 @@ class Model_view : Fragment() {
                     )
                 )
                 modelScenesBar.addView(textViewForScene)
+            }
+            if (selectedStageId!!.isNotEmpty()) {
+                val selectedTextView = modelScenesBar.findViewWithTag<TextView>(selectedStageId)
+                selectedTextView?.let {
+                    setSelectedScene(it)
+                }
+            }
+        }
+    }
+
+    private fun setSelectedScene(selectedTextView: TextView) {
+        for (i in 0 until modelScenesBar.childCount) {
+            val child = modelScenesBar.getChildAt(i)
+            if (child is TextView) {
+                if (child == selectedTextView) {
+                    child.setBackgroundColor(Color.GREEN)
+                    child.setTextColor(Color.BLACK)
+                } else {
+                    child.setBackgroundColor(Color.WHITE)
+                    child.setTextColor(Color.BLACK)
+                }
             }
         }
     }
