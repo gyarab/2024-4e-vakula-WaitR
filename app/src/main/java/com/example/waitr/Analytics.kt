@@ -1,14 +1,18 @@
 package com.example.waitr
 
+import android.app.Dialog
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
@@ -17,6 +21,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
@@ -89,7 +94,7 @@ class Analytics : Fragment() {
         }
         val tableBarChart = drawTableBarChard()
         val viewMoreTableDataButton = Button(context).apply {
-            text = "manage user"
+            text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
@@ -100,7 +105,7 @@ class Analytics : Fragment() {
             }
         }
         viewMoreTableDataButton.setOnClickListener {
-
+            viewMoreDataPopup("table")
         }
         tableAnalyticsLayout.addView(tableAnalyticsTextview)
         tableAnalyticsLayout.addView(tableBarChart)
@@ -126,7 +131,7 @@ class Analytics : Fragment() {
         }
         val itemBarChard = drawItemBarChard()
         val viewMoreItemDataButton = Button(context).apply {
-            text = "manage user"
+            text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
@@ -137,7 +142,7 @@ class Analytics : Fragment() {
             }
         }
         viewMoreItemDataButton.setOnClickListener {
-
+            viewMoreDataPopup("item")
         }
         itemAnalyticsLayout.addView(itemAnalyticsTextview)
         itemAnalyticsLayout.addView(itemBarChard)
@@ -163,7 +168,7 @@ class Analytics : Fragment() {
         }
         val userServedBarChard = drawUserServedBarChard()
         val viewMoreUserServedTableDataButton = Button(context).apply {
-            text = "manage user"
+            text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
@@ -174,7 +179,7 @@ class Analytics : Fragment() {
             }
         }
         viewMoreUserServedTableDataButton.setOnClickListener {
-
+            viewMoreDataPopup("userServed")
         }
         userServedAnalyticsLayout.addView(userServedAnalyticsTextview)
         userServedAnalyticsLayout.addView(userServedBarChard)
@@ -200,7 +205,7 @@ class Analytics : Fragment() {
         }
         val userActivityBarChard = drawUserActivityBarChard()
         val viewMoreUserActivityDataButton = Button(context).apply {
-            text = "manage user"
+            text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
             layoutParams = LinearLayout.LayoutParams(
@@ -211,7 +216,7 @@ class Analytics : Fragment() {
             }
         }
         viewMoreUserActivityDataButton.setOnClickListener {
-
+            viewMoreDataPopup("userActivity")
         }
         userActivityAnalyticsLayout.addView(userActivityAnalyticsTextview)
         userActivityAnalyticsLayout.addView(userActivityBarChard)
@@ -459,7 +464,155 @@ class Analytics : Fragment() {
     }
 
     private fun viewMoreDataPopup(whichData: String){
+        // Vytvoření dialogu
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(R.layout.show_more_data_popup)
 
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+        // Reference na prvky v popup layoutu
+        val textView = dialog.findViewById<TextView>(R.id.type_of_data_textView)
+        val closeButton = dialog.findViewById<Button>(R.id.close_extra_data_button)
+        val dataLayout = dialog.findViewById<LinearLayout>(R.id.more_data_layout)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dataLayout.removeAllViews()
+
+        when (whichData){
+            "table" -> {
+                textView.text = "Tables"
+                sortedTablesData.forEach { data ->
+                    val layout = LinearLayout(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                        orientation = LinearLayout.VERTICAL
+                        val backgroundDrawable = GradientDrawable().apply {
+                            setColor(Color.WHITE)
+                            cornerRadius = 30f
+                        }
+                        background = backgroundDrawable
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        setPadding(16, 16, 16, 16)
+                    }
+                    val textView2 = TextView(context).apply {
+                        text = "${findNameOfTheTable(data.id)} visits: ${data.numberOfTimesServed}"
+                        textSize = 25f
+                        setPadding(16, 16, 16, 16)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+                    layout.addView(textView2)
+                    dataLayout.addView(layout)
+                }
+            }
+            "item" -> {
+                textView.text = "Items"
+                sortedItemsData.forEach { data ->
+                    val layout = LinearLayout(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                        orientation = LinearLayout.VERTICAL
+                        val backgroundDrawable = GradientDrawable().apply {
+                            setColor(Color.WHITE)
+                            cornerRadius = 30f
+                        }
+                        background = backgroundDrawable
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        setPadding(16, 16, 16, 16)
+                    }
+                    val textView2 = TextView(context).apply {
+                        text = "${findNameOfTheItems(data.id)} times ordered: ${data.numberOfTimesServed}"
+                        textSize = 25f
+                        setPadding(16, 16, 16, 16)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+                    layout.addView(textView2)
+                    dataLayout.addView(layout)
+                }
+            }
+            "userServed" -> {
+                textView.text = "Users"
+                sortedByTablesUsersData.forEach { data ->
+                    val layout = LinearLayout(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                        orientation = LinearLayout.VERTICAL
+                        val backgroundDrawable = GradientDrawable().apply {
+                            setColor(Color.WHITE)
+                            cornerRadius = 30f
+                        }
+                        background = backgroundDrawable
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        setPadding(16, 16, 16, 16)
+                    }
+                    val textView2 = TextView(context).apply {
+                        text = "${findNameOfTheUser(data.id)} tables served: ${data.numberOfServedTables}"
+                        textSize = 25f
+                        setPadding(16, 16, 16, 16)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+                    layout.addView(textView2)
+                    dataLayout.addView(layout)
+                }
+            }
+            "userActivity" -> {
+                textView.text = "Users"
+                sortedByActivityUsersData.forEach { data ->
+                    val layout = LinearLayout(context).apply {
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.MATCH_PARENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        ).apply {
+                            setMargins(0, 8, 0, 8)
+                        }
+                        orientation = LinearLayout.VERTICAL
+                        val backgroundDrawable = GradientDrawable().apply {
+                            setColor(Color.WHITE)
+                            cornerRadius = 30f
+                        }
+                        background = backgroundDrawable
+                        gravity = Gravity.CENTER_HORIZONTAL
+                        setPadding(16, 16, 16, 16)
+                    }
+                    val textView2 = TextView(context).apply {
+                        text = "${findNameOfTheUser(data.id)} activity: ${data.activity}"
+                        textSize = 25f
+                        setPadding(16, 16, 16, 16)
+                        layoutParams = LinearLayout.LayoutParams(
+                            LinearLayout.LayoutParams.WRAP_CONTENT,
+                            LinearLayout.LayoutParams.WRAP_CONTENT
+                        )
+                    }
+                    layout.addView(textView2)
+                    dataLayout.addView(layout)
+                }
+            }
+        }
+        dialog.show()
     }
 
     //metoda na nacteni dat do listu
