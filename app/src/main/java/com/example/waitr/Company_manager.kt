@@ -16,6 +16,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.Gravity
+import android.view.Menu
 import android.view.MenuItem
 import android.view.SubMenu
 import android.view.View
@@ -170,10 +171,6 @@ class Company_manager : AppCompatActivity() {
         companySettingsDialog.setContentView(R.layout.company_settings_popup)
         settingsLayout = companySettingsDialog.findViewById(R.id.company_settings_layout)
 
-        notificationMenuItem = navigationView.menu.findItem(R.id.manager_notifications_button)
-        actionView = notificationMenuItem.actionView!!
-        badge = actionView.findViewById(R.id.badge)!!
-
         // nacteni dat do headeru
         userId?.let {
             val userRef = db.child("users").child(it)
@@ -257,9 +254,13 @@ class Company_manager : AppCompatActivity() {
     }
 
     // Funkce pro nastavení tečky
+    /*
     private fun showBadge(show: Boolean) {
-        badge.visibility = if (show) View.VISIBLE else View.GONE
+        handler.post {
+            badge.visibility = if (show) View.VISIBLE else View.GONE
+        }
     }
+     */
 
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
@@ -822,7 +823,7 @@ class Company_manager : AppCompatActivity() {
             tableNotificationDialog.dismiss()
         }
         drawNotifications()
-        showBadge(false)
+        //showBadge(false)
         tableNotificationDialog.show()
     }
 
@@ -1118,7 +1119,7 @@ class Company_manager : AppCompatActivity() {
             }
             if (notification.send) hasUnsentNotifications = true
         }
-        showBadge(hasUnsentNotifications)
+        //showBadge(hasUnsentNotifications)
     }
 
     //vymaze notifikaci
@@ -1137,6 +1138,19 @@ class Company_manager : AppCompatActivity() {
             transaction.add(R.id.companyframelayout, fragment)
         }
         transaction.commit()
+    }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.company_manager_menu, menu)
+
+        notificationMenuItem = menu?.findItem(R.id.manager_notifications_button)!!
+        notificationMenuItem.actionView?.let { actionView ->
+            badge = actionView.findViewById(R.id.badge)
+
+        } ?: run {
+            Log.e("Error", "ActionView is null")
+        }
+
+        return true
     }
     // metoda na funkcnost hamburgeru
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
