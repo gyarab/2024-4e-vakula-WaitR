@@ -15,6 +15,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
@@ -42,6 +43,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
@@ -580,7 +582,66 @@ class Company_manager : AppCompatActivity() {
 
         settingsLayout.addView(notificationsSetLayout)
 
+        val leaveButtonLayout = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(0, 8, 0, 8)
+            }
+            orientation = LinearLayout.VERTICAL
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.WHITE) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
+            gravity = Gravity.CENTER
+            setPadding(16, 16, 16, 16)
+        }
+        val leaveCompanyButton = MaterialButton(this).apply {
+            text = "Leave this company"
+            textSize = 20f
+            setPadding(8, 8, 8, 8)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(8, 0, 0, 8)
+            }
+        }
+        leaveCompanyButton.setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Leave company?")
+            builder.setMessage("Are you sure you want to leave this company?")
 
+            builder.setPositiveButton("Yes") { dialog1, _ ->
+                val companyRef = userId?.let { it1 ->
+                    db.child("companies").child(CompanyID).child("users").child(it1)
+                    }
+                companyRef?.removeValue()?.addOnSuccessListener {
+                    val userRef = userId?.let { it1 -> db.child("users").child(it1).child("companies").child(CompanyID) }
+                    userRef?.removeValue()?.addOnSuccessListener {
+                        // Přesun na Company menu obrazovku
+                        val intent = Intent(this, CompanyMenu::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        startActivity(intent)
+                        finish()
+                    }?.addOnFailureListener {
+                        Log.e("failure2", "failed to remove company from user")
+                    }
+                }?.addOnFailureListener {
+                    Log.e("failure1", "failed to remove user from company")
+                }
+            }
+
+            builder.setNegativeButton("No") { dialog1, _ ->
+                dialog1.dismiss()
+            }
+            val alertDialog = builder.create()
+            alertDialog.show()
+        }
+        leaveButtonLayout.addView(leaveCompanyButton)
+        settingsLayout.addView(leaveButtonLayout)
     }
 
     private fun changeNotificationPeriod(type: String){
