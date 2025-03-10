@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -87,8 +88,23 @@ class Analytics : Fragment() {
             )
         }
         val tableBarChart = drawTableBarChard()
+        val viewMoreTableDataButton = Button(context).apply {
+            text = "manage user"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(16, 0, 0, 8)
+            }
+        }
+        viewMoreTableDataButton.setOnClickListener {
+
+        }
         tableAnalyticsLayout.addView(tableAnalyticsTextview)
         tableAnalyticsLayout.addView(tableBarChart)
+        tableAnalyticsLayout.addView(viewMoreTableDataButton)
         analyticsLayout.addView(tableAnalyticsLayout)
 
         val itemAnalyticsLayout = LinearLayout(requireContext()).apply {
@@ -109,8 +125,23 @@ class Analytics : Fragment() {
             )
         }
         val itemBarChard = drawItemBarChard()
+        val viewMoreItemDataButton = Button(context).apply {
+            text = "manage user"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(16, 0, 0, 8)
+            }
+        }
+        viewMoreItemDataButton.setOnClickListener {
+
+        }
         itemAnalyticsLayout.addView(itemAnalyticsTextview)
         itemAnalyticsLayout.addView(itemBarChard)
+        itemAnalyticsLayout.addView(viewMoreItemDataButton)
         analyticsLayout.addView(itemAnalyticsLayout)
 
         val userServedAnalyticsLayout = LinearLayout(requireContext()).apply {
@@ -131,8 +162,23 @@ class Analytics : Fragment() {
             )
         }
         val userServedBarChard = drawUserServedBarChard()
+        val viewMoreUserServedTableDataButton = Button(context).apply {
+            text = "manage user"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(16, 0, 0, 8)
+            }
+        }
+        viewMoreUserServedTableDataButton.setOnClickListener {
+
+        }
         userServedAnalyticsLayout.addView(userServedAnalyticsTextview)
         userServedAnalyticsLayout.addView(userServedBarChard)
+        userServedAnalyticsLayout.addView(viewMoreUserServedTableDataButton)
         analyticsLayout.addView(userServedAnalyticsLayout)
 
         val userActivityAnalyticsLayout = LinearLayout(requireContext()).apply {
@@ -153,8 +199,23 @@ class Analytics : Fragment() {
             )
         }
         val userActivityBarChard = drawUserActivityBarChard()
+        val viewMoreUserActivityDataButton = Button(context).apply {
+            text = "manage user"
+            textSize = 20f
+            setPadding(16, 16, 16, 16)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                setMargins(16, 0, 0, 8)
+            }
+        }
+        viewMoreUserActivityDataButton.setOnClickListener {
+
+        }
         userActivityAnalyticsLayout.addView(userActivityAnalyticsTextview)
         userActivityAnalyticsLayout.addView(userActivityBarChard)
+        userActivityAnalyticsLayout.addView(viewMoreUserActivityDataButton)
         analyticsLayout.addView(userActivityAnalyticsLayout)
     }
 
@@ -395,6 +456,10 @@ class Analytics : Fragment() {
             if (user.id.equals(id)) return user.name
         }
         return null
+    }
+
+    private fun viewMoreDataPopup(whichData: String){
+
     }
 
     //metoda na nacteni dat do listu
