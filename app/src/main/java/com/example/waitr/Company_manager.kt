@@ -53,7 +53,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import kotlin.math.E
 
-//TODO debug notification + settings
 class Company_manager : AppCompatActivity() {
     // promenne sem
     private val auth = FirebaseAuth.getInstance()
@@ -158,6 +157,11 @@ class Company_manager : AppCompatActivity() {
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.company_manager_main)
         navigationView = findViewById(R.id.manager_company_drawer_menu)
+        getAuthorization { auth ->
+            if (auth != null && auth == "employee") {
+                navigationView.menu.findItem(R.id.manager_add_members_button).isVisible = false
+            }
+        }
         drawerToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
@@ -253,6 +257,30 @@ class Company_manager : AppCompatActivity() {
         startCheckingNotifications()
         startCompanyListener()
         listenForSettingsChanges()
+    }
+
+    //nacte pozici uzivatele pro authorizaci ve spolecnosti
+    private fun getAuthorization(callback: (String?) -> Unit) {
+        val authRef = CompanyID?.let { companyId ->
+            userId?.let { uid ->
+                db.child("companies").child(companyId).child("users").child(uid).child("authorization")
+            } ?: run {
+                Log.e("error", "chyba pri ziskani id uzivatele")
+                null
+            }
+        }
+
+        authRef?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                Authorization = dataSnapshot.getValue(String::class.java).toString()
+                Log.d("Authorization", "Hodnota authorization: ${Authorization ?: "Nenalezeno"}")
+                callback(Authorization) // Zavolá callback s hodnotou authorization
+            } else {
+                Log.e("error", "Chyba pri ziskavani dat", task.exception)
+                callback(null) // Zavolá callback s null v případě chyby
+            }
+        }
     }
 
     // Funkce pro nastavení tečky
@@ -582,6 +610,11 @@ class Company_manager : AppCompatActivity() {
 
         settingsLayout.addView(notificationsSetLayout)
 
+        // pro uzivatele employee pouze tlacitko pro odchod ze spolenosti
+        if (Authorization.equals("employee")){
+            settingsLayout.removeAllViews()
+        }
+
         val leaveButtonLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -641,7 +674,9 @@ class Company_manager : AppCompatActivity() {
             alertDialog.show()
         }
         leaveButtonLayout.addView(leaveCompanyButton)
-        settingsLayout.addView(leaveButtonLayout)
+        if (!Authorization.equals("owner")){
+            settingsLayout.addView(leaveButtonLayout)
+        }
     }
 
     private fun changeNotificationPeriod(type: String){
@@ -1199,19 +1234,6 @@ class Company_manager : AppCompatActivity() {
             transaction.add(R.id.companyframelayout, fragment)
         }
         transaction.commit()
-    }
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.company_manager_menu, menu)
-
-        notificationMenuItem = menu?.findItem(R.id.manager_notifications_button)!!
-        notificationMenuItem.actionView?.let { actionView ->
-            badge = actionView.findViewById(R.id.badge)
-
-        } ?: run {
-            Log.e("Error", "ActionView is null")
-        }
-
-        return true
     }
     // metoda na funkcnost hamburgeru
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

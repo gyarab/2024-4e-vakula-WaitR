@@ -30,6 +30,7 @@ import android.widget.Toast
 import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.Visibility
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -106,8 +107,9 @@ class Model_view : Fragment() {
     private var seatedTableNotificationPeriod = 5
     private var eatingTableNotificationPeriod = 5
     private var paidTableNotificationPeriod = 5
+    private lateinit var authorization: String
 
-// zde psat pouze kod nesouvisejici s UI
+    // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -227,6 +229,13 @@ class Model_view : Fragment() {
         editButton.setOnClickListener {
             showEditModelPopUp()
         }
+        // Zavoláme getAuthorization s callbackem
+        getAuthorization { auth ->
+            // Tento blok se zavolá až po načtení hodnoty authorization
+            if (auth != null && auth == "employee") {
+                editButton.visibility = View.GONE
+            }
+        }
         helpButton = view.findViewById(R.id.help_button)
         helpButton.setOnClickListener {
             //TODO dodelat help tlacitko
@@ -237,6 +246,29 @@ class Model_view : Fragment() {
         }
         // nacte vsechny MenuItem polozky z Menu
         fetchAllMenuItems{}
+    }
+    //nacte pozici uzivatele pro authorizaci ve spolecnosti
+    private fun getAuthorization(callback: (String?) -> Unit) {
+        val authRef = CompanyID?.let { companyId ->
+            userId?.let { uid ->
+                db.child("companies").child(companyId).child("users").child(uid).child("authorization")
+            } ?: run {
+                Log.e("error", "chyba pri ziskani id uzivatele")
+                null
+            }
+        }
+
+        authRef?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                authorization = dataSnapshot.getValue(String::class.java).toString()
+                Log.d("Authorization", "Hodnota authorization: ${authorization ?: "Nenalezeno"}")
+                callback(authorization) // Zavolá callback s hodnotou authorization
+            } else {
+                Log.e("error", "Chyba pri ziskavani dat", task.exception)
+                callback(null) // Zavolá callback s null v případě chyby
+            }
+        }
     }
 
     private fun manageEmptyTablePopup(){
@@ -2746,22 +2778,20 @@ class Model_view : Fragment() {
     private fun listenForSettingsChanges() {
         val databaseRef = CompanyID?.let { db.child("companies").child(it).child("settings") }
 
-        if (databaseRef != null) {
-            databaseRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    seatedTableNotificationPeriod = snapshot.child("seatedNotification").getValue(Int::class.java) ?: 5
-                    eatingTableNotificationPeriod = snapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
-                    paidTableNotificationPeriod = snapshot.child("paidNotification").getValue(Int::class.java) ?: 5
+        databaseRef?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                seatedTableNotificationPeriod = snapshot.child("seatedNotification").getValue(Int::class.java) ?: 5
+                eatingTableNotificationPeriod = snapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
+                paidTableNotificationPeriod = snapshot.child("paidNotification").getValue(Int::class.java) ?: 5
 
-                    // Debug log (pokud chceš vidět změny v Logcat)
-                    Log.d("SettingsListener", "Updated settings: Seated=$seatedTableNotificationPeriod, Eating=$eatingTableNotificationPeriod, Paid=$paidTableNotificationPeriod")
-                }
+                // Debug log (pokud chceš vidět změny v Logcat)
+                Log.d("SettingsListener", "Updated settings: Seated=$seatedTableNotificationPeriod, Eating=$eatingTableNotificationPeriod, Paid=$paidTableNotificationPeriod")
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("SettingsListener", "Failed to read settings", error.toException())
-                }
-            })
-        }
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("SettingsListener", "Failed to read settings", error.toException())
+            }
+        })
     }
 
     private fun updateDataInAnalytics(id: String, mutableMap: MutableMap<String, Int>){

@@ -51,6 +51,7 @@ class Food_menu : Fragment() {
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
     private val userId = currentUser?.uid
+    private lateinit var authorization: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,6 +105,13 @@ class Food_menu : Fragment() {
             }
         }
         val editButton = view.findViewById<ImageButton>(R.id.edit_menu_button)
+        // Zavoláme getAuthorization s callbackem
+        getAuthorization { auth ->
+            // Tento blok se zavolá až po načtení hodnoty authorization
+            if (auth != null && auth == "employee") {
+                editButton.visibility = View.GONE
+            }
+        }
         editButton.setOnClickListener {
             showEditMenuPopup()
         }
@@ -118,6 +126,29 @@ class Food_menu : Fragment() {
                     putString(CompanyID, companyId)
                 }
             }
+    }
+    //nacte pozici uzivatele pro authorizaci ve spolecnosti
+    private fun getAuthorization(callback: (String?) -> Unit) {
+        val authRef = CompanyID?.let { companyId ->
+            userId?.let { uid ->
+                db.child("companies").child(companyId).child("users").child(uid).child("authorization")
+            } ?: run {
+                Log.e("error", "chyba pri ziskani id uzivatele")
+                null
+            }
+        }
+
+        authRef?.get()?.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                authorization = dataSnapshot.getValue(String::class.java).toString()
+                Log.d("Authorization", "Hodnota authorization: ${authorization ?: "Nenalezeno"}")
+                callback(authorization) // Zavolá callback s hodnotou authorization
+            } else {
+                Log.e("error", "Chyba pri ziskavani dat", task.exception)
+                callback(null) // Zavolá callback s null v případě chyby
+            }
+        }
     }
 
     private fun showEditMenuPopup(){

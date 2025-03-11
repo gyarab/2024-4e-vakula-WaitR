@@ -180,7 +180,7 @@ class CompanyMenu : AppCompatActivity() {
                             selectedCompanyName = companyName
                             text = companyName
                             //tag = companyId // Uložení ID podniku
-                            tag = CompanyTag(companyId, companyName, "manager")
+                            tag = CompanyTag(companyId, companyName, "owner")
                         }
                         newButton.setOnClickListener {
                             val companyTag = it.tag as CompanyTag
@@ -196,7 +196,7 @@ class CompanyMenu : AppCompatActivity() {
                         // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
                         val companyMap = mapOf(
                             "companyName" to companyName,
-                            "authorization" to "manager"
+                            "authorization" to "owner"
                         )
 
                         // Uložení společnosti k uživateli
@@ -223,7 +223,7 @@ class CompanyMenu : AppCompatActivity() {
                             "name" to companyName,
                             "users" to mapOf(
                                 userId to mapOf(
-                                    "authorization" to "manager",
+                                    "authorization" to "owner",
                                     "status" to "offline",
                                     "email" to email,
                                     "username" to username
@@ -328,7 +328,6 @@ class CompanyMenu : AppCompatActivity() {
             }
 
             dialog1.dismiss()
-            //TODO zmenit na Company_employee
             intent = Intent(this, Company_manager::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
@@ -346,7 +345,7 @@ class CompanyMenu : AppCompatActivity() {
                 selectedCompanyName = companyName
                 text = companyName
                 //tag = companyId // Uložení ID podniku
-                tag = CompanyTag(companyId, companyName, "manager")
+                tag = CompanyTag(companyId, companyName, position)
             }
             newButton.setOnClickListener {
                 val companyTag = it.tag as CompanyTag
@@ -354,10 +353,10 @@ class CompanyMenu : AppCompatActivity() {
                 selectedCompanyId = companyTag.companyId // Aktualizace ID
                 selectedCompanyName = companyTag.companyName
                 selectedAuthorization = companyTag.authorization
-                if (position == "manager"){
+                if (position == "owner"){
                     selectedCompanyOptions()
                 }
-                if (position == "employee"){
+                if (position == "employee" || position == "manager"){
                     selectedCompanyFromInviteOptions()
                 }
             }
@@ -543,9 +542,9 @@ class CompanyMenu : AppCompatActivity() {
                                     selectedCompanyId = companyTag.companyId // Aktualizace ID
                                     selectedCompanyName = companyTag.companyName
                                     selectedAuthorization = companyTag.authorization
-                                    if (selectedAuthorization.equals("manager")){
+                                    if (selectedAuthorization.equals("owner")){
                                         selectedCompanyOptions()
-                                    } else if (selectedAuthorization.equals("employee")){
+                                    } else if (selectedAuthorization.equals("employee") || selectedAuthorization.equals("manager")){
                                         selectedCompanyFromInviteOptions()
                                     }
                                 }
