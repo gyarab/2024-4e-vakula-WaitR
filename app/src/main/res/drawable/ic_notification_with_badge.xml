@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Ikona -->
+    <item
+        android:drawable="@drawable/baseline_circle_notifications_24" />
+
+    <!-- Badge (červená tečka) -->
+    <item
+        android:width="10dp"
+        android:height="10dp"
+        android:gravity="end|top"
+        android:drawable="@drawable/badge_background" />
+</layer-list>

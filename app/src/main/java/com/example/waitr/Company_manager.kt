@@ -37,6 +37,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -62,8 +63,6 @@ class Company_manager : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var notificationMenuItem: MenuItem
-    private lateinit var actionView: View
-    private lateinit var badge: View
     private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var yourUsername: TextView
     private lateinit var yourEmail: TextView
@@ -157,11 +156,14 @@ class Company_manager : AppCompatActivity() {
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.company_manager_main)
         navigationView = findViewById(R.id.manager_company_drawer_menu)
+        navigationView.itemIconTintList = null
+        navigationView.itemTextColor = null
         getAuthorization { auth ->
             if (auth != null && auth == "employee") {
                 navigationView.menu.findItem(R.id.manager_add_members_button).isVisible = false
             }
         }
+        notificationMenuItem = navigationView.menu.findItem(R.id.manager_notifications_button)
         drawerToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
@@ -261,7 +263,7 @@ class Company_manager : AppCompatActivity() {
 
     //nacte pozici uzivatele pro authorizaci ve spolecnosti
     private fun getAuthorization(callback: (String?) -> Unit) {
-        val authRef = CompanyID?.let { companyId ->
+        val authRef = CompanyID.let { companyId ->
             userId?.let { uid ->
                 db.child("companies").child(companyId).child("users").child(uid).child("authorization")
             } ?: run {
@@ -283,14 +285,16 @@ class Company_manager : AppCompatActivity() {
         }
     }
 
-    // Funkce pro nastavení tečky
-    /*
     private fun showBadge(show: Boolean) {
-        handler.post {
-            badge.visibility = if (show) View.VISIBLE else View.GONE
+        if (show) {
+            notificationMenuItem.icon = ContextCompat.getDrawable(this, R.drawable.ic_notification_with_badge)
+            notificationMenuItem.title = "Notifications - new"
+        } else {
+            notificationMenuItem.icon = ContextCompat.getDrawable(this, R.drawable.baseline_circle_notifications_24)
+            notificationMenuItem.title = "Notifications"
         }
+        navigationView.invalidate()
     }
-     */
 
     //Trida pro zobrazeni nastaveni pro spolecnost
     private fun companySettingsPopup(){
@@ -1215,7 +1219,7 @@ class Company_manager : AppCompatActivity() {
             }
             if (notification.send) hasUnsentNotifications = true
         }
-        //showBadge(hasUnsentNotifications)
+        showBadge(hasUnsentNotifications)
     }
 
     //vymaze notifikaci

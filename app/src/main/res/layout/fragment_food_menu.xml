@@ -104,15 +104,15 @@
         android:id="@+id/textView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:gravity="center"
-        android:text="@string/menu"
         android:autoSizeMaxTextSize="1000dp"
-        android:textColor="#fff"
         android:autoSizeMinTextSize="1dp"
         android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:text="@string/menu"
+        android:textColor="#fff"
         app:layout_constraintBottom_toTopOf="@+id/guideline75"
-        app:layout_constraintEnd_toStartOf="@+id/edit_menu_button"
-        app:layout_constraintStart_toEndOf="@+id/help_menu_button"
+        app:layout_constraintEnd_toStartOf="@+id/guideline73"
+        app:layout_constraintStart_toStartOf="@+id/guideline72"
         app:layout_constraintTop_toTopOf="@+id/guideline74" />
 
     <androidx.constraintlayout.widget.Guideline
