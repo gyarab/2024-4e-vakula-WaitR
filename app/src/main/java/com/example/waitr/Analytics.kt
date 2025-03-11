@@ -12,7 +12,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import com.github.mikephil.charting.charts.BarChart
@@ -21,9 +20,12 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 
 data class X(
     val id: String,
@@ -67,6 +69,7 @@ class Analytics : Fragment() {
         fetchAnalyticsData {
             drawAnalytics()
         }
+        setupAnalyticsListener()
         // Inflate the layout for this fragment
         return view
     }
@@ -744,6 +747,27 @@ class Analytics : Fragment() {
         }?.addOnFailureListener { error ->
             Toast.makeText(context, "Error loading menu: ${error.message}", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    //listener pro zmeny v analytics
+    private fun setupAnalyticsListener() {
+        CompanyID?.let {
+            db.child("companies")
+                .child(it)
+                .child("Analytics")
+        }?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                fetchAllMenuItems {}
+                fetchAllTables {}
+                fetchAllUsers {}
+                fetchAnalyticsData {
+                    drawAnalytics()
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("AnalyticsListener", "Chyba při čtení dat: ${databaseError.message}")
+            }
+        })
     }
 
     companion object {
