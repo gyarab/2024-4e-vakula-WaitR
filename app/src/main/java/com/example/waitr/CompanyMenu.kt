@@ -25,6 +25,7 @@ import androidx.core.view.isEmpty
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 // trida pro ulozeni  tagu pro button
@@ -797,6 +798,42 @@ class CompanyMenu : AppCompatActivity() {
                     (resources.displayMetrics.widthPixels * 0.95).toInt(),
                     (resources.displayMetrics.heightPixels * 0.85).toInt()
                 )
+                val currentPassword = dialog.findViewById<TextInputEditText>(R.id.current_password)
+                val newPassword = dialog.findViewById<TextInputEditText>(R.id.new_password)
+                val closeButton = dialog.findViewById<Button>(R.id.close_change_password_button)
+                val changeButton = dialog.findViewById<Button>(R.id.change_to_new_password_button)
+                closeButton.setOnClickListener {
+                    dialog.dismiss()
+                }
+                changeButton.setOnClickListener {
+                    val currentPasswordText = currentPassword.text.toString().trim()
+                    val newPasswordText = newPassword.text.toString().trim()
+
+                    // Kontrola, zda jsou pole vyplněná
+                    if (currentPasswordText.isEmpty() || newPasswordText.isEmpty()) {
+                        Toast.makeText(dialog.context, "Please fill in both fields", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+
+                    // Ověření aktuálního hesla
+                    val credential = EmailAuthProvider.getCredential(currentUser?.email ?: "", currentPasswordText)
+                    currentUser?.reauthenticate(credential)?.addOnCompleteListener { reauthTask ->
+                        if (reauthTask.isSuccessful) {
+                            // Heslo je správné, změnit na nové heslo
+                            currentUser.updatePassword(newPasswordText).addOnCompleteListener { updateTask ->
+                                if (updateTask.isSuccessful) {
+                                    Toast.makeText(dialog.context, "Password changed successfully", Toast.LENGTH_SHORT).show()
+                                    dialog.dismiss() // Zavření dialogu po úspěšné změně
+                                } else {
+                                    Toast.makeText(dialog.context, "Failed to change password", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            // Heslo je nesprávné
+                            Toast.makeText(dialog.context, "Current password is incorrect", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
             }
         }
         dialog.show()
