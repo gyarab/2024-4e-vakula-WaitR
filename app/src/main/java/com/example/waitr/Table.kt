@@ -9,8 +9,8 @@ data class Table(
     var totalTablePrice: Double = 0.0,
     var height: Int = 0,
     var width: Int = 0,
-    var xPosition: Int = 0,
-    var yPosition: Int = 0,
+    var xPosition: Float = 0f,
+    var yPosition: Float = 0f,
     var locked: String? = null
 ){
     fun toMap(): Map<String, Any?> {

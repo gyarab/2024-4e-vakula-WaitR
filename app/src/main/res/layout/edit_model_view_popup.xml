@@ -150,7 +150,7 @@
         </LinearLayout>
     </HorizontalScrollView>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/edit_model_canvas_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -160,7 +160,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline116"
         app:layout_constraintTop_toTopOf="@+id/guideline121">
 
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
         android:id="@+id/add_helper_shape"

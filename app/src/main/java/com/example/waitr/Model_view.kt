@@ -27,6 +27,7 @@ import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,7 +48,7 @@ class Model_view : Fragment() {
     private lateinit var editButton: ImageButton
     private lateinit var helpButton: ImageButton
     private lateinit var modelScenesBar: LinearLayout
-    private lateinit var currentScene: FrameLayout
+    private lateinit var currentScene: ConstraintLayout
     private val db = FirebaseDatabase.getInstance("https://waitr-dee9a-default-rtdb.europe-west1.firebasedatabase.app/").reference // Using Realtime Database reference
     private val auth = FirebaseAuth.getInstance()
     private val currentUser = auth.currentUser
@@ -57,7 +58,7 @@ class Model_view : Fragment() {
     private lateinit var dynamicLinearLayout: LinearLayout
     private lateinit var editModelDialoge: Dialog
     private lateinit var editModelScenesLayout: LinearLayout
-    private lateinit var editModelSceneLayout: FrameLayout
+    private lateinit var editModelSceneLayout: ConstraintLayout
     private var model: Model = Model(mutableListOf())
     private var editModel: Model = Model(mutableListOf())
     private var tableEditMode: Boolean = false
@@ -69,8 +70,8 @@ class Model_view : Fragment() {
     private lateinit var confirmTableChanges: ImageButton
     private lateinit var currentTableToEdit: TextView
     private lateinit var currentHelperToEdit: TextView
-    private var finalX: Int = 0
-    private var finalY: Int = 0
+    private var finalBiasX: Float = 0f
+    private var finalBiasY: Float = 0f
     private var selectedStageId: String? = null
     private var selectedTableId: String? = null
     private var selectedHelperId: String? = null
@@ -79,6 +80,8 @@ class Model_view : Fragment() {
     private var initialY = 0f
     private var initialTouchX = 0f
     private var initialTouchY = 0f
+    private var initialBiasX: Float = 0f
+    private var initialBiasY: Float = 0f
     private var newTableName: String? = null
     private var newTableHeight: Int? = null
     private var newTableWidth: Int? = null
@@ -159,8 +162,8 @@ class Model_view : Fragment() {
         if (tableEditMode){
             tableEditMode = false
             val table = findTableById(editModel, selectedTableId!!)
-            table?.xPosition = finalX
-            table?.yPosition = finalY
+            table?.xPosition = finalBiasX
+            table?.yPosition = finalBiasY
 
             confirmTableChanges.visibility = View.GONE
             saveButton.visibility = View.VISIBLE
@@ -174,8 +177,8 @@ class Model_view : Fragment() {
         if (helperEditMode){
             helperEditMode = false
             val helper = findHelperById(editModel, selectedHelperId!!)
-            helper?.xPosition = finalX
-            helper?.yPosition = finalY
+            helper?.xPosition = finalBiasX
+            helper?.yPosition = finalBiasY
 
             confirmTableChanges.visibility = View.GONE
             saveButton.visibility = View.VISIBLE
@@ -212,9 +215,21 @@ class Model_view : Fragment() {
             showEditModelPopUp()
         }
     }
+    //TODO
     dynamicLinearLayout = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER
+        layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            // Připojit k rodičovskému ConstraintLayout ze všech stran
+            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+            endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+            topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+        }
+
         addView(noStagesTODisplayTextView)
         addView(addStageButtonIfNon)
     }
@@ -1061,8 +1076,8 @@ class Model_view : Fragment() {
                 0.0,
                 150,
                 150,
-                0,
-                0)
+                0f,
+                0f)
             val currentModelScene = selectedStageId?.let { it1 -> findSceneById(editModel, it1) }
             currentModelScene?.listOfTables?.add(table)
             Log.e("model", editModel.toString())
@@ -1072,13 +1087,27 @@ class Model_view : Fragment() {
                 textSize = 18f
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.LTGRAY)
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+
+                // Nastavit ConstraintLayout.LayoutParams
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
+                    // Nastavit šířku a výšku
                     width = 150 // Výchozí šířka
                     height = 150 // Výchozí výška
+
+                    // Připojit k rodičovskému ConstraintLayout ze všech stran
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    // Nastavit bias pro levý horní roh
+                    horizontalBias = 0f // 0.0 = úplně vlevo
+                    verticalBias = 0f   // 0.0 = úplně nahoře
                 }
+
                 tag = TableTag(randomID, "empty")
             }
             textView.setOnClickListener(
@@ -1119,48 +1148,56 @@ class Model_view : Fragment() {
 
             textView.setOnTouchListener { view, event ->
                 if (tableEditMode && currentTableToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
-                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    val params = view.layoutParams as ConstraintLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
                             // Inicializace proměnných při zahájení dotyku
-                            initialX = params.leftMargin.toFloat()
-                            initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
                             initialTouchY = event.rawY
+                            initialBiasX = params.horizontalBias
+                            initialBiasY = params.verticalBias
                             true
                         }
 
                         MotionEvent.ACTION_MOVE -> {
+                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Vypočítat nové souřadnice
-                            val newLeft = (initialX + deltaX).toInt()
-                                .coerceIn(0, editModelSceneLayout.width - view.width)
-                            val newTop = (initialY + deltaY).toInt()
-                                .coerceIn(0, editModelSceneLayout.height - view.height)
+                            // Přepočítat posun na procentuální změnu (bias)
+                            val scaleX = deltaX / editModelSceneLayout.width.toFloat()
+                            val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            val tempParams = FrameLayout.LayoutParams(params)
-                            tempParams.leftMargin = newLeft
-                            tempParams.topMargin = newTop
+                            // Vypočítat nové bias hodnoty
+                            var newBiasX = initialBiasX + scaleX
+                            var newBiasY = initialBiasY + scaleY
+
+                            // Omezit bias na rozsah 0.0 - 1.0
+                            newBiasX = newBiasX.coerceIn(0f, 1f)
+                            newBiasY = newBiasY.coerceIn(0f, 1f)
+
+                            // Nastavit nové bias hodnoty
+                            params.horizontalBias = newBiasX
+                            params.verticalBias = newBiasY
+                            view.layoutParams = params
 
                             // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
-                                        otherParams.leftMargin,
-                                        otherParams.topMargin,
-                                        otherParams.leftMargin + otherView.width,
-                                        otherParams.topMargin + otherView.height
+                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
+                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
                                     )
                                     val newRect = Rect(
-                                        tempParams.leftMargin,
-                                        tempParams.topMargin,
-                                        tempParams.leftMargin + view.width,
-                                        tempParams.topMargin + view.height
+                                        (newBiasX * editModelSceneLayout.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height).toInt(),
+                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
                                     )
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
@@ -1170,13 +1207,13 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj souřadnice
-                                params.leftMargin = newLeft
-                                params.topMargin = newTop
+                                // Pokud nedochází k překryvu, aktualizuj bias
+                                params.horizontalBias = newBiasX
+                                params.verticalBias = newBiasY
                                 view.layoutParams = params
 
-                                finalX = newLeft
-                                finalY = newTop
+                                finalBiasX = newBiasX
+                                finalBiasY = newBiasY
                             }
 
                             true
@@ -1263,8 +1300,8 @@ class Model_view : Fragment() {
                 randomId,
                 150,
                 150,
-                0,
-                0
+                0f,
+                0f
             )
             val scene = findSceneById(editModel, selectedStageId!!)
             scene?.listOfHelpers?.add(helper)
@@ -1274,12 +1311,21 @@ class Model_view : Fragment() {
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.BLACK)
                 tag = randomId
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
-                    width = 150
-                    height = 150
+
+                    width = helper.width
+                    height = helper.height
+
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    horizontalBias = helper.xPosition
+                    verticalBias = helper.yPosition
                 }
             }
             textView.setOnClickListener(
@@ -1308,48 +1354,56 @@ class Model_view : Fragment() {
 
             textView.setOnTouchListener { view, event ->
                 if (helperEditMode && currentHelperToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
-                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    val params = view.layoutParams as ConstraintLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
                             // Inicializace proměnných při zahájení dotyku
-                            initialX = params.leftMargin.toFloat()
-                            initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
                             initialTouchY = event.rawY
+                            initialBiasX = params.horizontalBias
+                            initialBiasY = params.verticalBias
                             true
                         }
 
                         MotionEvent.ACTION_MOVE -> {
+                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Vypočítat nové souřadnice
-                            val newLeft = (initialX + deltaX).toInt()
-                                .coerceIn(0, editModelSceneLayout.width - view.width)
-                            val newTop = (initialY + deltaY).toInt()
-                                .coerceIn(0, editModelSceneLayout.height - view.height)
+                            // Přepočítat posun na procentuální změnu (bias)
+                            val scaleX = deltaX / editModelSceneLayout.width.toFloat()
+                            val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            val tempParams = FrameLayout.LayoutParams(params)
-                            tempParams.leftMargin = newLeft
-                            tempParams.topMargin = newTop
+                            // Vypočítat nové bias hodnoty
+                            var newBiasX = initialBiasX + scaleX
+                            var newBiasY = initialBiasY + scaleY
+
+                            // Omezit bias na rozsah 0.0 - 1.0
+                            newBiasX = newBiasX.coerceIn(0f, 1f)
+                            newBiasY = newBiasY.coerceIn(0f, 1f)
+
+                            // Nastavit nové bias hodnoty
+                            params.horizontalBias = newBiasX
+                            params.verticalBias = newBiasY
+                            view.layoutParams = params
 
                             // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
-                                        otherParams.leftMargin,
-                                        otherParams.topMargin,
-                                        otherParams.leftMargin + otherView.width,
-                                        otherParams.topMargin + otherView.height
+                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
+                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
                                     )
                                     val newRect = Rect(
-                                        tempParams.leftMargin,
-                                        tempParams.topMargin,
-                                        tempParams.leftMargin + view.width,
-                                        tempParams.topMargin + view.height
+                                        (newBiasX * editModelSceneLayout.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height).toInt(),
+                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
                                     )
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
@@ -1359,13 +1413,13 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj souřadnice
-                                params.leftMargin = newLeft
-                                params.topMargin = newTop
+                                // Pokud nedochází k překryvu, aktualizuj bias
+                                params.horizontalBias = newBiasX
+                                params.verticalBias = newBiasY
                                 view.layoutParams = params
 
-                                finalX = newLeft
-                                finalY = newTop
+                                finalBiasX = newBiasX
+                                finalBiasY = newBiasY
                             }
 
                             true
@@ -1393,13 +1447,25 @@ class Model_view : Fragment() {
                 tag = TableTag(table.id, table.state)
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.LTGRAY)
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+
+                // Nastavit ConstraintLayout.LayoutParams
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
+                    // Nastavit šířku a výšku
                     width = table.width
                     height = table.height
-                    setMargins(table.xPosition, table.yPosition, 0, 0)
+
+                    // Připojit k rodičovskému ConstraintLayout ze všech stran
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    // Nastavit bias na základě table.xPosition a table.yPosition
+                    horizontalBias = table.xPosition
+                    verticalBias = table.yPosition
                 }
             }
             textView.setOnClickListener(
@@ -1438,48 +1504,56 @@ class Model_view : Fragment() {
             )
             textView.setOnTouchListener { view, event ->
                 if (tableEditMode && currentTableToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
-                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    val params = view.layoutParams as ConstraintLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
                             // Inicializace proměnných při zahájení dotyku
-                            initialX = params.leftMargin.toFloat()
-                            initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
                             initialTouchY = event.rawY
+                            initialBiasX = params.horizontalBias
+                            initialBiasY = params.verticalBias
                             true
                         }
 
                         MotionEvent.ACTION_MOVE -> {
+                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Vypočítat nové souřadnice
-                            val newLeft = (initialX + deltaX).toInt()
-                                .coerceIn(0, editModelSceneLayout.width - view.width)
-                            val newTop = (initialY + deltaY).toInt()
-                                .coerceIn(0, editModelSceneLayout.height - view.height)
+                            // Přepočítat posun na procentuální změnu (bias)
+                            val scaleX = deltaX / editModelSceneLayout.width.toFloat()
+                            val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            val tempParams = FrameLayout.LayoutParams(params)
-                            tempParams.leftMargin = newLeft
-                            tempParams.topMargin = newTop
+                            // Vypočítat nové bias hodnoty
+                            var newBiasX = initialBiasX + scaleX
+                            var newBiasY = initialBiasY + scaleY
+
+                            // Omezit bias na rozsah 0.0 - 1.0
+                            newBiasX = newBiasX.coerceIn(0f, 1f)
+                            newBiasY = newBiasY.coerceIn(0f, 1f)
+
+                            // Nastavit nové bias hodnoty
+                            params.horizontalBias = newBiasX
+                            params.verticalBias = newBiasY
+                            view.layoutParams = params
 
                             // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
-                                        otherParams.leftMargin,
-                                        otherParams.topMargin,
-                                        otherParams.leftMargin + otherView.width,
-                                        otherParams.topMargin + otherView.height
+                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
+                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
                                     )
                                     val newRect = Rect(
-                                        tempParams.leftMargin,
-                                        tempParams.topMargin,
-                                        tempParams.leftMargin + view.width,
-                                        tempParams.topMargin + view.height
+                                        (newBiasX * editModelSceneLayout.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height).toInt(),
+                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
                                     )
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
@@ -1489,13 +1563,13 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj souřadnice
-                                params.leftMargin = newLeft
-                                params.topMargin = newTop
+                                // Pokud nedochází k překryvu, aktualizuj bias
+                                params.horizontalBias = newBiasX
+                                params.verticalBias = newBiasY
                                 view.layoutParams = params
 
-                                finalX = newLeft
-                                finalY = newTop
+                                finalBiasX = newBiasX
+                                finalBiasY = newBiasY
                             }
 
                             true
@@ -1512,13 +1586,21 @@ class Model_view : Fragment() {
                 textSize = 18f
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.BLACK)
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
+
                     width = helper.width
                     height = helper.height
-                    setMargins(helper.xPosition, helper.yPosition, 0, 0)
+
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    horizontalBias = helper.xPosition
+                    verticalBias = helper.yPosition
                 }
                 tag = helper.id
             }
@@ -1546,48 +1628,56 @@ class Model_view : Fragment() {
             )
             textView.setOnTouchListener { view, event ->
                 if (helperEditMode && currentHelperToEdit == view) { // Povolit manipulaci pouze pro aktuálně editovaný stůl
-                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    val params = view.layoutParams as ConstraintLayout.LayoutParams
                     when (event.action) {
                         MotionEvent.ACTION_DOWN -> {
                             // Inicializace proměnných při zahájení dotyku
-                            initialX = params.leftMargin.toFloat()
-                            initialY = params.topMargin.toFloat()
                             initialTouchX = event.rawX
                             initialTouchY = event.rawY
+                            initialBiasX = params.horizontalBias
+                            initialBiasY = params.verticalBias
                             true
                         }
 
                         MotionEvent.ACTION_MOVE -> {
+                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Vypočítat nové souřadnice
-                            val newLeft = (initialX + deltaX).toInt()
-                                .coerceIn(0, editModelSceneLayout.width - view.width)
-                            val newTop = (initialY + deltaY).toInt()
-                                .coerceIn(0, editModelSceneLayout.height - view.height)
+                            // Přepočítat posun na procentuální změnu (bias)
+                            val scaleX = deltaX / editModelSceneLayout.width.toFloat()
+                            val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            val tempParams = FrameLayout.LayoutParams(params)
-                            tempParams.leftMargin = newLeft
-                            tempParams.topMargin = newTop
+                            // Vypočítat nové bias hodnoty
+                            var newBiasX = initialBiasX + scaleX
+                            var newBiasY = initialBiasY + scaleY
+
+                            // Omezit bias na rozsah 0.0 - 1.0
+                            newBiasX = newBiasX.coerceIn(0f, 1f)
+                            newBiasY = newBiasY.coerceIn(0f, 1f)
+
+                            // Nastavit nové bias hodnoty
+                            params.horizontalBias = newBiasX
+                            params.verticalBias = newBiasY
+                            view.layoutParams = params
 
                             // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as FrameLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
-                                        otherParams.leftMargin,
-                                        otherParams.topMargin,
-                                        otherParams.leftMargin + otherView.width,
-                                        otherParams.topMargin + otherView.height
+                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
+                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
+                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
                                     )
                                     val newRect = Rect(
-                                        tempParams.leftMargin,
-                                        tempParams.topMargin,
-                                        tempParams.leftMargin + view.width,
-                                        tempParams.topMargin + view.height
+                                        (newBiasX * editModelSceneLayout.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height).toInt(),
+                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
+                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
                                     )
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
@@ -1597,13 +1687,13 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj souřadnice
-                                params.leftMargin = newLeft
-                                params.topMargin = newTop
+                                // Pokud nedochází k překryvu, aktualizuj bias
+                                params.horizontalBias = newBiasX
+                                params.verticalBias = newBiasY
                                 view.layoutParams = params
 
-                                finalX = newLeft
-                                finalY = newTop
+                                finalBiasX = newBiasX
+                                finalBiasY = newBiasY
                             }
 
                             true
@@ -2187,10 +2277,14 @@ class Model_view : Fragment() {
         val selectedTable = findTableById(editModel, selectedTableId!!) ?: return false
 
         // Získej parametry aktuálního prvku
-        val selectedLeft = selectedTable.xPosition
-        val selectedTop = selectedTable.yPosition
+        val selectedBiasX = selectedTable.xPosition
+        val selectedBiasY = selectedTable.yPosition
+
+        val selectedLeft = (selectedBiasX * editModelSceneLayout.width).toInt()
+        val selectedTop = (selectedBiasY * editModelSceneLayout.height).toInt()
         var selectedRight = 0
         var selectedBottom = 0
+
         if (whichPar.equals("width")){
             selectedRight = selectedLeft + parameter
             selectedBottom = selectedTop + selectedTable.height
@@ -2210,28 +2304,62 @@ class Model_view : Fragment() {
 
         // Projdi všechny ostatní prvky a zkontroluj překryvy
         for (child in editModelSceneLayout.children) {
-            val otherTable = findTableById(editModel, child.id.toString()) ?: continue
+            if (child is TextView) {
+                when (child.tag) {
+                    is TableTag -> {
+                        val tableTag = child.tag as TableTag
+                        val otherTable = findTableById(editModel, tableTag.id) ?: continue
+                        if (otherTable.id == selectedTableId) continue
 
-            // Vynech aktuálně kontrolovaný prvek
-            if (otherTable.id == selectedTableId) continue
+                        // Získej parametry ostatního prvku
+                        val otherBiasX = otherTable.xPosition
+                        val otherBiasY = otherTable.yPosition
+                        val otherLeft = (otherBiasX * editModelSceneLayout.width).toInt()
+                        val otherTop = (otherBiasY * editModelSceneLayout.height).toInt()
+                        val otherRight = otherLeft + otherTable.width
+                        val otherBottom = otherTop + otherTable.height
 
-            // Získej parametry ostatního prvku
-            val otherLeft = otherTable.xPosition
-            val otherTop = otherTable.yPosition
-            val otherRight = otherLeft + otherTable.width
-            val otherBottom = otherTop + otherTable.height
+                        // Zkontroluj překryv mezi prvky
+                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
+                                selectedLeft >= otherRight || // Není vpravo
+                                selectedBottom <= otherTop || // Není nahoře
+                                selectedTop >= otherBottom)   // Není dole
 
-            // Zkontroluj překryv mezi prvky
-            val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
-                    selectedLeft >= otherRight || // Není vpravo
-                    selectedBottom <= otherTop || // Není nahoře
-                    selectedTop >= otherBottom)   // Není dole
+                        if (isOverlapping) {
+                            return false // Prvky se překrývají
+                        }
+                    }
+                    is String -> {
+                        // Je to pomocný prvek
+                        val helperId = child.tag as String
+                        val otherHelper = findHelperById(editModel, helperId) ?: continue
+                        if (otherHelper.id == selectedHelperId) continue
 
-            if (isOverlapping) {
-                return false // Prvky se překrývají
+                        // Získej parametry ostatního prvku
+                        val otherBiasX = otherHelper.xPosition
+                        val otherBiasY = otherHelper.yPosition
+                        val otherLeft = (otherBiasX * editModelSceneLayout.width).toInt()
+                        val otherTop = (otherBiasY * editModelSceneLayout.height).toInt()
+                        val otherRight = otherLeft + otherHelper.width
+                        val otherBottom = otherTop + otherHelper.height
+
+                        // Zkontroluj překryv mezi prvky
+                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
+                                selectedLeft >= otherRight || // Není vpravo
+                                selectedBottom <= otherTop || // Není nahoře
+                                selectedTop >= otherBottom)   // Není dole
+
+                        if (isOverlapping) {
+                            return false // Prvky se překrývají
+                        }
+                    }
+                    else -> {
+                        // Neznámý typ (můžeš hodit výjimku nebo ignorovat)
+                        continue
+                    }
+                }
             }
         }
-
         // Vše je v pořádku
         return true
     }
@@ -2241,8 +2369,10 @@ class Model_view : Fragment() {
         val selectedHelper = findHelperById(editModel, selectedHelperId!!) ?: return false
 
         // Získej parametry aktuálního prvku
-        val selectedLeft = selectedHelper.xPosition
-        val selectedTop = selectedHelper.yPosition
+        val selectedBiasX = selectedHelper.xPosition
+        val selectedBiasY = selectedHelper.yPosition
+        val selectedLeft = (selectedBiasX * editModelSceneLayout.width).toInt()
+        val selectedTop = (selectedBiasY * editModelSceneLayout.height).toInt()
         var selectedRight = 0
         var selectedBottom = 0
         if (whichPar.equals("width")){
@@ -2264,28 +2394,63 @@ class Model_view : Fragment() {
 
         // Projdi všechny ostatní prvky a zkontroluj překryvy
         for (child in editModelSceneLayout.children) {
-            val otherTable = findHelperById(editModel, child.id.toString()) ?: continue
+            if (child is TextView) {
+                when (child.tag) {
+                    is TableTag -> {
+                        // Je to tabulka
+                        val tableTag = child.tag as TableTag
+                        val otherTable = findTableById(editModel, tableTag.id.toString()) ?: continue
+                        if (otherTable.id == selectedTableId) continue
 
-            // Vynech aktuálně kontrolovaný prvek
-            if (otherTable.id == selectedHelperId) continue
+                        // Získej parametry ostatního prvku
+                        val otherBiasX = otherTable.xPosition
+                        val otherBiasY = otherTable.yPosition
+                        val otherLeft = (otherBiasX * editModelSceneLayout.width).toInt()
+                        val otherTop = (otherBiasY * editModelSceneLayout.height).toInt()
+                        val otherRight = otherLeft + otherTable.width
+                        val otherBottom = otherTop + otherTable.height
 
-            // Získej parametry ostatního prvku
-            val otherLeft = otherTable.xPosition
-            val otherTop = otherTable.yPosition
-            val otherRight = otherLeft + otherTable.width
-            val otherBottom = otherTop + otherTable.height
+                        // Zkontroluj překryv mezi prvky
+                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
+                                selectedLeft >= otherRight || // Není vpravo
+                                selectedBottom <= otherTop || // Není nahoře
+                                selectedTop >= otherBottom)   // Není dole
 
-            // Zkontroluj překryv mezi prvky
-            val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
-                    selectedLeft >= otherRight || // Není vpravo
-                    selectedBottom <= otherTop || // Není nahoře
-                    selectedTop >= otherBottom)   // Není dole
+                        if (isOverlapping) {
+                            return false // Prvky se překrývají
+                        }
+                    }
+                    is String -> {
+                        // Je to pomocný prvek
+                        val helperId = child.tag as String
+                        val otherHelper = findHelperById(editModel, helperId) ?: continue
+                        if (otherHelper.id == selectedHelperId) continue
 
-            if (isOverlapping) {
-                return false // Prvky se překrývají
+                        // Získej parametry ostatního prvku
+                        val otherBiasX = otherHelper.xPosition
+                        val otherBiasY = otherHelper.yPosition
+                        val otherLeft = (otherBiasX * editModelSceneLayout.width).toInt()
+                        val otherTop = (otherBiasY * editModelSceneLayout.height).toInt()
+                        val otherRight = otherLeft + otherHelper.width
+                        val otherBottom = otherTop + otherHelper.height
+
+                        // Zkontroluj překryv mezi prvky
+                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
+                                selectedLeft >= otherRight || // Není vpravo
+                                selectedBottom <= otherTop || // Není nahoře
+                                selectedTop >= otherBottom)   // Není dole
+
+                        if (isOverlapping) {
+                            return false // Prvky se překrývají
+                        }
+                    }
+                    else -> {
+                        // Neznámý typ (můžeš hodit výjimku nebo ignorovat)
+                        continue
+                    }
+                }
             }
         }
-
         // Vše je v pořádku
         return true
     }
@@ -2400,9 +2565,8 @@ class Model_view : Fragment() {
         drawScene()
         drawScenesToBar()
     }
-
     private fun drawScene(){
-        if (selectedStageId == null){
+        if (selectedStageId == null && model.listOfScenes.isNotEmpty()){
             selectedStageId = model.listOfScenes.get(0).id
         }
         currentScene.removeAllViews()
@@ -2418,13 +2582,23 @@ class Model_view : Fragment() {
                 textSize = 18f
                 tag = TableTag(table.id, table.state)
                 gravity = Gravity.CENTER
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
+                    // Nastavit šířku a výšku
                     width = table.width
                     height = table.height
-                    setMargins(table.xPosition, table.yPosition, 0, 0)
+
+                    // Připojit k rodičovskému ConstraintLayout ze všech stran
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    // Nastavit bias na základě table.xPosition a table.yPosition
+                    horizontalBias = table.xPosition
+                    verticalBias = table.yPosition
                 }
             }
             setColorForState(table, textView)
@@ -2453,13 +2627,20 @@ class Model_view : Fragment() {
                 textSize = 18f
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.BLACK)
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
+                layoutParams = ConstraintLayout.LayoutParams(
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                    ConstraintLayout.LayoutParams.WRAP_CONTENT
                 ).apply {
                     width = helper.width
                     height = helper.height
-                    setMargins(helper.xPosition, helper.yPosition, 0, 0)
+
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+
+                    horizontalBias = helper.xPosition
+                    verticalBias = helper.yPosition
                 }
             }
             currentScene.addView(textView)
