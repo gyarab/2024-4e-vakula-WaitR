@@ -54,6 +54,7 @@ class CompanyMenu : AppCompatActivity() {
     private lateinit var noInvitesYet: TextView
     private lateinit var username: String
     private lateinit var email: String
+    private val companiesList = mutableListOf<String>()
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -533,6 +534,7 @@ class CompanyMenu : AppCompatActivity() {
                     if (dataSnapshot.exists()) {
                         for (companySnapshot in dataSnapshot.children) {
                             val companyId = companySnapshot.key
+                            companySnapshot.key?.let { it1 -> companiesList.add(it1) }
                             val companyName = companySnapshot.child("companyName").getValue(String::class.java)
                             val authorization = companySnapshot.child("authorization").getValue(String::class.java)
 
@@ -753,21 +755,50 @@ class CompanyMenu : AppCompatActivity() {
     private fun changeProfileParameters(type: String){
         // Vytvoření dialogu
         val dialog = Dialog(this)
-        dialog.setContentView(R.layout.create_company_popup)
-
-        // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.95).toInt(),
-            (resources.displayMetrics.heightPixels * 0.85).toInt()
-        )
-
         when(type){
             "username" -> {
+                dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
+                // Nastavení velikosti dialogu
+                dialog.window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                    (resources.displayMetrics.heightPixels * 0.85).toInt()
+                )
+                val textView = dialog.findViewById<TextView>(R.id.parametr_view)
+                textView.text = "Change username"
+                val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
+                parametrToChange.hint = "New username"
+                val changeUsernameButton = dialog.findViewById<Button>(R.id.change_group_name_button)
+                changeUsernameButton.text = "Change"
+                changeUsernameButton.setOnClickListener {
+                    val newUsername = parametrToChange.text.toString().trim()
+                    if (newUsername.isEmpty()){
+                        Toast.makeText(dialog.context, "You must enter the height first", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    val usernameRef = userId?.let { it1 -> db.child("users").child(it1).child("username") }
+                    usernameRef?.setValue(newUsername)?.addOnSuccessListener {
+                        companiesList.forEach { companyId ->
+                            val ref = userId?.let { it1 ->
+                                db.child("companies").child(companyId).child("users").child(it1)
+                                    .child("username")
+                            }
+                            ref?.setValue(usernameRef)
+                        }
+                        dialog.dismiss()
+                    }
+                }
             }
             "password" -> {
+                dialog.setContentView(R.layout.change_password_layout)
 
+                // Nastavení velikosti dialogu
+                dialog.window?.setLayout(
+                    (resources.displayMetrics.widthPixels * 0.95).toInt(),
+                    (resources.displayMetrics.heightPixels * 0.85).toInt()
+                )
             }
         }
+        dialog.show()
     }
 }

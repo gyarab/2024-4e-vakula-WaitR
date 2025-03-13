@@ -86,4 +86,7 @@
     <string name="profile">Profile</string>
     <string name="change_username">Change username</string>
     <string name="change_password">Change password</string>
+    <string name="change">Change</string>
+    <string name="current_password">Current password</string>
+    <string name="new_password">New password</string>
 </resources>

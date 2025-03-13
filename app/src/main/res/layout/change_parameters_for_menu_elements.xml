@@ -63,7 +63,7 @@
             android:id="@+id/parameter_to_change"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:hint="@string/group_name" />
+            android:hint="." />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button
