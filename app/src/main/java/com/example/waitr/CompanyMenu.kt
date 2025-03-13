@@ -155,6 +155,7 @@ class CompanyMenu : AppCompatActivity() {
         }
 
     }
+
     private fun showCreateCompanyPopup() {
         // Vytvoření dialogu
         val dialog = Dialog(this)

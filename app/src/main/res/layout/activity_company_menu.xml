@@ -11,103 +11,149 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/background_blue">
 
-        <TextView
-            android:id="@+id/main_content_text"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
-            android:gravity="center"
-            android:text="@string/your_companies"
-            android:textSize="40sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/scrollView3"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_white_background"
+            app:layout_constraintBottom_toTopOf="@+id/guideline8"
             app:layout_constraintEnd_toStartOf="@+id/guideline20"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/guideline19"
-            app:layout_constraintTop_toTopOf="@+id/guideline7"
-            app:layout_constraintVertical_bias="0.08" />
+            app:layout_constraintTop_toTopOf="@+id/guideline7">
 
-
-        <ScrollView
-            android:id="@+id/scrollView3"
-            android:layout_width="0dp"
-            android:layout_height="350dp"
-            android:layout_marginTop="12dp"
-            android:contentDescription="@string/scrollable_company_list"
-            app:layout_constraintEnd_toStartOf="@+id/guideline20"
-            app:layout_constraintHorizontal_bias="0.497"
-            app:layout_constraintStart_toStartOf="@+id/guideline19"
-            app:layout_constraintTop_toBottomOf="@+id/main_content_text">
-
-            <LinearLayout
-                android:id="@+id/linearLayoutContainer"
-                android:layout_width="match_parent"
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline341"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
-        </ScrollView>
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.1" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline342"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline343"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.1" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline344"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.95" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline345"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.7" />
+
+            <TextView
+                android:id="@+id/main_content_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:gravity="center"
+                android:text="@string/your_companies"
+                android:textSize="35sp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/guideline343"
+                app:layout_constraintEnd_toStartOf="@+id/guideline342"
+                app:layout_constraintStart_toStartOf="@+id/guideline341"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ScrollView
+                android:id="@+id/scrollView3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@color/background_grey"
+                android:contentDescription="@string/scrollable_company_list"
+                app:layout_constraintBottom_toTopOf="@+id/guideline345"
+                app:layout_constraintEnd_toStartOf="@+id/guideline342"
+                app:layout_constraintStart_toStartOf="@+id/guideline341"
+                app:layout_constraintTop_toTopOf="@+id/guideline343">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </ScrollView>
+
+            <Button
+                android:id="@+id/Create_Company_popup_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/create_company"
+                android:textSize="20sp"
+                android:backgroundTint="@color/background_blue"
+                app:layout_constraintBottom_toTopOf="@+id/Join_Company_button"
+                app:layout_constraintEnd_toStartOf="@+id/guideline342"
+                app:layout_constraintStart_toStartOf="@+id/guideline341"
+                app:layout_constraintTop_toBottomOf="@+id/scrollView3"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <Button
+                android:id="@+id/Join_Company_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/join_company"
+                android:textSize="20sp"
+                android:backgroundTint="@color/background_green"
+                app:layout_constraintBottom_toTopOf="@+id/guideline344"
+                app:layout_constraintEnd_toStartOf="@+id/guideline342"
+                app:layout_constraintStart_toStartOf="@+id/guideline341"
+                app:layout_constraintTop_toBottomOf="@+id/Create_Company_popup_button"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.15" />
+            app:layout_constraintGuide_percent="0.025" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.8" />
-
-        <Button
-            android:id="@+id/Create_Company_popup_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
-            android:text="@string/create_company"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/Join_Company_button"
-            app:layout_constraintEnd_toStartOf="@+id/guideline20"
-            app:layout_constraintStart_toStartOf="@+id/guideline19"
-            app:layout_constraintTop_toBottomOf="@+id/scrollView3" />
-
-        <Button
-            android:id="@+id/Join_Company_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
-            android:text="@string/join_company"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline8"
-            app:layout_constraintEnd_toStartOf="@+id/guideline20"
-            app:layout_constraintStart_toStartOf="@+id/guideline19"
-            app:layout_constraintTop_toBottomOf="@+id/Create_Company_popup_button" />
+            app:layout_constraintGuide_percent="0.975" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline19"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.1" />
+            app:layout_constraintGuide_percent="0.05" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline20"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.9" />
-
+            app:layout_constraintGuide_percent="0.95" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
