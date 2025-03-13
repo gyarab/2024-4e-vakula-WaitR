@@ -97,29 +97,7 @@ class CompanyMenu : AppCompatActivity() {
         yourEmail = headerView.findViewById(R.id.yourEmail)
 
         // nacteni dat do headeru
-        userId?.let {
-            val userRef = db.child("users").child(it)
-            userRef.get()
-                .addOnSuccessListener { dataSnapshot ->
-                    if (dataSnapshot.exists()) {
-                        val usernamedata = dataSnapshot.child("username").getValue(String::class.java)
-                        val emaildata = dataSnapshot.child("email").getValue(String::class.java)
-
-                        // nastaveni textu v TextView a nastaveni globalnich promenych
-                        yourUsername.text = usernamedata
-                        yourEmail.text = emaildata
-                        if (emaildata != null) {
-                            email = emaildata
-                        }
-                        if (usernamedata != null) {
-                            username = usernamedata
-                        }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("RealtimeDB", "Error getting data: ", exception)
-                }
-        }
+        loadDataToHeader()
 // funkcnost polozek v drawermenu
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -154,6 +132,32 @@ class CompanyMenu : AppCompatActivity() {
             showJoinCompanyPopup()
         }
 
+    }
+    // nacteni dat do headeru
+    private fun loadDataToHeader(){
+        userId?.let {
+            val userRef = db.child("users").child(it)
+            userRef.get()
+                .addOnSuccessListener { dataSnapshot ->
+                    if (dataSnapshot.exists()) {
+                        val usernamedata = dataSnapshot.child("username").getValue(String::class.java)
+                        val emaildata = dataSnapshot.child("email").getValue(String::class.java)
+
+                        // nastaveni textu v TextView a nastaveni globalnich promenych
+                        yourUsername.text = usernamedata
+                        yourEmail.text = emaildata
+                        if (emaildata != null) {
+                            email = emaildata
+                        }
+                        if (usernamedata != null) {
+                            username = usernamedata
+                        }
+                    }
+                }
+                .addOnFailureListener { exception ->
+                    Log.e("RealtimeDB", "Error getting data: ", exception)
+                }
+        }
     }
 
     private fun showCreateCompanyPopup() {
@@ -787,6 +791,7 @@ class CompanyMenu : AppCompatActivity() {
                             }
                             ref?.setValue(usernameRef)
                         }
+                        loadDataToHeader()
                         dialog.dismiss()
                     }
                 }
