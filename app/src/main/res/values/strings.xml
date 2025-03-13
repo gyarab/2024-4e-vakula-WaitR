@@ -83,4 +83,7 @@
     <string name="promote_to_manager">Promote to manager</string>
     <string name="kick">Kick</string>
     <string name="Analytics">Analytics</string>
+    <string name="profile">Profile</string>
+    <string name="change_username">Change username</string>
+    <string name="change_password">Change password</string>
 </resources>

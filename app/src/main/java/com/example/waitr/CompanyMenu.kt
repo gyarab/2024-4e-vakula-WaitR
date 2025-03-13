@@ -70,7 +70,7 @@ class CompanyMenu : AppCompatActivity() {
         invitesDialog.setContentView(R.layout.displaying_invites_in_company_menu_popup)
         //definovani dynamickeho layoutu v dialogu
         invitesDisplay = invitesDialog.findViewById(R.id.display_invites_layout)
-        linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+        linearLayoutContainer = findViewById(R.id.linearLayoutContainer)
 
         noCompaniesTextView = TextView(this).apply {
             text = "No companies yet"
@@ -85,6 +85,7 @@ class CompanyMenu : AppCompatActivity() {
         // zprovozneni drawermenu...
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.nav_view)
+        navigationView.itemTextColor = null
         drawerToggle = ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
         drawerLayout.addDrawerListener(drawerToggle)
         drawerToggle.syncState()
@@ -129,6 +130,10 @@ class CompanyMenu : AppCompatActivity() {
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
                     finish()
+                    true
+                }
+                R.id.profile_button -> {
+                    profileSettingsPopup()
                     true
                 }
                 else -> false
@@ -711,5 +716,9 @@ class CompanyMenu : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
+    }
+
+    private fun profileSettingsPopup(){
+
     }
 }

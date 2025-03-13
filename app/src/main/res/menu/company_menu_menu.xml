@@ -5,6 +5,10 @@
         android:icon="@drawable/baseline_logout_24"
         android:title="@string/logout">
     </item>
+    <item android:id="@+id/profile_button"
+        android:icon="@drawable/baseline_contact_page_24"
+        android:title="@string/profile">
+    </item>
 </group>
 
 </menu>
