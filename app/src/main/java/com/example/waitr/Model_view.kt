@@ -1432,11 +1432,12 @@ class Model_view : Fragment() {
         }
     }
     @SuppressLint("ClickableViewAccessibility")
-    private fun drawEditScene(){
+    private fun drawEditScene() {
+        if (model.listOfScenes.isNotEmpty()){
         editModelSceneLayout.removeAllViews()
         lateinit var scene: ModelScene
         editModel.listOfScenes.forEach { modelScene ->
-            if (modelScene.id == selectedStageId){
+            if (modelScene.id == selectedStageId) {
                 scene = modelScene
             }
         }
@@ -1474,8 +1475,12 @@ class Model_view : Fragment() {
                         val tableParams = textView.tag as TableTag
                         selectedTableId = tableParams.id
                         val state = tableParams.state
-                        if (!state.equals("empty")){
-                            Toast.makeText(requireContext(), "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                        if (!state.equals("empty")) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Can´t edit table when in use",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@CustomClickListener
                         }
                         if (!tableEditMode) {
@@ -1494,8 +1499,12 @@ class Model_view : Fragment() {
                         val tableParams = textView.tag as TableTag
                         selectedTableId = tableParams.id
                         val state = tableParams.state
-                        if (!state.equals("empty")){
-                            Toast.makeText(requireContext(), "Can´t edit table when in use", Toast.LENGTH_SHORT).show()
+                        if (!state.equals("empty")) {
+                            Toast.makeText(
+                                requireContext(),
+                                "Can´t edit table when in use",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             return@CustomClickListener
                         }
                         tableOptionsPopup()
@@ -1542,7 +1551,8 @@ class Model_view : Fragment() {
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherParams =
+                                        otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
                                         (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
                                         (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
@@ -1666,7 +1676,8 @@ class Model_view : Fragment() {
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherParams =
+                                        otherView.layoutParams as ConstraintLayout.LayoutParams
                                     val otherRect = Rect(
                                         (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
                                         (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
@@ -1705,6 +1716,7 @@ class Model_view : Fragment() {
             }
             editModelSceneLayout.addView(textView)
         }
+    }
     }
 
     private fun drawEditScenesToBar(){
@@ -2565,14 +2577,15 @@ class Model_view : Fragment() {
         drawScene()
         drawScenesToBar()
     }
-    private fun drawScene(){
-        if (selectedStageId == null && model.listOfScenes.isNotEmpty()){
+    private fun drawScene() {
+        if (model.listOfScenes.isNotEmpty()){
+        if (selectedStageId == null && model.listOfScenes.isNotEmpty()) {
             selectedStageId = model.listOfScenes.get(0).id
         }
         currentScene.removeAllViews()
         lateinit var scene: ModelScene
         model.listOfScenes.forEach { modelScene ->
-            if (modelScene.id == selectedStageId){
+            if (modelScene.id == selectedStageId) {
                 scene = modelScene
             }
         }
@@ -2609,11 +2622,13 @@ class Model_view : Fragment() {
                             val tableParams = textView.tag as TableTag
                             selectedTableId = tableParams.id
                             tableManager(tableParams.state)
-                        } else { Toast.makeText(
-                            context,
-                            "Model is currently being edited! Please wait",
-                            Toast.LENGTH_SHORT
-                        ).show() }
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "Model is currently being edited! Please wait",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     },
                     onDoubleClick = {
 
@@ -2646,6 +2661,7 @@ class Model_view : Fragment() {
             currentScene.addView(textView)
         }
     }
+    }
 
     private fun tableManager(state: String){
         when (state) {
@@ -2673,7 +2689,7 @@ class Model_view : Fragment() {
     private fun drawScenesToBar(){
         modelScenesBar.removeAllViews()
         if (model.listOfScenes.isEmpty()){
-            val textView = TextView(context).apply {
+            val textView = TextView(requireContext()).apply {
                 this.text = "No Scene"
                 this.textSize = 18f // Velikost textu
                 this.setTextColor(Color.WHITE) // Barva textu
