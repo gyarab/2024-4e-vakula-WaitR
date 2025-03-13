@@ -10,18 +10,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.ContextThemeWrapper
 import android.view.Gravity
-import android.view.Menu
 import android.view.MenuItem
-import android.view.SubMenu
-import android.view.View
-import android.widget.ActionMenuView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageButton
@@ -52,7 +46,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlin.math.E
 
 class Company_manager : AppCompatActivity() {
     // promenne sem
@@ -94,6 +87,7 @@ class Company_manager : AppCompatActivity() {
     private lateinit var companyListener: ValueEventListener
     private val userCompaniesRef = userId?.let { db.child("users").child(it).child("companies") }
     private val handler = Handler(Looper.getMainLooper())
+    private val allUsersList = mutableListOf<String>()
     private val checkNotificationsRunnable = object : Runnable {
         override fun run() {
             checkAndSendNotifications() // Zavolá tvou funkci
@@ -1281,12 +1275,14 @@ class Company_manager : AppCompatActivity() {
     }
     //získání useru z menu a rozdělení na online a offline
     private fun fetchUsers(){
+        allUsersList.clear()
         onlineMembers.clear()
         offlineMembers.clear()
         val usersRef = db.child("companies").child(CompanyID).child("users")
         usersRef.get()
             .addOnSuccessListener { usersDataSnapshot ->
                 for(user in usersDataSnapshot.children){
+                    user.key?.let { allUsersList.add(it) }
                     val userName = user.child("username").getValue(String::class.java)
                     val userStatus = user.child("status").getValue(String::class.java)
                     if (userStatus == "online" && userName != null){
@@ -1296,6 +1292,7 @@ class Company_manager : AppCompatActivity() {
                         offlineMembers.add(userName)
                     }
                 }
+                updateAnalytics()
                 loadCurrentUsersToLayout()
             }
     }
@@ -1330,6 +1327,53 @@ class Company_manager : AppCompatActivity() {
             }
             displayOfflineUsers.addView(userToDisplay)
         }
+    }
+    //updatne analytics
+    private fun updateAnalytics(){
+        val analyticsUsersList = mutableListOf<String>()
+
+        val tablesRef = CompanyID.let { db.child("companies").child(it).child("Analytics").child("users") }
+        tablesRef.get().addOnSuccessListener { snapshot ->
+            analyticsUsersList.clear() // Vyčištění listu
+
+            for (itemSnapshot in snapshot.children) {
+                val itemId = itemSnapshot.key // Každý klíč je ID položky
+                if (itemId != null) {
+                    analyticsUsersList.add(itemId)
+                }
+            }
+            Log.d("Analytics", "Načtené ID položek: $analyticsUsersList")
+
+            val finalAnalyticsUsersList = mutableListOf<String>()
+
+            analyticsUserTraversal(analyticsUsersList, finalAnalyticsUsersList)
+
+            analyticsUsersList.forEach { table ->
+                tablesRef.child(table).removeValue()
+            }
+            finalAnalyticsUsersList.forEach { table ->
+                val tableMap = mapOf(
+                    table to mapOf(
+                        "numberOfServedTables" to 0,
+                        "activity" to 0
+                    )
+                )
+                tablesRef.updateChildren(tableMap)
+            }
+
+        }.addOnFailureListener { error ->
+            Log.e("Firebase", "Chyba při načítání Analytics: ${error.message}")
+        }
+    }
+
+    private fun analyticsUserTraversal(list: MutableList<String>, finalList: MutableList<String>){
+            allUsersList.forEach { user ->
+                if (list.contains(user)){
+                    list.remove(user)
+                } else {
+                    finalList.add(user)
+                }
+            }
     }
     //nastaveni realtime listeneru
     private fun setupRealtimeListener() {
