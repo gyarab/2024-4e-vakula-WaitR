@@ -719,6 +719,55 @@ class CompanyMenu : AppCompatActivity() {
     }
 
     private fun profileSettingsPopup(){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.profile_settings_popup)
 
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+
+        // Reference na prvky v popup layoutu
+        val closeButton = dialog.findViewById<Button>(R.id.Create_Company_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        val usernameTextView = dialog.findViewById<TextView>(R.id.profile_settings_username_textView)
+        usernameTextView.text = username
+        val emailTextView = dialog.findViewById<TextView>(R.id.profile_settings_email_textView)
+        emailTextView.text = email
+        val changeUsername = dialog.findViewById<Button>(R.id.change_profile_username_button)
+        changeUsername.setOnClickListener {
+            changeProfileParameters("username")
+        }
+        val changePassword = dialog.findViewById<Button>(R.id.change_profile_password_button)
+        changePassword.setOnClickListener {
+            changeProfileParameters("password")
+        }
+
+        dialog.show()
+    }
+
+    private fun changeProfileParameters(type: String){
+        // Vytvoření dialogu
+        val dialog = Dialog(this)
+        dialog.setContentView(R.layout.create_company_popup)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
+        )
+
+        when(type){
+            "username" -> {
+
+            }
+            "password" -> {
+
+            }
+        }
     }
 }
