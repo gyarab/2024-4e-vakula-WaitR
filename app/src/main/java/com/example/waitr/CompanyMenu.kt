@@ -6,6 +6,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.icu.text.Transliterator.Position
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,8 @@ import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -359,11 +362,24 @@ class CompanyMenu : AppCompatActivity() {
             selectedCompanyName = companyName
             selectedCompanyId = companyId // Nastavení ID do globální proměnné
             // Vytvoř nový Button
-            val newButton = Button(this).apply {
-                selectedCompanyName = companyName
+            val newButton = MaterialButton(this).apply {
                 text = companyName
-                //tag = companyId // Uložení ID podniku
                 tag = CompanyTag(companyId, companyName, position)
+
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx())
+                }
+
+                setBackgroundColor(
+                    ContextCompat.getColor(context, R.color.background_blue)
+                )
+
+                isAllCaps = false
+                textSize = 20f
+                gravity = Gravity.CENTER
             }
             newButton.setOnClickListener {
                 val companyTag = it.tag as CompanyTag
@@ -477,6 +493,7 @@ class CompanyMenu : AppCompatActivity() {
         }
     }
     private fun loadInvites(){
+        invitesDisplay.removeAllViews()
         if (invitesDisplay.contains(noInvitesYet)){
             invitesDisplay.removeView(noInvitesYet)
         }
@@ -502,25 +519,81 @@ class CompanyMenu : AppCompatActivity() {
                                         val textViewID = View.generateViewId()
 
                                         companyName?.let { name ->
+                                            //TODO
                                             // Dynamické vytvoření TextView pro každou pozvánku
-                                            val inviteToDisplay = TextView(this).apply {
-                                                text = "New invite from company: $name\nClick to accept" // Nastavení textu
-                                                layoutParams = LinearLayout.LayoutParams(280.dpToPx(), LinearLayout.LayoutParams.WRAP_CONTENT).apply {
-                                                    setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx()) // Nastavení marginů
+                                            val inviteLayout = LinearLayout(this).apply {
+                                                layoutParams = LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                ).apply {
+                                                    setMargins(10, 10, 10, 10)
                                                 }
-                                                textSize = 18f // Nastavení velikosti textu
-                                                setBackgroundColor(Color.parseColor("#BDEDBF")) // Nastavení barvy pozadí
+                                                orientation = LinearLayout.VERTICAL
+                                                val backgroundDrawable = GradientDrawable().apply {
+                                                    setColor(Color.WHITE) // Barva pozadí
+                                                    cornerRadius = 30f // Zaoblení rohů v pixelech
+                                                }
+                                                background = backgroundDrawable
+                                                gravity = Gravity.CENTER_HORIZONTAL
+                                                setPadding(16, 16, 16, 16)
+                                            }
+                                            val inviteToDisplay = TextView(this).apply {
+                                                text = "New invite from company: $name" // Nastavení textu
+                                                setPadding(16, 16, 16, 16)
+                                                layoutParams = LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                )
+                                                textSize = 20f // Nastavení velikosti textu
                                                 tag = textViewID
                                             }
+                                            val buttonsLayout = LinearLayout(this).apply {
+                                                layoutParams = LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                )
+                                                orientation = LinearLayout.HORIZONTAL
+                                                setPadding(16, 16, 16, 16)
+                                            }
+                                            val acceptButton = ImageButton(this).apply {
+                                                setImageResource(R.drawable.baseline_done_24)
+                                                layoutParams = LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                )
+                                                setPadding(16, 16, 16, 16)
+                                                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                                                setBackgroundColor(Color.GREEN)
+                                            }
+                                            val declineButton = ImageButton(this).apply {
+                                                setImageResource(R.drawable.baseline_close_24)
+                                                layoutParams = LinearLayout.LayoutParams(
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT
+                                                )
+                                                setPadding(16, 16, 16, 16)
+                                                scaleType = ImageView.ScaleType.CENTER_INSIDE
+                                                setBackgroundColor(Color.RED)
+                                            }
+                                            buttonsLayout.addView(acceptButton)
+                                            buttonsLayout.addView(declineButton)
+                                            inviteLayout.addView(inviteToDisplay)
+                                            inviteLayout.addView(buttonsLayout)
+
                                             // Nastavení listeneru na TextView
-                                            inviteToDisplay.setOnClickListener {
+                                            acceptButton.setOnClickListener {
                                                 if (position != null) {
                                                     acceptInvite(companyID, companyName, textViewID, position)
+                                                    invitesDialog.dismiss()
                                                 }
+                                            }
+                                            declineButton.setOnClickListener {
+                                                removeInvite(companyID)
+                                                invitesDialog.dismiss()
                                             }
 
                                             // Přidání TextView do vašeho layoutu
-                                            invitesDisplay.addView(inviteToDisplay)
+                                            invitesDisplay.addView(inviteLayout)
 
                                         }
                                     }.addOnFailureListener { error ->

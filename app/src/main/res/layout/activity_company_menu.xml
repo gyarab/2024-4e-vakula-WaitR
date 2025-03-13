@@ -83,8 +83,10 @@
                 android:contentDescription="@string/scrollable_company_list"
                 app:layout_constraintBottom_toTopOf="@+id/guideline345"
                 app:layout_constraintEnd_toStartOf="@+id/guideline342"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="@+id/guideline341"
-                app:layout_constraintTop_toTopOf="@+id/guideline343">
+                app:layout_constraintTop_toTopOf="@+id/guideline343"
+                app:layout_constraintVertical_bias="0.0">
 
                 <LinearLayout
                     android:id="@+id/linearLayoutContainer"
