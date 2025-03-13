@@ -89,4 +89,5 @@
     <string name="change">Change</string>
     <string name="current_password">Current password</string>
     <string name="new_password">New password</string>
+    <string name="create_your_company">Create your company</string>
 </resources>

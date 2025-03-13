@@ -4,110 +4,191 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#91D5F4">
-
-    <TextView
-        android:id="@+id/create_company_showcase_text"
-        android:layout_width="247dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        android:gravity="center"
-        android:text="@string/here_you_create_your_company"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/username_layout"
-        app:layout_constraintEnd_toStartOf="@+id/guideline48"
-        app:layout_constraintStart_toStartOf="@+id/guideline47"
-        app:layout_constraintTop_toTopOf="@+id/guideline23"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/username_layout"
-        android:layout_width="329dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/Create_Company_button"
-        app:layout_constraintEnd_toStartOf="@+id/guideline22"
-        app:layout_constraintStart_toStartOf="@+id/guideline21"
-        app:layout_constraintTop_toBottomOf="@+id/create_company_showcase_text"
-        app:layout_constraintVertical_bias="0.5">
-
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/Company_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/company_name" />
-    </com.google.android.material.textfield.TextInputLayout>
-
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline21"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline22"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline23"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <Button
-        android:id="@+id/Create_Company_button"
-        android:layout_width="164dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/create"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline24"
-        app:layout_constraintEnd_toStartOf="@+id/guideline26"
-        app:layout_constraintStart_toStartOf="@+id/guideline25"
-        app:layout_constraintTop_toBottomOf="@+id/username_layout"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline22"
+        app:layout_constraintStart_toStartOf="@+id/guideline21"
+        app:layout_constraintTop_toTopOf="@+id/guideline23">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline25"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.30" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline26"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.7" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline26"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline47"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline47"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline48"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline48"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline350"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline351"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.85" />
+
+        <TextView
+            android:id="@+id/create_company_showcase_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            android:gravity="center"
+            android:text="@string/create_your_company"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline350"
+            app:layout_constraintEnd_toStartOf="@+id/guideline26"
+            app:layout_constraintStart_toStartOf="@+id/guideline25"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_grey_background"
+            app:layout_constraintBottom_toTopOf="@+id/guideline351"
+            app:layout_constraintEnd_toStartOf="@+id/guideline26"
+            app:layout_constraintStart_toStartOf="@+id/guideline25"
+            app:layout_constraintTop_toTopOf="@+id/guideline350">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/username_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_white_background"
+                app:layout_constraintBottom_toTopOf="@+id/Create_Company_button"
+                app:layout_constraintEnd_toStartOf="@+id/guideline355"
+                app:layout_constraintStart_toStartOf="@+id/guideline354"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5">
+
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/Company_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="5dp"
+                    android:hint="@string/company_name" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/Create_Company_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/create"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline353"
+                app:layout_constraintStart_toStartOf="@+id/guideline352"
+                app:layout_constraintTop_toBottomOf="@+id/username_layout"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline352"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.2" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline353"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.8" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline354"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.05" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline355"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.95" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/close_create_company"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/Close"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline48"
+            app:layout_constraintStart_toStartOf="@+id/guideline47"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout2" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

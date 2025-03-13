@@ -18,11 +18,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.contains
 import androidx.core.view.isEmpty
 import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.EmailAuthProvider
@@ -175,6 +177,10 @@ class CompanyMenu : AppCompatActivity() {
         val createButton = dialog.findViewById<Button>(R.id.Create_Company_button)
         val companyNameInput = dialog.findViewById<TextInputEditText>(R.id.Company_name)
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
+        val closeButton = dialog.findViewById<Button>(R.id.close_create_company)
+        closeButton.setOnClickListener{
+            dialog.dismiss()
+        }
 
         // Akce při kliknutí na tlačítko "Create"
         createButton.setOnClickListener {
@@ -545,9 +551,28 @@ class CompanyMenu : AppCompatActivity() {
                             val authorization = companySnapshot.child("authorization").getValue(String::class.java)
 
                             if (companyId != null && companyName != null && authorization != null) {
-                                val newButton = Button(this).apply {
+                                val newButton = MaterialButton(this).apply {
                                     text = companyName
                                     tag = CompanyTag(companyId, companyName, authorization)
+
+                                    layoutParams = LinearLayout.LayoutParams(
+                                        LinearLayout.LayoutParams.MATCH_PARENT,
+                                        LinearLayout.LayoutParams.WRAP_CONTENT
+                                    ).apply {
+                                        setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx())
+                                    }
+
+                                    setBackgroundColor(
+                                        if (authorization == "owner") {
+                                            ContextCompat.getColor(context, R.color.background_blue)
+                                        } else {
+                                            ContextCompat.getColor(context, R.color.background_green)
+                                        }
+                                    )
+
+                                    isAllCaps = false
+                                    textSize = 20f
+                                    gravity = Gravity.CENTER
                                 }
                                 newButton.setOnClickListener {
                                     val companyTag = it.tag as CompanyTag

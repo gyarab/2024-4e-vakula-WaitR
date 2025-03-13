@@ -3,61 +3,89 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline55"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline56"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline57"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.2" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline58"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.8" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <Button
-        android:id="@+id/enter_company_from_invite_button"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/enter"
-        app:layout_constraintVertical_bias="0.5"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline58"
         app:layout_constraintEnd_toStartOf="@+id/guideline56"
         app:layout_constraintStart_toStartOf="@+id/guideline55"
-        app:layout_constraintTop_toTopOf="@+id/company_from_invite_to_display" />
+        app:layout_constraintTop_toTopOf="@+id/guideline57">
 
-    <TextView
-        android:id="@+id/company_from_invite_to_display"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text=""
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/enter_company_from_invite_button"
-        app:layout_constraintEnd_toStartOf="@+id/guideline56"
-        app:layout_constraintStart_toStartOf="@+id/guideline55"
-        app:layout_constraintTop_toTopOf="@+id/guideline57" />
+        <Button
+            android:id="@+id/enter_company_from_invite_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/enter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline349"
+            app:layout_constraintStart_toStartOf="@+id/guideline348"
+            app:layout_constraintTop_toBottomOf="@+id/company_from_invite_to_display"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <TextView
+            android:id="@+id/company_from_invite_to_display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/enter_company_from_invite_button"
+            app:layout_constraintEnd_toStartOf="@+id/guideline349"
+            app:layout_constraintStart_toStartOf="@+id/guideline348"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline348"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline349"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.8" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
