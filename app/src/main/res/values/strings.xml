@@ -90,4 +90,5 @@
     <string name="current_password">Current password</string>
     <string name="new_password">New password</string>
     <string name="create_your_company">Create your company</string>
+    <string name="model">Model</string>
 </resources>

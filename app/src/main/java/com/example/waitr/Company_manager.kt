@@ -1315,7 +1315,18 @@ class Company_manager : AppCompatActivity() {
             val userToDisplay = TextView(this).apply {
                 text = user
                 textSize = 20f
-                gravity = Gravity.CENTER
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(5,5,5,5)
+                }
+                val backgroundDrawable = GradientDrawable().apply {
+                    setColor(Color.WHITE)
+                    cornerRadius = 30f
+                }
+                background = backgroundDrawable
             }
             displayOnlineUsers.addView(userToDisplay)
         }
@@ -1323,7 +1334,18 @@ class Company_manager : AppCompatActivity() {
             val userToDisplay = TextView(this).apply {
                 text = user
                 textSize = 20f
-                gravity = Gravity.CENTER
+                setPadding(16, 16, 16, 16)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    setMargins(5,5,5,5)
+                }
+                val backgroundDrawable = GradientDrawable().apply {
+                    setColor(Color.WHITE)
+                    cornerRadius = 30f
+                }
+                background = backgroundDrawable
             }
             displayOfflineUsers.addView(userToDisplay)
         }
