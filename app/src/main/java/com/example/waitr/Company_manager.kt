@@ -210,6 +210,7 @@ class Company_manager : AppCompatActivity() {
                     currentMembersPopup()
                     true
                 }
+                //TODO tady vzhled jsem skoncili
                 R.id.manager_add_members_button -> {
                     // funkce pridavani uzivatelu do spolecnosti pomoci pozvanky
                     showInviteUserPopUp()
