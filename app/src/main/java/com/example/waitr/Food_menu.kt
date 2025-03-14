@@ -470,6 +470,10 @@ class Food_menu : Fragment() {
         textView.text = "Item name"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New item name"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change name"
         changeTextButton.setOnClickListener {
@@ -501,6 +505,10 @@ class Food_menu : Fragment() {
         parametrToChange.hint = "New item price"
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change price"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         changeTextButton.setOnClickListener {
             val newPrice = parametrToChange.text.toString().trim()
             if (newPrice.isEmpty()){
@@ -534,6 +542,10 @@ class Food_menu : Fragment() {
         textView.text = "Item description"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New item description"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change description"
         changeTextButton.setOnClickListener {
@@ -642,6 +654,10 @@ class Food_menu : Fragment() {
         textView.text = "Group name"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New group name"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change name"
         changeTextButton.setOnClickListener {

@@ -195,7 +195,6 @@ class Company_manager : AppCompatActivity() {
                     Log.e("RealtimeDB", "Error getting data: ", exception)
                 }
         }
-// TODO funkcnost polozek v drawermenu
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.manager_notifications_button -> {
@@ -210,7 +209,6 @@ class Company_manager : AppCompatActivity() {
                     currentMembersPopup()
                     true
                 }
-                //TODO tady vzhled jsem skoncili
                 R.id.manager_add_members_button -> {
                     // funkce pridavani uzivatelu do spolecnosti pomoci pozvanky
                     showInviteUserPopUp()
@@ -697,6 +695,10 @@ class Company_manager : AppCompatActivity() {
         }
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New period"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changePeriodButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changePeriodButton.text = "Change period"
         changePeriodButton.setOnClickListener {
@@ -823,6 +825,10 @@ class Company_manager : AppCompatActivity() {
         parametrToChange.hint = "New company name"
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change name"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         changeTextButton.setOnClickListener {
             val newName = parametrToChange.text.toString().trim()
             if (newName.isEmpty()){
@@ -1045,6 +1051,10 @@ class Company_manager : AppCompatActivity() {
         val inviteButton = dialog.findViewById<Button>(R.id.invite_user_button)
         val userToInvite = dialog.findViewById<TextInputEditText>(R.id.user_to_invite)
         val spinner: Spinner = dialog.findViewById(R.id.positionSpinner)
+        val closeButton = dialog.findViewById<Button>(R.id.close_invite_users_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
 
         // Možnosti pro Spinner
         val options = listOf("Select position", "employee", "manager")

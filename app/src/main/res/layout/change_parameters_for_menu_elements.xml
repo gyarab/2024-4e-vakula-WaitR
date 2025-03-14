@@ -3,96 +3,200 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline110"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline111"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline112"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline113"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <TextView
-        android:id="@+id/parametr_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:textSize="30sp"
-        android:text=""
-        app:layout_constraintBottom_toTopOf="@+id/parameter_to_change_layout"
-        app:layout_constraintEnd_toStartOf="@+id/guideline115"
-        app:layout_constraintStart_toStartOf="@+id/guideline114"
-        app:layout_constraintTop_toTopOf="@+id/guideline112"
-        app:layout_constraintVertical_bias="0.5" />
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/parameter_to_change_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/change_group_name_button"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
+        app:layout_constraintBottom_toTopOf="@+id/guideline113"
         app:layout_constraintEnd_toStartOf="@+id/guideline111"
         app:layout_constraintStart_toStartOf="@+id/guideline110"
-        app:layout_constraintTop_toBottomOf="@+id/parametr_view"
-        app:layout_constraintVertical_bias="0.5">
+        app:layout_constraintTop_toTopOf="@+id/guideline112">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/parameter_to_change"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="." />
-    </com.google.android.material.textfield.TextInputLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline368"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.85" />
 
-    <Button
-        android:id="@+id/change_group_name_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Button"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        app:layout_constraintBottom_toTopOf="@+id/guideline113"
-        app:layout_constraintEnd_toStartOf="@+id/guideline115"
-        app:layout_constraintStart_toStartOf="@+id/guideline114"
-        app:layout_constraintTop_toBottomOf="@+id/parameter_to_change_layout"
-        app:layout_constraintVertical_bias="0.5" />
+        <TextView
+            android:id="@+id/parametr_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline360"
+            app:layout_constraintEnd_toStartOf="@+id/guideline115"
+            app:layout_constraintStart_toStartOf="@+id/guideline114"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline114"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.25" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintLayout3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_grey_background"
+            app:layout_constraintBottom_toTopOf="@+id/guideline368"
+            app:layout_constraintEnd_toStartOf="@+id/guideline115"
+            app:layout_constraintStart_toStartOf="@+id/guideline114"
+            app:layout_constraintTop_toTopOf="@+id/guideline360">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline115"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75" />
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline371"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.05" />
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline372"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.95" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline373"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.25" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline374"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.75" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/parameter_to_change_layout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_white_background"
+                app:layout_constraintBottom_toTopOf="@+id/change_group_name_button"
+                app:layout_constraintEnd_toStartOf="@+id/guideline372"
+                app:layout_constraintStart_toStartOf="@+id/guideline371"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/parameter_to_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:hint="." />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/change_group_name_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="Button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline374"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/guideline373"
+                app:layout_constraintTop_toBottomOf="@+id/parameter_to_change_layout"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/close_change_parameters_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/Close"
+            app:layout_constraintBottom_toTopOf="@+id/guideline361"
+            app:layout_constraintEnd_toStartOf="@+id/guideline370"
+            app:layout_constraintStart_toStartOf="@+id/guideline369"
+            app:layout_constraintTop_toTopOf="@+id/guideline368" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline114"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline115"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline360"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.125" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline361"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.95" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline369"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline370"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.7" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

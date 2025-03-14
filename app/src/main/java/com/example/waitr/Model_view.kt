@@ -1881,6 +1881,10 @@ class Model_view : Fragment() {
         textView.text = "Scene name"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New Scene name"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change name"
         changeTextButton.setOnClickListener {
@@ -2003,6 +2007,10 @@ class Model_view : Fragment() {
         textView.text = "Table name"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New Table name"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change name"
         changeTextButton.setOnClickListener {
@@ -2033,6 +2041,10 @@ class Model_view : Fragment() {
         textView.text = "Table height"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New table height"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change height"
         changeTextButton.setOnClickListener {
@@ -2080,6 +2092,10 @@ class Model_view : Fragment() {
         textView.text = "Table width"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New table width"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change width"
         changeTextButton.setOnClickListener {
@@ -2204,6 +2220,10 @@ class Model_view : Fragment() {
         textView.text = "Helper height"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New helper height"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change height"
         changeTextButton.setOnClickListener {
@@ -2251,6 +2271,10 @@ class Model_view : Fragment() {
         textView.text = "Helper width"
         val parametrToChange = dialog.findViewById<TextInputEditText>(R.id.parameter_to_change)
         parametrToChange.hint = "New helper width"
+        val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
         val changeTextButton = dialog.findViewById<Button>(R.id.change_group_name_button)
         changeTextButton.text = "Change width"
         changeTextButton.setOnClickListener {

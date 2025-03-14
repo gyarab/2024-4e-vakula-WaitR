@@ -3,112 +3,168 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline272"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.2" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline273"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.8" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline274"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline275"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.025" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline276"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline277"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.3" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline278"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.7" />
-
-    <TextView
-        android:id="@+id/textView12"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text=""
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline274"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
+        app:layout_constraintBottom_toTopOf="@+id/guideline275"
         app:layout_constraintEnd_toStartOf="@+id/guideline273"
         app:layout_constraintStart_toStartOf="@+id/guideline272"
-        app:layout_constraintTop_toTopOf="@+id/guideline275" />
+        app:layout_constraintTop_toTopOf="@+id/guideline274">
 
-    <Button
-        android:id="@+id/promote_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/promote_to_manager"
-        app:layout_constraintBottom_toTopOf="@+id/kick_button"
-        app:layout_constraintEnd_toStartOf="@+id/guideline273"
-        app:layout_constraintStart_toStartOf="@+id/guideline272"
-        app:layout_constraintTop_toTopOf="@+id/guideline274"
-        app:layout_constraintVertical_bias="0.5" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline276"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.15" />
 
-    <Button
-        android:id="@+id/kick_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/kick"
-        app:layout_constraintBottom_toTopOf="@+id/close_user_settings_button"
-        app:layout_constraintEnd_toStartOf="@+id/guideline278"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline277"
-        app:layout_constraintTop_toBottomOf="@+id/promote_button"
-        app:layout_constraintVertical_bias="0.5" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline277"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
 
-    <Button
-        android:id="@+id/close_user_settings_button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/Close"
-        app:layout_constraintBottom_toTopOf="@+id/guideline276"
-        app:layout_constraintEnd_toStartOf="@+id/guideline278"
-        app:layout_constraintStart_toStartOf="@+id/guideline277"
-        app:layout_constraintTop_toBottomOf="@+id/kick_button"
-        app:layout_constraintVertical_bias="0.5" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline278"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline362"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.95" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline363"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline364"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.7" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline365"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.8" />
+
+        <TextView
+            android:id="@+id/textView12"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center"
+            android:text=""
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline276"
+            app:layout_constraintEnd_toStartOf="@+id/guideline278"
+            app:layout_constraintStart_toStartOf="@+id/guideline277"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_grey_background"
+            app:layout_constraintBottom_toTopOf="@+id/guideline365"
+            app:layout_constraintEnd_toStartOf="@+id/guideline278"
+            app:layout_constraintStart_toStartOf="@+id/guideline277"
+            app:layout_constraintTop_toTopOf="@+id/guideline276">
+
+            <Button
+                android:id="@+id/promote_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:layout_marginStart="20sp"
+                android:layout_marginEnd="20sp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/promote_to_manager"
+                app:layout_constraintBottom_toTopOf="@+id/kick_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <Button
+                android:id="@+id/kick_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:layout_marginStart="20sp"
+                android:layout_marginEnd="20sp"
+                android:text="@string/kick"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/promote_button"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/close_user_settings_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/Close"
+            app:layout_constraintBottom_toTopOf="@+id/guideline362"
+            app:layout_constraintEnd_toStartOf="@+id/guideline364"
+            app:layout_constraintStart_toStartOf="@+id/guideline363"
+            app:layout_constraintTop_toTopOf="@+id/guideline365"
+            app:layout_constraintVertical_bias="0.5" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
