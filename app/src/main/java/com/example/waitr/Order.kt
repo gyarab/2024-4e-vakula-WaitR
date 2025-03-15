@@ -24,4 +24,12 @@ data class Order(
         return false
     }
 
+    fun deepCopy(): Order {
+        return Order(
+            menuItems = this.menuItems.map { it.deepCopy() }.toMutableList(),
+            totalPrice = this.totalPrice,
+            paid = this.paid
+        )
+    }
+
 }

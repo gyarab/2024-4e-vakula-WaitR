@@ -32,4 +32,11 @@ data class Model(
             scene.listOfTables[tableIndex] = updatedTable
         }
     }
+
+    fun deepCopy(): Model {
+        return Model(
+            listOfScenes = listOfScenes.map { it.deepCopy() }.toMutableList(),
+            locked = locked
+        )
+    }
 }

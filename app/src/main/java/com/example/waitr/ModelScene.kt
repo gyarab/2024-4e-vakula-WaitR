@@ -37,4 +37,13 @@ data class ModelScene(
         return false
     }
 
+    fun deepCopy(): ModelScene {
+        return ModelScene(
+            id = this.id,
+            name = this.name,
+            listOfTables = this.listOfTables.map { it.deepCopy() }.toMutableList(),
+            listOfHelpers = this.listOfHelpers.map { it.deepCopy() }.toMutableList()
+        )
+    }
+
 }

@@ -355,7 +355,7 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val changeNameButton = Button(this).apply {
+        val changeNameButton = MaterialButton(this).apply {
             text = "Change name"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -431,7 +431,7 @@ class Company_manager : AppCompatActivity() {
                 }
             }
             val manageUserSettingsTag = manageUserSettingsTag(user.id, user.name, user.authorization)
-            val manageButton = Button(this).apply {
+            val manageButton = MaterialButton(this).apply {
                 text = "manage user"
                 textSize = 20f
                 setPadding(16, 16, 16, 16)
@@ -501,7 +501,7 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val changeSeatedNotPeriodButton = Button(this).apply {
+        val changeSeatedNotPeriodButton = MaterialButton(this).apply {
             text = "Change"
             textSize = 20f
             setPadding(8, 8, 8, 8)
@@ -544,7 +544,7 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val changeEatingNotPeriodButton = Button(this).apply {
+        val changeEatingNotPeriodButton = MaterialButton(this).apply {
             text = "Change"
             textSize = 20f
             setPadding(8, 8, 8, 8)
@@ -587,7 +587,7 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
         }
-        val changePaidNotPeriodButton = Button(this).apply {
+        val changePaidNotPeriodButton = MaterialButton(this).apply {
             text = "Change"
             textSize = 20f
             setPadding(8, 8, 8, 8)
@@ -617,7 +617,7 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(0, 8, 0, 8)
+                setMargins(8, 8, 8, 8)
             }
             orientation = LinearLayout.VERTICAL
             val backgroundDrawable = GradientDrawable().apply {
@@ -631,7 +631,7 @@ class Company_manager : AppCompatActivity() {
         val leaveCompanyButton = MaterialButton(this).apply {
             text = "Leave this company"
             textSize = 20f
-            setPadding(8, 8, 8, 8)
+            setPadding(15, 10, 10, 15)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT

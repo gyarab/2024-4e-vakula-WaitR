@@ -32,6 +32,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
+import androidx.core.view.setPadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.Visibility
@@ -678,7 +679,7 @@ class Model_view : Fragment() {
         val table = findTableById(model, selectedTableId!!)
         val price = table?.totalTablePrice
         // HashMap pro sledování počtu výskytů jednotlivých menuItem.id
-        val itemCounts = mutableMapOf<String, Int>()
+        val overAllItemsCounts = mutableMapOf<String, Int>()
 
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.managing_table_proceed_to_checkout)
@@ -692,7 +693,7 @@ class Model_view : Fragment() {
         val continueButton = dialog.findViewById<Button>(R.id.checkout_continue_button)
         continueButton.setOnClickListener {
             if (table != null) {
-                updateDataInAnalytics(table.id, itemCounts)
+                updateDataInAnalytics(table.id, overAllItemsCounts)
             }
             table?.state = "paid"
             val iterator = table?.listOfCustomers?.iterator()
@@ -725,8 +726,10 @@ class Model_view : Fragment() {
         val displayLayout = dialog.findViewById<LinearLayout>(R.id.check_out_customers_layout)
         table?.listOfCustomers?.forEach { customer ->
             // Nejprve spočítáme výskyty
+            val itemCounts = mutableMapOf<String, Int>()
             customer.order.menuItems.forEach { menuItem ->
                 itemCounts[menuItem.name] = itemCounts.getOrDefault(menuItem.name, 0) + 1
+                overAllItemsCounts[menuItem.name] = overAllItemsCounts.getOrDefault(menuItem.name, 0) + 1
             }
 
             val customerLayout = LinearLayout(context).apply {
@@ -742,7 +745,9 @@ class Model_view : Fragment() {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-                )
+                ).apply {
+                    setMargins(10,10,10,10)
+                }
                 orientation = LinearLayout.HORIZONTAL
             }
             val customerView = TextView(context).apply {
@@ -956,7 +961,7 @@ class Model_view : Fragment() {
         if (model.locked == null) {
             model.locked = userId
             updateModel {
-                editModel = model
+                editModel = model.deepCopy()
             }
             //vykresleni scen
             drawEditScenesToBar()
@@ -1003,12 +1008,13 @@ class Model_view : Fragment() {
             addSceneButton = editModelDialoge.findViewById(R.id.add_scene)
             addHelperButton = editModelDialoge.findViewById(R.id.add_helper_shape)
             saveButton.setOnClickListener {
-                model = editModel
+                model = editModel.deepCopy()
                 updateModel {
                     editModelDialoge.dismiss()
                 }
             }
             cancelButton.setOnClickListener {
+                selectedStageId = null
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("Cancel changes")
                 builder.setMessage("Are you sure you want to cancel all the changes?")
@@ -1083,8 +1089,8 @@ class Model_view : Fragment() {
                 0f)
             val currentModelScene = selectedStageId?.let { it1 -> findSceneById(editModel, it1) }
             currentModelScene?.listOfTables?.add(table)
-            Log.e("model", editModel.toString())
-
+            Log.e("editmodel", editModel.toString())
+            Log.e("model", model.toString())
             val textView = TextView(context).apply {
                 text = tableName
                 textSize = 18f
@@ -1436,7 +1442,7 @@ class Model_view : Fragment() {
     }
     @SuppressLint("ClickableViewAccessibility")
     private fun drawEditScene() {
-        if (model.listOfScenes.isNotEmpty()){
+        if (editModel.listOfScenes.isNotEmpty()){
         editModelSceneLayout.removeAllViews()
         lateinit var scene: ModelScene
         editModel.listOfScenes.forEach { modelScene ->
@@ -1740,10 +1746,9 @@ class Model_view : Fragment() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        setMargins(5, 5, 10, -5)
+                        setMargins(15, 15, 15, 15)
                     }
-                    setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
-                    textSize = 28f
+                    textSize = 20f
                     text = name
                     val backgroundDrawable = GradientDrawable().apply {
                         setColor(Color.WHITE)
@@ -1753,7 +1758,7 @@ class Model_view : Fragment() {
                     setTextColor(Color.BLACK)
                     gravity = Gravity.CENTER
                     isSingleLine = true
-                    ellipsize = TextUtils.TruncateAt.END
+                    setPadding(10,10,10,10)
                     tag = id
                 }
                 textViewForScene.setOnClickListener(
@@ -2505,11 +2510,6 @@ class Model_view : Fragment() {
         companyModelRef
             ?.updateChildren(model.toMap())
             ?.addOnSuccessListener {
-                Toast.makeText(
-                    context,
-                    "Changes saved!",
-                    Toast.LENGTH_SHORT
-                ).show()
                 updateAnalytics()
                 onComplete()
             }
@@ -2610,7 +2610,7 @@ class Model_view : Fragment() {
     }
     private fun drawScene() {
         if (model.listOfScenes.isNotEmpty()){
-        if (selectedStageId == null && model.listOfScenes.isNotEmpty()) {
+        if (selectedStageId == null) {
             selectedStageId = model.listOfScenes.get(0).id
         }
         currentScene.removeAllViews()
@@ -2735,10 +2735,9 @@ class Model_view : Fragment() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        setMargins(10, 10, 10, 10)
+                        setMargins(15, 15, 15, 15)
                     }
-                    setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
-                    textSize = 28f
+                    textSize = 20f
                     text = name
                     val backgroundDrawable = GradientDrawable().apply {
                         setColor(Color.WHITE)
@@ -2748,7 +2747,7 @@ class Model_view : Fragment() {
                     setTextColor(Color.BLACK)
                     gravity = Gravity.CENTER
                     isSingleLine = true
-                    ellipsize = TextUtils.TruncateAt.END
+                    setPadding(10,10,10,10)
                     tag = id
                 }
                 textViewForScene.setOnClickListener(
@@ -2778,11 +2777,17 @@ class Model_view : Fragment() {
             val child = whichLayout.getChildAt(i)
             if (child is TextView) {
                 if (child == selectedTextView) {
-                    child.setBackgroundColor(Color.GREEN)
-                    child.setTextColor(Color.BLACK)
+                    val backgroundDrawable = GradientDrawable().apply {
+                        setColor(Color.GREEN)
+                        cornerRadius = 30f
+                    }
+                    child.background = backgroundDrawable
                 } else {
-                    child.setBackgroundColor(Color.WHITE)
-                    child.setTextColor(Color.BLACK)
+                    val backgroundDrawable = GradientDrawable().apply {
+                        setColor(Color.WHITE)
+                        cornerRadius = 30f
+                    }
+                    child.background = backgroundDrawable
                 }
             }
         }

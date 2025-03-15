@@ -17,4 +17,14 @@ data class MenuItem(
 
         )
     }
+
+    fun deepCopy(): MenuItem {
+        return MenuItem(
+            id = this.id,
+            name = this.name,
+            price = this.price,
+            description = this.description,
+            served = this.served
+        )
+    }
 }

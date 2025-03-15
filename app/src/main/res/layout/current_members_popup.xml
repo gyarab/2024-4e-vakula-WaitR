@@ -107,6 +107,7 @@
                 android:id="@+id/display_current_online_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:background="@drawable/rounded_grey_background"
                 android:orientation="vertical">
 
@@ -130,6 +131,7 @@
                 android:id="@+id/display_current_offline_users"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="vertical">
 
             </LinearLayout>

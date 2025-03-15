@@ -160,7 +160,7 @@ class Food_menu : Fragment() {
         if (menu.locked == null) {
             menu.locked = userId
             updateMenu {
-                editMenu = menu
+                editMenu = menu.deepCopy()
             }
             // Nastavení velikosti dialogu
             editMenuDialoge.window?.setLayout(
@@ -174,7 +174,7 @@ class Food_menu : Fragment() {
             val addGroupButton = editMenuDialoge.findViewById<TextView>(R.id.add_menu_group)
             saveButton.setOnClickListener {
                 Log.e("editMenu", editMenu.toString())
-                menu = editMenu
+                menu = editMenu.deepCopy()
                 updateMenu {
                     editMenuDialoge.dismiss()
                 }
@@ -703,7 +703,7 @@ class Food_menu : Fragment() {
             db.child("companies").child(it).child("Menu")
         }
         companyMenuRef
-            ?.updateChildren(editMenu.toMap())
+            ?.updateChildren(menu.toMap())
             ?.addOnSuccessListener {
                 Toast.makeText(
                     context,

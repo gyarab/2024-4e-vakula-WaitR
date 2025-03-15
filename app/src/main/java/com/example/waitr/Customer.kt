@@ -13,4 +13,12 @@ data class Customer(
             "order" to order.toMap()
         )
     }
+
+    fun deepCopy(): Customer {
+        return Customer(
+            id = this.id,
+            name = this.name,
+            order = this.order.deepCopy()
+        )
+    }
 }

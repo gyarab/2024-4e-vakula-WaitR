@@ -29,4 +29,20 @@ data class Table(
         )
     }
 
+    fun deepCopy(): Table{
+        return Table(
+            id = this.id,
+            name = this.name,
+            state = this.state,
+            numberOfPeople = this.numberOfPeople,
+            listOfCustomers = this.listOfCustomers.map { it.deepCopy() }.toMutableList(),
+            totalTablePrice = this.totalTablePrice,
+            height = this.height,
+            width = this.width,
+            xPosition = this.xPosition,
+            yPosition = this.yPosition,
+            locked = this.locked
+        )
+    }
+
 }

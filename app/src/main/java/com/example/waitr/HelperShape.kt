@@ -16,5 +16,14 @@ data class HelperShape(
             "yPosition" to yPosition
         )
     }
+    fun deepCopy(): HelperShape{
+        return HelperShape(
+            id = this.id,
+            height = this.height,
+            width = this.width,
+            xPosition = this.xPosition,
+            yPosition = this.yPosition
+        )
+    }
 
 }

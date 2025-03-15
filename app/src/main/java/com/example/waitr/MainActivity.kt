@@ -21,6 +21,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        startService(Intent(this, BackgroundService::class.java))
+
         val toRegisterButton = findViewById<Button>(R.id.ToRegisterPage_button)
         val toLoginButton = findViewById<Button>(R.id.ToLoginPage_button)
 

@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -96,7 +97,7 @@ class Analytics : Fragment() {
             )
         }
         val tableBarChart = drawTableBarChard()
-        val viewMoreTableDataButton = Button(context).apply {
+        val viewMoreTableDataButton = MaterialButton(requireContext()).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -133,7 +134,7 @@ class Analytics : Fragment() {
             )
         }
         val itemBarChard = drawItemBarChard()
-        val viewMoreItemDataButton = Button(context).apply {
+        val viewMoreItemDataButton = MaterialButton(requireContext()).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -170,7 +171,7 @@ class Analytics : Fragment() {
             )
         }
         val userServedBarChard = drawUserServedBarChard()
-        val viewMoreUserServedTableDataButton = Button(context).apply {
+        val viewMoreUserServedTableDataButton = MaterialButton(requireContext()).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -207,7 +208,7 @@ class Analytics : Fragment() {
             )
         }
         val userActivityBarChard = drawUserActivityBarChard()
-        val viewMoreUserActivityDataButton = Button(context).apply {
+        val viewMoreUserActivityDataButton = MaterialButton(requireContext()).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)

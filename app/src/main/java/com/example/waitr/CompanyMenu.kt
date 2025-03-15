@@ -61,6 +61,7 @@ class CompanyMenu : AppCompatActivity() {
     private lateinit var username: String
     private lateinit var email: String
     private val companiesList = mutableListOf<String>()
+    private lateinit var profileSettingsDialog: Dialog
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,6 +76,8 @@ class CompanyMenu : AppCompatActivity() {
         //definovani dialogu pro zobrazeni pozvanek
         invitesDialog = Dialog(this)
         invitesDialog.setContentView(R.layout.displaying_invites_in_company_menu_popup)
+        profileSettingsDialog = Dialog(this)
+        profileSettingsDialog.setContentView(R.layout.profile_settings_popup)
         //definovani dynamickeho layoutu v dialogu
         invitesDisplay = invitesDialog.findViewById(R.id.display_invites_layout)
         linearLayoutContainer = findViewById(R.id.linearLayoutContainer)
@@ -616,6 +619,7 @@ class CompanyMenu : AppCompatActivity() {
         }
     }
     private fun loadCompanies(){
+        companiesList.clear()
         userId?.let {
             val userRef = db.child("users").child(it).child("companies") // Cesta k podnikovým datům uživatele
             userRef.get()
@@ -829,35 +833,31 @@ class CompanyMenu : AppCompatActivity() {
     }
 
     private fun profileSettingsPopup(){
-        // Vytvoření dialogu
-        val dialog = Dialog(this)
-        dialog.setContentView(R.layout.profile_settings_popup)
-
         // Nastavení velikosti dialogu
-        dialog.window?.setLayout(
+        profileSettingsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
             (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
 
         // Reference na prvky v popup layoutu
-        val closeButton = dialog.findViewById<Button>(R.id.close_profile_settings_button)
+        val closeButton = profileSettingsDialog.findViewById<Button>(R.id.close_profile_settings_button)
         closeButton.setOnClickListener {
-            dialog.dismiss()
+            profileSettingsDialog.dismiss()
         }
-        val usernameTextView = dialog.findViewById<TextView>(R.id.profile_settings_username_textView)
+        val usernameTextView = profileSettingsDialog.findViewById<TextView>(R.id.profile_settings_username_textView)
         usernameTextView.text = username
-        val emailTextView = dialog.findViewById<TextView>(R.id.profile_settings_email_textView)
+        val emailTextView = profileSettingsDialog.findViewById<TextView>(R.id.profile_settings_email_textView)
         emailTextView.text = email
-        val changeUsername = dialog.findViewById<Button>(R.id.change_profile_username_button)
+        val changeUsername = profileSettingsDialog.findViewById<Button>(R.id.change_profile_username_button)
         changeUsername.setOnClickListener {
             changeProfileParameters("username")
         }
-        val changePassword = dialog.findViewById<Button>(R.id.change_profile_password_button)
+        val changePassword = profileSettingsDialog.findViewById<Button>(R.id.change_profile_password_button)
         changePassword.setOnClickListener {
             changeProfileParameters("password")
         }
 
-        dialog.show()
+        profileSettingsDialog.show()
     }
 
     private fun changeProfileParameters(type: String){
@@ -878,6 +878,10 @@ class CompanyMenu : AppCompatActivity() {
                 parametrToChange.hint = "New username"
                 val changeUsernameButton = dialog.findViewById<Button>(R.id.change_group_name_button)
                 changeUsernameButton.text = "Change"
+                val closeButton = dialog.findViewById<Button>(R.id.close_change_parameters_button)
+                closeButton.setOnClickListener {
+                    dialog.dismiss()
+                }
                 changeUsernameButton.setOnClickListener {
                     val newUsername = parametrToChange.text.toString().trim()
                     if (newUsername.isEmpty()){
@@ -886,15 +890,19 @@ class CompanyMenu : AppCompatActivity() {
                     }
                     val usernameRef = userId?.let { it1 -> db.child("users").child(it1).child("username") }
                     usernameRef?.setValue(newUsername)?.addOnSuccessListener {
+                        Log.e("list spolecnosti", companiesList.toString())
                         companiesList.forEach { companyId ->
                             val ref = userId?.let { it1 ->
                                 db.child("companies").child(companyId).child("users").child(it1)
                                     .child("username")
                             }
-                            ref?.setValue(usernameRef)
+                            ref?.setValue(newUsername)?.addOnSuccessListener {
+                                Log.e("profile", "jmeno zmeneno ve spolecnostech")
+                            }
                         }
                         loadDataToHeader()
                         dialog.dismiss()
+                        profileSettingsDialog.dismiss()
                     }
                 }
             }
@@ -932,6 +940,7 @@ class CompanyMenu : AppCompatActivity() {
                                 if (updateTask.isSuccessful) {
                                     Toast.makeText(dialog.context, "Password changed successfully", Toast.LENGTH_SHORT).show()
                                     dialog.dismiss() // Zavření dialogu po úspěšné změně
+                                    profileSettingsDialog.dismiss()
                                 } else {
                                     Toast.makeText(dialog.context, "Failed to change password", Toast.LENGTH_SHORT).show()
                                 }

@@ -50,4 +50,13 @@ data class MenuGroup(
         // Pokud položka nebyla nalezena ani odstraněna
         return false
     }
+
+    fun deepCopy(): MenuGroup {
+        return MenuGroup(
+            id = this.id,
+            name = this.name,
+            items = this.items.map { it.deepCopy() }.toMutableList(),
+            subGroups = this.subGroups.map { it.deepCopy() }.toMutableList()
+        )
+    }
 }
