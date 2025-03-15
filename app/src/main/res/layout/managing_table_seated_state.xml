@@ -4,40 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3F51B5">
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline185"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline186"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline188"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline189"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#fff"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline189"
         app:layout_constraintEnd_toStartOf="@+id/guideline186"
         app:layout_constraintHorizontal_bias="1.0"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.95" />
+            app:layout_constraintGuide_percent="0.975" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline194"
@@ -119,7 +119,7 @@
             android:id="@+id/manage_customers_scrollable_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#E9E4E4"
+            android:background="@drawable/rounded_grey_background"
             android:contentDescription="@string/scrollable_menu_list"
             app:layout_constraintBottom_toTopOf="@+id/guideline195"
             app:layout_constraintEnd_toStartOf="@+id/guideline191"

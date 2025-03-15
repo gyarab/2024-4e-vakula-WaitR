@@ -4,40 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3F51B5">
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline169"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline170"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline171"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline172"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#fff"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline172"
         app:layout_constraintEnd_toStartOf="@+id/guideline170"
         app:layout_constraintHorizontal_bias="1.0"
@@ -80,11 +80,13 @@
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
-            android:text=""
+            android:text="nfn"
             android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/textView5"
             app:layout_constraintEnd_toStartOf="@+id/guideline174"
             app:layout_constraintStart_toStartOf="@+id/guideline173"
-            app:layout_constraintTop_toTopOf="@+id/guideline176" />
+            app:layout_constraintTop_toTopOf="@+id/guideline176"
+            app:layout_constraintVertical_bias="0.5" />
 
         <TextView
             android:id="@+id/textView5"
@@ -93,16 +95,17 @@
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
-            android:background="#E9E4E4"
+            android:background="@drawable/rounded_grey_background"
             android:gravity="center"
+            android:padding="10dp"
             android:text="@string/table_is_currently_empty"
             android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline177"
+            app:layout_constraintBottom_toTopOf="@+id/new_customers_button"
             app:layout_constraintEnd_toStartOf="@+id/guideline174"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/guideline173"
             app:layout_constraintTop_toBottomOf="@+id/name_of_the_table_to_manage"
-            app:layout_constraintVertical_bias="0.128" />
+            app:layout_constraintVertical_bias="0.5" />
 
         <Button
             android:id="@+id/new_customers_button"
@@ -112,10 +115,11 @@
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
             android:text="@string/new_customers"
-            app:layout_constraintBottom_toTopOf="@+id/guideline177"
+            app:layout_constraintBottom_toTopOf="@+id/close_empty_table_button"
             app:layout_constraintEnd_toStartOf="@+id/guideline174"
             app:layout_constraintStart_toStartOf="@+id/guideline173"
-            app:layout_constraintTop_toBottomOf="@+id/name_of_the_table_to_manage" />
+            app:layout_constraintTop_toBottomOf="@+id/textView5"
+            app:layout_constraintVertical_bias="0.5" />
 
         <Button
             android:id="@+id/close_empty_table_button"
@@ -128,7 +132,8 @@
             app:layout_constraintBottom_toTopOf="@+id/guideline177"
             app:layout_constraintEnd_toStartOf="@+id/guideline174"
             app:layout_constraintStart_toStartOf="@+id/guideline173"
-            app:layout_constraintTop_toBottomOf="@+id/textView5" />
+            app:layout_constraintTop_toBottomOf="@+id/new_customers_button"
+            app:layout_constraintVertical_bias="0.5" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

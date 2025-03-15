@@ -118,7 +118,7 @@
             android:id="@+id/table_notifications_scrollable_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#E9E4E4"
+            android:background="@drawable/rounded_grey_background"
             android:contentDescription="@string/scrollable_menu_list"
             app:layout_constraintBottom_toTopOf="@+id/guideline258"
             app:layout_constraintEnd_toStartOf="@+id/guideline262"

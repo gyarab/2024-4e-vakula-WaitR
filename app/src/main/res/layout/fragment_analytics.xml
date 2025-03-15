@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15" />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline282"
@@ -50,27 +50,20 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.8" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline285"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
-
     <TextView
         android:id="@+id/textView13"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:gravity="center"
-        android:text="@string/Analytics"
         android:autoSizeMaxTextSize="1000dp"
-        android:textColor="#fff"
         android:autoSizeMinTextSize="1dp"
         android:autoSizeTextType="uniform"
+        android:gravity="center"
+        android:text="@string/Analytics"
+        android:textColor="#fff"
         app:layout_constraintBottom_toTopOf="@+id/guideline281"
         app:layout_constraintEnd_toStartOf="@+id/guideline284"
         app:layout_constraintStart_toStartOf="@+id/guideline283"
-        app:layout_constraintTop_toTopOf="@+id/guideline285" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ScrollView
         android:id="@+id/scrollable_analytics_layout"

@@ -5,11 +5,13 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.graphics.Color
 import android.graphics.Rect
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
+import android.util.TypedValue
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -28,6 +30,7 @@ import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -1595,7 +1598,7 @@ class Model_view : Fragment() {
             val textView = TextView(context).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
-                setBackgroundColor(Color.BLACK)
+                setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background_light_black))
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -1739,10 +1742,14 @@ class Model_view : Fragment() {
                     ).apply {
                         setMargins(5, 5, 10, -5)
                     }
-                    //setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
+                    setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
                     textSize = 28f
                     text = name
-                    setBackgroundColor(Color.WHITE)
+                    val backgroundDrawable = GradientDrawable().apply {
+                        setColor(Color.WHITE)
+                        cornerRadius = 30f
+                    }
+                    background = backgroundDrawable
                     setTextColor(Color.BLACK)
                     gravity = Gravity.CENTER
                     isSingleLine = true
@@ -1753,7 +1760,7 @@ class Model_view : Fragment() {
                     CustomClickListener(
                         onClick = {
                             selectedStageId = textViewForScene.tag.toString()
-                            setSelectedScene(textViewForScene)
+                            setSelectedScene(editModelScenesLayout, textViewForScene)
                             drawEditScene()
                         },
                         onDoubleClick = {
@@ -1765,9 +1772,9 @@ class Model_view : Fragment() {
                 editModelScenesLayout.addView(textViewForScene)
             }
             if (selectedStageId!!.isNotEmpty()) {
-                val selectedTextView = modelScenesBar.findViewWithTag<TextView>(selectedStageId)
+                val selectedTextView = editModelScenesLayout.findViewWithTag<TextView>(selectedStageId)
                 selectedTextView?.let {
-                    setSelectedScene(it)
+                    setSelectedScene(editModelScenesLayout, it)
                 }
             }
         }
@@ -2665,7 +2672,7 @@ class Model_view : Fragment() {
             val textView = TextView(context).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
-                setBackgroundColor(Color.BLACK)
+                setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background_light_black))
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -2728,12 +2735,16 @@ class Model_view : Fragment() {
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     ).apply {
-                        setMargins(5, 5, 10, -5)
+                        setMargins(10, 10, 10, 10)
                     }
-                    //setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
+                    setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
                     textSize = 28f
                     text = name
-                    setBackgroundColor(Color.WHITE)
+                    val backgroundDrawable = GradientDrawable().apply {
+                        setColor(Color.WHITE)
+                        cornerRadius = 30f
+                    }
+                    background = backgroundDrawable
                     setTextColor(Color.BLACK)
                     gravity = Gravity.CENTER
                     isSingleLine = true
@@ -2743,7 +2754,7 @@ class Model_view : Fragment() {
                 textViewForScene.setOnClickListener(
                     CustomClickListener(
                         onClick = {
-                            setSelectedScene(textViewForScene)
+                            setSelectedScene(modelScenesBar, textViewForScene)
                             selectedStageId = textViewForScene.tag.toString()
                             drawScene()
                         },
@@ -2756,15 +2767,15 @@ class Model_view : Fragment() {
             if (selectedStageId!!.isNotEmpty()) {
                 val selectedTextView = modelScenesBar.findViewWithTag<TextView>(selectedStageId)
                 selectedTextView?.let {
-                    setSelectedScene(it)
+                    setSelectedScene(modelScenesBar ,it)
                 }
             }
         }
     }
 
-    private fun setSelectedScene(selectedTextView: TextView) {
-        for (i in 0 until modelScenesBar.childCount) {
-            val child = modelScenesBar.getChildAt(i)
+    private fun setSelectedScene(whichLayout: LinearLayout, selectedTextView: TextView) {
+        for (i in 0 until whichLayout.childCount) {
+            val child = whichLayout.getChildAt(i)
             if (child is TextView) {
                 if (child == selectedTextView) {
                     child.setBackgroundColor(Color.GREEN)
@@ -2873,32 +2884,6 @@ class Model_view : Fragment() {
             currentScene.removeAllViews()
             currentScene.addView(dynamicLinearLayout)
         }
-    }
-
-    private fun findNumberOfSceneInList(sceneId: String): Int{
-        var number = 0
-        model.listOfScenes.forEach { modelScene ->
-            if (modelScene.id == sceneId) return number
-            number+=1
-        }
-        return -1
-    }
-    private fun findNumberOfTableInList(sceneIndex: Int, tableId: String): Int{
-        var number = 0
-        model.listOfScenes.get(sceneIndex).listOfTables.forEach { table ->
-            if (table.id == tableId) return number
-            number+=1
-        }
-        return -1
-    }
-
-    private fun checkIfAllTablesEmpty(): Boolean {
-        model.listOfScenes.forEach { modelScene ->
-            modelScene.listOfTables.forEach { table ->
-                if (!table.state.equals("empty")) return false
-            }
-        }
-        return true
     }
 
     private fun setListenerForTableState(){

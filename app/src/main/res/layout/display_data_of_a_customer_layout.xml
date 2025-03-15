@@ -11,33 +11,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline196"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline197"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline198"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#fff"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline198"
         app:layout_constraintEnd_toStartOf="@+id/guideline196"
         app:layout_constraintStart_toStartOf="@+id/guideline187"
@@ -69,21 +69,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.95" />
+            app:layout_constraintGuide_percent="0.975" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline203"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.20" />
+            app:layout_constraintGuide_percent="0.15" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline204"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.8" />
+            app:layout_constraintGuide_percent="0.85" />
 
         <TextView
             android:id="@+id/display_customer_name"
@@ -95,6 +95,7 @@
             android:gravity="center"
             android:text=""
             android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/textView8"
             app:layout_constraintEnd_toStartOf="@+id/guideline200"
             app:layout_constraintStart_toStartOf="@+id/guideline199"
             app:layout_constraintTop_toTopOf="@+id/guideline201" />
@@ -105,8 +106,10 @@
             android:layout_height="wrap_content"
             android:text="Orders:"
             android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline203"
-            app:layout_constraintStart_toStartOf="@+id/guideline199" />
+            app:layout_constraintBottom_toTopOf="@+id/display_orders_scrollable_view"
+            app:layout_constraintStart_toStartOf="@+id/guideline199"
+            app:layout_constraintTop_toBottomOf="@+id/display_customer_name"
+            app:layout_constraintVertical_bias="0.5" />
 
         <ScrollView
             android:id="@+id/display_orders_scrollable_view"
@@ -132,10 +135,10 @@
             android:id="@+id/close_display_of_the_customer_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Close"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
+            android:text="@string/Close"
             app:layout_constraintBottom_toTopOf="@+id/guideline202"
             app:layout_constraintEnd_toStartOf="@+id/guideline200"
             app:layout_constraintStart_toStartOf="@+id/guideline199"
@@ -146,11 +149,11 @@
             android:id="@+id/display_total_price_of_the_order"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Total price:"
-            android:textSize="20sp"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
+            android:text="Total price:"
+            android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/close_display_of_the_customer_button"
             app:layout_constraintStart_toStartOf="@+id/guideline199"
             app:layout_constraintTop_toBottomOf="@+id/display_orders_scrollable_view"

@@ -4,40 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3F51B5">
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline228"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline229"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline230"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline231"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#fff"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline231"
         app:layout_constraintEnd_toStartOf="@+id/guideline229"
         app:layout_constraintStart_toStartOf="@+id/guideline228"
@@ -58,25 +58,11 @@
             app:layout_constraintGuide_percent="0.9" />
 
         <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline234"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.05" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline235"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.95" />
-
-        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline236"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.17" />
+            app:layout_constraintGuide_percent="0.12" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline237"
@@ -109,19 +95,20 @@
             android:gravity="center"
             android:text="Check out"
             android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline236"
             app:layout_constraintEnd_toStartOf="@+id/guideline233"
             app:layout_constraintStart_toStartOf="@+id/guideline232"
-            app:layout_constraintTop_toTopOf="@+id/guideline234" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Button
             android:id="@+id/checkout_continue_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/Continue"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toTopOf="@+id/guideline235"
+            android:text="@string/Continue"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline239"
             app:layout_constraintStart_toStartOf="@+id/guideline238"
             app:layout_constraintTop_toBottomOf="@+id/checkout_total_table_price"
@@ -142,7 +129,7 @@
             android:id="@+id/check_out_customers_scrollable_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="#E9E4E4"
+            android:background="@drawable/rounded_grey_background"
             android:contentDescription="@string/scrollable_menu_list"
             app:layout_constraintBottom_toTopOf="@+id/guideline237"
             app:layout_constraintEnd_toStartOf="@+id/guideline233"

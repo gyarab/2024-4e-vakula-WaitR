@@ -3,115 +3,142 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/item_name_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/item_price_layout"
-        app:layout_constraintEnd_toStartOf="@+id/guideline83"
-        app:layout_constraintStart_toStartOf="@+id/guideline82"
-        app:layout_constraintTop_toTopOf="@+id/guideline84"
-        app:layout_constraintVertical_bias="0.5">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/item_name"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/item_name" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/item_price_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/item_discription_layout"
-        app:layout_constraintEnd_toStartOf="@+id/guideline83"
-        app:layout_constraintStart_toStartOf="@+id/guideline82"
-        app:layout_constraintTop_toBottomOf="@+id/item_name_layout"
-        app:layout_constraintVertical_bias="0.5">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/item_price"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/item_price" />
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/item_discription_layout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="#fff"
-        app:layout_constraintBottom_toTopOf="@+id/add_item_button"
-        app:layout_constraintEnd_toStartOf="@+id/guideline83"
-        app:layout_constraintStart_toStartOf="@+id/guideline82"
-        app:layout_constraintTop_toBottomOf="@+id/item_price_layout"
-        app:layout_constraintVertical_bias="0.5">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/item_discription"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/item_discription" />
-    </com.google.android.material.textfield.TextInputLayout>
+    android:layout_height="match_parent"
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline82"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline83"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline84"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline85"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <Button
-        android:id="@+id/add_item_button"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/add"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline85"
-        app:layout_constraintEnd_toStartOf="@+id/guideline87"
-        app:layout_constraintStart_toStartOf="@+id/guideline86"
-        app:layout_constraintTop_toBottomOf="@+id/item_discription_layout"
-        app:layout_constraintVertical_bias="0.5" />
+        app:layout_constraintEnd_toStartOf="@+id/guideline83"
+        app:layout_constraintStart_toStartOf="@+id/guideline82"
+        app:layout_constraintTop_toTopOf="@+id/guideline84">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline86"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.3" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_name_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            app:layout_constraintBottom_toTopOf="@+id/item_price_layout"
+            app:layout_constraintEnd_toStartOf="@+id/guideline386"
+            app:layout_constraintStart_toStartOf="@+id/guideline385"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline87"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.7" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/item_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/item_name" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_price_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            app:layout_constraintBottom_toTopOf="@+id/item_discription_layout"
+            app:layout_constraintEnd_toStartOf="@+id/guideline386"
+            app:layout_constraintStart_toStartOf="@+id/guideline385"
+            app:layout_constraintTop_toBottomOf="@+id/item_name_layout"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/item_price"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/item_price" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/item_discription_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="#fff"
+            app:layout_constraintBottom_toTopOf="@+id/add_item_button"
+            app:layout_constraintEnd_toStartOf="@+id/guideline386"
+            app:layout_constraintStart_toStartOf="@+id/guideline385"
+            app:layout_constraintTop_toBottomOf="@+id/item_price_layout"
+            app:layout_constraintVertical_bias="0.5">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/item_discription"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/item_discription" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <Button
+            android:id="@+id/add_item_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline87"
+            app:layout_constraintStart_toStartOf="@+id/guideline86"
+            app:layout_constraintTop_toBottomOf="@+id/item_discription_layout"
+            app:layout_constraintVertical_bias="0.5" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline86"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline87"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.75" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline385"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline386"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

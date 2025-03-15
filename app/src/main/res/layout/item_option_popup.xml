@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/background_blue">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline102"
@@ -23,220 +24,283 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline105"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline106"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline107"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline108"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.33" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline109"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.66" />
-
-    <TextView
-        android:id="@+id/item_textview"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/item"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline106"
-        app:layout_constraintEnd_toStartOf="@+id/guideline109"
-        app:layout_constraintStart_toStartOf="@+id/guideline108"
-        app:layout_constraintTop_toTopOf="@+id/guideline104" />
-
-    <Button
-        android:id="@+id/save_item_options_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/save"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline105"
-        app:layout_constraintEnd_toStartOf="@+id/guideline108"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toTopOf="@+id/guideline107" />
-
-    <Button
-        android:id="@+id/cancel_item_options_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/cancel"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline105"
-        app:layout_constraintEnd_toStartOf="@+id/guideline109"
-        app:layout_constraintStart_toStartOf="@+id/guideline108"
-        app:layout_constraintTop_toTopOf="@+id/guideline107" />
-
-    <Button
-        android:id="@+id/delete_item_options_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/delete"
-        android:textSize="20sp"
+        android:layout_height="0dp"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline105"
         app:layout_constraintEnd_toStartOf="@+id/guideline103"
-        app:layout_constraintStart_toStartOf="@+id/guideline109"
-        app:layout_constraintTop_toTopOf="@+id/guideline107" />
-
-    <TextView
-        android:id="@+id/name_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/name"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
         app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toTopOf="@+id/guideline106"
-        app:layout_constraintVertical_bias="0.035" />
+        app:layout_constraintTop_toTopOf="@+id/guideline104">
 
-    <TextView
-        android:id="@+id/name_of_the_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text=""
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/name_textview"
-        app:layout_constraintVertical_bias="0.02" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline106"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.1" />
 
-    <Button
-        android:id="@+id/change_item_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/change_name"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/name_of_the_item"
-        app:layout_constraintVertical_bias="0.041" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline107"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.875" />
 
-    <TextView
-        android:id="@+id/price_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/price"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/change_item_name"
-        app:layout_constraintVertical_bias="0.069" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline108"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.33" />
 
-    <TextView
-        android:id="@+id/price_of_the_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text=""
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/price_textview"
-        app:layout_constraintVertical_bias="0.032" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline109"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.66" />
 
-    <Button
-        android:id="@+id/change_item_price"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/change_price"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/price_of_the_item"
-        app:layout_constraintVertical_bias="0.025" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline401"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.05" />
 
-    <TextView
-        android:id="@+id/discription_textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/description"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/change_item_price"
-        app:layout_constraintVertical_bias="0.102" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline402"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.95" />
 
-    <TextView
-        android:id="@+id/discription_of_the_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text=""
-        android:textSize="10sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/discription_textview"
-        app:layout_constraintVertical_bias="0.064" />
+        <TextView
+            android:id="@+id/item_textview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/item"
+            android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/guideline106"
+            app:layout_constraintEnd_toStartOf="@+id/guideline109"
+            app:layout_constraintStart_toStartOf="@+id/guideline108"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/change_item_discription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:autoSizeMaxTextSize="1000dp"
-        android:autoSizeMinTextSize="1dp"
-        android:autoSizeTextType="uniform"
-        android:text="@string/change_description"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline107"
-        app:layout_constraintStart_toStartOf="@+id/guideline102"
-        app:layout_constraintTop_toBottomOf="@+id/discription_of_the_item"
-        app:layout_constraintVertical_bias="0.095" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_grey_background"
+            app:layout_constraintBottom_toTopOf="@+id/guideline107"
+            app:layout_constraintEnd_toStartOf="@+id/guideline402"
+            app:layout_constraintStart_toStartOf="@+id/guideline401"
+            app:layout_constraintTop_toTopOf="@+id/guideline106">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline403"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.1" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline404"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout7"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_white_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="15dp"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout8"
+                app:layout_constraintEnd_toStartOf="@+id/guideline404"
+                app:layout_constraintStart_toStartOf="@+id/guideline403"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5">
+
+                <TextView
+                    android:id="@+id/name_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/name"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/name_of_the_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text=""
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/change_item_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/change_name"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout8"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_white_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="15dp"
+                app:layout_constraintBottom_toTopOf="@+id/linearLayout9"
+                app:layout_constraintEnd_toStartOf="@+id/guideline404"
+                app:layout_constraintStart_toStartOf="@+id/guideline403"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout7"
+                app:layout_constraintVertical_bias="0.5">
+
+                <TextView
+                    android:id="@+id/price_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/price"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/price_of_the_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text=""
+                    android:textSize="20sp" />
+
+                <Button
+                    android:id="@+id/change_item_price"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/change_price"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayout9"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_white_background"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="15dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline404"
+                app:layout_constraintStart_toStartOf="@+id/guideline403"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout8"
+                app:layout_constraintVertical_bias="0.5">
+
+                <TextView
+                    android:id="@+id/discription_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/description"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/discription_of_the_item"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text=""
+                    android:textSize="10sp" />
+
+                <Button
+                    android:id="@+id/change_item_discription"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:autoSizeMaxTextSize="1000dp"
+                    android:autoSizeMinTextSize="1dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/change_description"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <Button
+            android:id="@+id/save_item_options_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/save"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline108"
+            app:layout_constraintStart_toStartOf="@+id/guideline401"
+            app:layout_constraintTop_toTopOf="@+id/guideline107" />
+
+        <Button
+            android:id="@+id/cancel_item_options_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/cancel"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline109"
+            app:layout_constraintStart_toStartOf="@+id/guideline108"
+            app:layout_constraintTop_toTopOf="@+id/guideline107" />
+
+        <Button
+            android:id="@+id/delete_item_options_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoSizeMaxTextSize="1000dp"
+            android:autoSizeMinTextSize="1dp"
+            android:autoSizeTextType="uniform"
+            android:text="@string/delete"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/guideline402"
+            app:layout_constraintStart_toStartOf="@+id/guideline109"
+            app:layout_constraintTop_toTopOf="@+id/guideline107" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

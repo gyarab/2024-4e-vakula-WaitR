@@ -11,33 +11,33 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.05" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline206"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.9" />
+        app:layout_constraintGuide_percent="0.95" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline207"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.05" />
+        app:layout_constraintGuide_percent="0.025" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline208"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.975" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="#fff"
+        android:background="@drawable/rounded_white_background"
         app:layout_constraintBottom_toTopOf="@+id/guideline208"
         app:layout_constraintEnd_toStartOf="@+id/guideline206"
         app:layout_constraintHorizontal_bias="0.0"
@@ -78,21 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.3" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline214"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
             app:layout_constraintGuide_percent="0.2" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline215"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.8" />
 
         <TextView
             android:id="@+id/display_the_name_of_the_item_in_order"
@@ -104,62 +90,90 @@
             android:gravity="center"
             android:text=""
             android:textSize="30sp"
+            app:layout_constraintBottom_toTopOf="@+id/display_price_of_the_item"
             app:layout_constraintEnd_toStartOf="@+id/guideline210"
             app:layout_constraintStart_toStartOf="@+id/guideline209"
-            app:layout_constraintTop_toTopOf="@+id/guideline211" />
-
-        <Button
-            android:id="@+id/mark_item_as_served_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/Mark_as_served"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toTopOf="@+id/remove_item_from_order_button"
-            app:layout_constraintEnd_toStartOf="@+id/guideline215"
-            app:layout_constraintStart_toStartOf="@+id/guideline214"
-            app:layout_constraintTop_toTopOf="@+id/guideline213"
+            app:layout_constraintTop_toTopOf="@+id/guideline211"
             app:layout_constraintVertical_bias="0.5" />
 
-        <Button
-            android:id="@+id/remove_item_from_order_button"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/remove_item"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
-            app:layout_constraintBottom_toTopOf="@+id/close_display_of_the_item_button"
-            app:layout_constraintEnd_toStartOf="@+id/guideline215"
-            app:layout_constraintStart_toStartOf="@+id/guideline214"
-            app:layout_constraintTop_toBottomOf="@+id/mark_item_as_served_button"
-            app:layout_constraintVertical_bias="0.5" />
-
-        <Button
-            android:id="@+id/close_display_of_the_item_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/Close"
-            android:autoSizeMaxTextSize="1000dp"
-            android:autoSizeMinTextSize="1dp"
-            android:autoSizeTextType="uniform"
+            android:layout_height="0dp"
+            android:background="@drawable/rounded_grey_background"
             app:layout_constraintBottom_toTopOf="@+id/guideline212"
-            app:layout_constraintEnd_toStartOf="@+id/guideline215"
-            app:layout_constraintStart_toStartOf="@+id/guideline214"
-            app:layout_constraintTop_toBottomOf="@+id/remove_item_from_order_button"
-            app:layout_constraintVertical_bias="0.5" />
+            app:layout_constraintEnd_toStartOf="@+id/guideline210"
+            app:layout_constraintStart_toStartOf="@+id/guideline209"
+            app:layout_constraintTop_toTopOf="@+id/guideline213">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline214"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.2" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline215"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.8" />
+
+            <Button
+                android:id="@+id/mark_item_as_served_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/Mark_as_served"
+                app:layout_constraintBottom_toTopOf="@+id/remove_item_from_order_button"
+                app:layout_constraintEnd_toStartOf="@+id/guideline215"
+                app:layout_constraintStart_toStartOf="@+id/guideline214"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <Button
+                android:id="@+id/remove_item_from_order_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/remove_item"
+                app:layout_constraintBottom_toTopOf="@+id/close_display_of_the_item_button"
+                app:layout_constraintEnd_toStartOf="@+id/guideline215"
+                app:layout_constraintStart_toStartOf="@+id/guideline214"
+                app:layout_constraintTop_toBottomOf="@+id/mark_item_as_served_button"
+                app:layout_constraintVertical_bias="0.5" />
+
+            <Button
+                android:id="@+id/close_display_of_the_item_button"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:autoSizeMaxTextSize="1000dp"
+                android:autoSizeMinTextSize="1dp"
+                android:autoSizeTextType="uniform"
+                android:text="@string/Close"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline215"
+                app:layout_constraintStart_toStartOf="@+id/guideline214"
+                app:layout_constraintTop_toBottomOf="@+id/remove_item_from_order_button"
+                app:layout_constraintVertical_bias="0.5" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/display_price_of_the_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Price:"
             android:autoSizeMaxTextSize="1000dp"
             android:autoSizeMinTextSize="1dp"
             android:autoSizeTextType="uniform"
+            android:text="Price:"
             android:textSize="20sp"
             app:layout_constraintBottom_toTopOf="@+id/guideline213"
+            app:layout_constraintEnd_toStartOf="@+id/guideline210"
             app:layout_constraintStart_toStartOf="@+id/guideline209"
             app:layout_constraintTop_toBottomOf="@+id/display_the_name_of_the_item_in_order"
             app:layout_constraintVertical_bias="0.496" />
