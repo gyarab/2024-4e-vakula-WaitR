@@ -301,6 +301,10 @@ class CompanyMenu : AppCompatActivity() {
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
             (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
+        val closeButton = invitesDialog.findViewById<Button>(R.id.close_invites)
+        closeButton.setOnClickListener {
+            invitesDialog.dismiss()
+        }
         loadInvites()
         invitesDialog.show()
     }
@@ -836,7 +840,7 @@ class CompanyMenu : AppCompatActivity() {
         )
 
         // Reference na prvky v popup layoutu
-        val closeButton = dialog.findViewById<Button>(R.id.Create_Company_button)
+        val closeButton = dialog.findViewById<Button>(R.id.close_profile_settings_button)
         closeButton.setOnClickListener {
             dialog.dismiss()
         }
