@@ -1065,6 +1065,10 @@ class Model_view : Fragment() {
         val tableNameInput = dialog.findViewById<TextInputEditText>(R.id.table_name)
         val addButton = dialog.findViewById<Button>(R.id.add_table_button)
         addButton.setOnClickListener {
+            if (!canAddNewTable(editModelSceneLayout)){
+                Toast.makeText(dialog.context, "You cant add anymore objects", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             if (editModel.listOfScenes.isEmpty()){
                 Toast.makeText(dialog.context, "First you need to create scene", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
@@ -1301,6 +1305,10 @@ class Model_view : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun addHelperPopup(){
+        if (!canAddNewTable(editModelSceneLayout)){
+            Toast.makeText(requireContext(), "You cant add anymore objects", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (editModel.listOfScenes.isEmpty()){
             Toast.makeText(requireContext(), "First you need to create scene", Toast.LENGTH_SHORT).show()
         } else {
@@ -1440,6 +1448,43 @@ class Model_view : Fragment() {
             }
         }
     }
+
+    private fun canAddNewTable(layout: ConstraintLayout): Boolean {
+
+        // Celková plocha layoutu
+        val layoutWidth = layout.width
+        val layoutHeight = layout.height
+        val totalLayoutArea = layoutWidth * layoutHeight
+
+        // Celková plocha všech existujících prvků
+        var totalOccupiedArea = 0
+
+        // Projděte všechny existující prvky v layoutu
+        for (i in 0 until layout.childCount) {
+            val child = layout.getChildAt(i)
+            if (child is TextView) {
+                // Získání rozměrů a pozice prvku
+                val width = child.width
+                val height = child.height
+
+                // Přidání plochy prvku k celkové ploše
+                totalOccupiedArea += width * height
+            }
+        }
+
+        // Kontrola, zda nový prvek nepřekročí 85 % plochy layoutu
+        val totalAreaAfterAdding = totalOccupiedArea + 150*150
+        val maxAllowedArea = totalLayoutArea * 0.85
+
+        if (totalAreaAfterAdding > maxAllowedArea) {
+            return false
+        }
+
+        // Pokud vše projde, vrátí true
+        return true
+    }
+
+
     @SuppressLint("ClickableViewAccessibility")
     private fun drawEditScene() {
         if (editModel.listOfScenes.isNotEmpty()){
