@@ -283,6 +283,7 @@ class Analytics : Fragment() {
         tableBarChart.axisRight.isEnabled = false
 
         tableBarChart.legend.isEnabled = false
+        tableBarChart.description.isEnabled = false
 
         tableBarChart.animateY(1000)
 
@@ -339,6 +340,7 @@ class Analytics : Fragment() {
         itemBarChart.axisRight.isEnabled = false
 
         itemBarChart.legend.isEnabled = false
+        itemBarChart.description.isEnabled = false
 
         itemBarChart.animateY(1000)
 
@@ -395,6 +397,7 @@ class Analytics : Fragment() {
         usersServedBarChart.axisRight.isEnabled = false
 
         usersServedBarChart.legend.isEnabled = false
+        usersServedBarChart.description.isEnabled = false
 
         usersServedBarChart.animateY(1000)
 
@@ -451,6 +454,7 @@ class Analytics : Fragment() {
         usersActivityBarChart.axisRight.isEnabled = false
 
         usersActivityBarChart.legend.isEnabled = false
+        usersActivityBarChart.description.isEnabled = false
 
         usersActivityBarChart.animateY(1000)
 
