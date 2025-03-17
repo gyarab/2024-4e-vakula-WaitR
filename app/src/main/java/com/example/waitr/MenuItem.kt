@@ -1,5 +1,5 @@
 package com.example.waitr
-
+//Objektová třída pro položku v menu
 data class MenuItem(
     val id: String = "",
     var name: String = "",
@@ -7,6 +7,7 @@ data class MenuItem(
     var description: String = "",
     var served: Boolean = false
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,
@@ -17,7 +18,7 @@ data class MenuItem(
 
         )
     }
-
+//Kopie dat
     fun deepCopy(): MenuItem {
         return MenuItem(
             id = this.id,

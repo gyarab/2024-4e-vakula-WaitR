@@ -42,8 +42,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.UUID
 
-//nadefinovane objekty...
-
 class Model_view : Fragment() {
     //promenne
     private var CompanyID: String? = null
@@ -166,6 +164,7 @@ class Model_view : Fragment() {
     paidTableManagingDialog = Dialog(fragmentContext)
     paidTableManagingDialog.setContentView(R.layout.managing_table_paid_state)
 
+    //nastaveni akce po kliknutí u tlačítka na potvrzení polohy položky v modelu
     confirmTableChanges.setOnClickListener {
         if (tableEditMode){
             tableEditMode = false
@@ -292,7 +291,7 @@ class Model_view : Fragment() {
             }
         }
     }
-
+// metoda pro obsluhu prázdného stolu
     private fun manageEmptyTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
@@ -373,6 +372,7 @@ class Model_view : Fragment() {
             ).show()
         }
     }
+    //metoda pro obsluhu zabraného stolu
     private fun manageSeatedTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
@@ -418,6 +418,7 @@ class Model_view : Fragment() {
         }
     }
 
+    //vykreslí objednávky zákazníků
     private fun drawTableOrders(){
         val table = findTableById(model, selectedTableId!!)
         tableOrdersLayout.removeAllViews()
@@ -525,6 +526,7 @@ class Model_view : Fragment() {
        tableTotalPriceTextView.text = "Total table price: ${table?.totalTablePrice} Kč"
     }
 
+    //metoda co nastavuje zda je k dispozici tlsčítko pro přesun na platbu objednavek
     private fun setCheckoutButton(button: Button, table: Table){
         if (table.state.equals("eating")) {
             button.isEnabled = true
@@ -535,6 +537,7 @@ class Model_view : Fragment() {
         }
     }
 
+    //Zobrazí potrobnějí objednávku zákazníka
     private fun displayDataOfACustomerPopup(table: Table){
         val customer = findCustomerById(table, selectedCustomerId)
         val name = customer?.name
@@ -574,6 +577,7 @@ class Model_view : Fragment() {
         dialog.show()
     }
 
+    //zobrazí podrobněji data o položce v objednávce
     private fun displayDataOfTheItemInOrderPopup(table: Table){
         val customer = findCustomerById(table, selectedCustomerId)
         val item = findItemInOrderById(customer!!, selectedItemFromOrderId)
@@ -644,6 +648,7 @@ class Model_view : Fragment() {
         dialog.show()
     }
 
+    //metoda pro přidání položky k objednávce
     private fun addItemsToOrderPopup(table: Table){
         val customer = findCustomerById(table, selectedCustomerId)
 
@@ -677,7 +682,7 @@ class Model_view : Fragment() {
         }
         dialog.show()
     }
-
+    //metoda pro obsluhu stolu při placení
     private fun proceedToCheckoutPopup(){
         val table = findTableById(model, selectedTableId!!)
         val price = table?.totalTablePrice
@@ -814,6 +819,7 @@ class Model_view : Fragment() {
         dialog.show()
     }
 
+    //obsluha zaplaceného stolu
     private fun managePaidTablePopup(){
         val table = findTableById(model, selectedTableId!!)
         val name = table?.name
@@ -861,6 +867,7 @@ class Model_view : Fragment() {
         }
     }
 
+    //metoda co zjistí jestli všichni zákazníci platili
     private fun checkIfAllCustomersPaid(table: Table, button: Button): Boolean{
         table.listOfCustomers.forEach { customer ->
             if (!customer.order.paid){
@@ -874,6 +881,7 @@ class Model_view : Fragment() {
         return true
     }
 
+    //metoda pro zjištění jestli všechny položky v objednávce jsou přineseny
     private fun checkIfAllOrdersServed(table: Table): Boolean{
         table.listOfCustomers.forEach { customer ->
             customer.order.menuItems.forEach { menuItem ->
@@ -1304,7 +1312,6 @@ class Model_view : Fragment() {
                 ).apply {
                     setMargins(5, 5, 10, -5)
                 }
-                //setAutoSizeTextTypeUniformWithConfiguration(28, 100, 1, TypedValue.COMPLEX_UNIT_DIP)
                 textSize = 28f
                 text = sceneName
                 setBackgroundColor(Color.WHITE)
@@ -3154,12 +3161,6 @@ class Model_view : Fragment() {
 
     companion object {
         private const val COMPANY_ID = "COMPANY_ID"
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @return A new instance of fragment Model_view.
-         */
         @JvmStatic
         fun newInstance(companyId: String) =
             Model_view().apply {

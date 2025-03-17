@@ -1,5 +1,5 @@
 package com.example.waitr
-
+//Objektová třída pro seznam v menu
 data class MenuGroup(
     val id: String = "",
     var name: String = "",
@@ -7,6 +7,7 @@ data class MenuGroup(
     val subGroups: MutableList<MenuGroup> = mutableListOf(),
     var locked: String? = null
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,
@@ -51,6 +52,7 @@ data class MenuGroup(
         return false
     }
 
+    //kopie dat
     fun deepCopy(): MenuGroup {
         return MenuGroup(
             id = this.id,

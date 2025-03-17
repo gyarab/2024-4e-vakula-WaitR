@@ -1,11 +1,12 @@
 package com.example.waitr
-
+//Objektová třída pro scénu v modelu
 data class ModelScene(
     val id: String = "",
     var name: String = "",
     var listOfTables: MutableList<Table> = mutableListOf(),
     var listOfHelpers: MutableList<HelperShape> = mutableListOf()
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,
@@ -37,6 +38,7 @@ data class ModelScene(
         return false
     }
 
+    //kopie dat
     fun deepCopy(): ModelScene {
         return ModelScene(
             id = this.id,

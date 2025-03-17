@@ -26,7 +26,7 @@ class BackgroundService : Service() {
         updateUserStatus() // Nastav stav uživatele na "offline"
         stopSelf()
     }
-
+//změna statusu na offline
     private fun updateUserStatus() {
         getCompanyId { id ->
             companyId = id
@@ -36,7 +36,7 @@ class BackgroundService : Service() {
             }
         }
     }
-
+//získání id společnosti ve lteré je zrovna online
     private fun getCompanyId(callback: (String) -> Unit) {
         val companyList = mutableListOf<String>()
         val ref = userId?.let { db.child("users").child(it).child("companies") }

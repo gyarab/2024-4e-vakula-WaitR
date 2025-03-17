@@ -3,7 +3,7 @@ package com.example.waitr
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-
+// Vlastní OnClickListener
 class CustomClickListener(
     private val onClick: () -> Unit,
     private val onDoubleClick: () -> Unit
@@ -31,7 +31,7 @@ class CustomClickListener(
             clickCount = 0
         }, DOUBLE_CLICK_THRESHOLD)
 
-        // Aktualizace času posledního kliknutí (pro debug nebo další logiku)
+        // Aktualizace času posledního kliknutí
         lastClickTime = currentTime
     }
 }

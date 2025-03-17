@@ -1,9 +1,10 @@
 package com.example.waitr
-
+//Objektová třída pro model
 data class Model(
     var listOfScenes: MutableList<ModelScene> = mutableListOf(),
     var locked: String? = null
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "listOfScenes" to listOfScenes.map { it.toMap() },
@@ -21,18 +22,8 @@ data class Model(
         // Pokud položka nebyla nalezena ani odstraněna
         return false
     }
-    fun updateTableInScene(sceneId: String, updatedTable: Table) {
-        // Najdeme scénu podle ID
-        val scene = listOfScenes.find { it.id == sceneId } ?: return
 
-        // Najdeme index existujícího stolu podle ID
-        val tableIndex = scene.listOfTables.indexOfFirst { it.id == updatedTable.id }
-        if (tableIndex != -1) {
-            // 🔥 Pokud existuje, přepíšeme ho novými daty
-            scene.listOfTables[tableIndex] = updatedTable
-        }
-    }
-
+    //kopie dat
     fun deepCopy(): Model {
         return Model(
             listOfScenes = listOfScenes.map { it.deepCopy() }.toMutableList(),

@@ -82,6 +82,7 @@ class CompanyMenu : AppCompatActivity() {
         invitesDisplay = invitesDialog.findViewById(R.id.display_invites_layout)
         linearLayoutContainer = findViewById(R.id.linearLayoutContainer)
 
+        //inicializace view prvku když uživatel nemá společnosti které by načetl
         noCompaniesTextView = TextView(this).apply {
             text = "No companies yet"
             textSize = 16f
@@ -192,6 +193,7 @@ class CompanyMenu : AppCompatActivity() {
         createButton.setOnClickListener {
             val companyName = companyNameInput.text.toString().trim()
             if (companyName.isNotEmpty()) {
+                // ošetření výjimky
                 if (companyName.length > 20) {
                     Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
@@ -246,7 +248,7 @@ class CompanyMenu : AppCompatActivity() {
                                 ).show()
                             }
 
-                        // ulozeni spolecnosti do database
+                   // struktura dat ukládaných do databáse
                         val companyMap2 = mapOf(
                             "name" to companyName,
                             "users" to mapOf(
@@ -274,6 +276,7 @@ class CompanyMenu : AppCompatActivity() {
                             )
                         )
 
+                        // Přidání nové společnosti k seznamu společností
                         db.child("companies").child(companyId)
                             .setValue(companyMap2)
                             .addOnSuccessListener {
@@ -302,6 +305,7 @@ class CompanyMenu : AppCompatActivity() {
         // Zobrazení dialogu
         dialog.show()
     }
+    // Metoda co zobrazí dialog pro pozvánky
     private fun showJoinCompanyPopup(){
         // Nastavení velikosti dialogu
         invitesDialog.window?.setLayout(
@@ -312,6 +316,7 @@ class CompanyMenu : AppCompatActivity() {
         closeButton.setOnClickListener {
             invitesDialog.dismiss()
         }
+        //Vykreslí pozvánky do layoutu
         loadInvites()
         invitesDialog.show()
     }
@@ -319,6 +324,8 @@ class CompanyMenu : AppCompatActivity() {
     fun Int.dpToPx(): Int {
         return (this * Resources.getSystem().displayMetrics.density).toInt()
     }
+
+    //Zobrazí dialog s možností vsoupit dovnitř u společnstech u kterých má uživatel pozici "employee" nebo ""manager
     private fun selectedCompanyFromInviteOptions(){
         // Vytvoření dialogu
         val dialog1 = Dialog(this)
@@ -368,6 +375,7 @@ class CompanyMenu : AppCompatActivity() {
         }
         dialog1.show()
     }
+    // metoda pro příjmutí pozvánky
     private fun acceptInvite(companyId: String, companyName: String, textViewId: Int, position: String){
         if (companyName.isNotEmpty()) {
             selectedCompanyName = companyName
@@ -411,7 +419,6 @@ class CompanyMenu : AppCompatActivity() {
             Log.e("naslo to invite", view.toString())
             invitesDisplay.removeView(view)
 
-            // Uložení názvu společnosti a ID do Firebase Realtime Database u konkrétního uživatele
             val companyMap = mapOf(
                 "companyName" to companyName,
                 "authorization" to position
@@ -437,7 +444,7 @@ class CompanyMenu : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                //pridani uzivatele ke spolecnosti
+
                 val newUserMap = mapOf(
                     userId to mapOf(
                         "authorization" to position,
@@ -446,6 +453,7 @@ class CompanyMenu : AppCompatActivity() {
                         "username" to username
                     )
                 )
+                //pridani uzivatele ke spolecnosti
                 db.child("companies").child(companyId).child("users")
                     .updateChildren(newUserMap)
                     .addOnSuccessListener {
@@ -454,13 +462,14 @@ class CompanyMenu : AppCompatActivity() {
                     .addOnFailureListener{ exception ->
                         Log.e("DatabaseUpdate", "Error adding user: ${exception.message}")
                     }
-                // pridani uzivatele k analytics
+
                 val userAnalytics = mapOf(
                     userId to mapOf(
                         "numberOfServedTables" to 0,
                         "activity" to 0
                     )
                 )
+                // pridani uzivatele k analytics
                 db.child("companies").child(companyId).child("Analytics").child("users")
                     .updateChildren(userAnalytics)
                     .addOnSuccessListener {
@@ -469,12 +478,12 @@ class CompanyMenu : AppCompatActivity() {
                     .addOnFailureListener{ exception ->
                         Log.e("DatabaseUpdate", "Error adding user to analytics: ${exception.message}")
                     }
-                // smazani poznamky po potvrzeni
+                // smazání pozvánky ze seznamu po potvrzení
                 removeInvite(companyId)
             }
         }
     }
-    // vymaze poznamku z database uzivatele
+    // vymaze poznamku ze seznamu uživatele
     private fun removeInvite(companyIdToRemove: String){
         userId?.let { userId ->
             val invitesRef = db.child("users").child(userId).child("invites")
@@ -503,6 +512,7 @@ class CompanyMenu : AppCompatActivity() {
                 }
         }
     }
+    //Metoda pro vykreslení pozvánek
     private fun loadInvites(){
         invitesDisplay.removeAllViews()
         if (invitesDisplay.contains(noInvitesYet)){
@@ -625,6 +635,7 @@ class CompanyMenu : AppCompatActivity() {
                 }
         }
     }
+    //Metoda pro vykreslení společností do seznamu
     private fun loadCompanies(){
         companiesList.clear()
         userId?.let {
@@ -668,6 +679,7 @@ class CompanyMenu : AppCompatActivity() {
                                     selectedCompanyId = companyTag.companyId // Aktualizace ID
                                     selectedCompanyName = companyTag.companyName
                                     selectedAuthorization = companyTag.authorization
+                                    //podle authorizace nastavuje akci po kliknutí
                                     if (selectedAuthorization.equals("owner")){
                                         selectedCompanyOptions()
                                     } else if (selectedAuthorization.equals("employee") || selectedAuthorization.equals("manager")){
@@ -688,6 +700,7 @@ class CompanyMenu : AppCompatActivity() {
             checksIfNoCompanies()
         }
     }
+    //Zobrazení možností pro spoečnosti kde je uživatel vlastníkem
     private fun selectedCompanyOptions() {
         // Vytvoření dialogu
         val dialog1 = Dialog(this)
@@ -732,6 +745,7 @@ class CompanyMenu : AppCompatActivity() {
             }
 
             dialog1.dismiss()
+            //Přesměrování na novou aktivitu
             intent = Intent(this, Company_manager::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtra("COMPANY_ID", selectedCompanyId) // Předání ID do nové aktivity
@@ -759,11 +773,12 @@ class CompanyMenu : AppCompatActivity() {
         }
         dialog1.show()
     }
-//metoda pro smazani vsem spolecnosti
+//metoda pro smazání společnosti
     private fun deleteCompany(companyId: String, CompanyTag: CompanyTag){
         val linearLayoutContainer = findViewById<LinearLayout>(R.id.linearLayoutContainer)
         db.child("users").get()
             .addOnSuccessListener { snapshot ->
+                //Smaže společnost všem uživatelům z jejich seznamu
                 snapshot.children.forEach { userSnapshot ->
                     val userId = userSnapshot.key
                     if (userId != null) {
@@ -776,7 +791,7 @@ class CompanyMenu : AppCompatActivity() {
                             }
                     }
                 }
-                // Odstrani spolecnosti z database podniku
+                // Odstrani spolecnosti ze seznamu společností
                 db.child("companies").child(companyId).removeValue()
                     .addOnSuccessListener {
                         val buttonToRemove = linearLayoutContainer.findViewWithTag<Button>(CompanyTag)
@@ -792,6 +807,7 @@ class CompanyMenu : AppCompatActivity() {
                 Toast.makeText(this, "Failed to retrieve users: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+    //Metoda co kontroluje zda má uživatél prázdný seznam společností a podle toho vykresluje prvky do layoutu
     private fun checksIfNoCompanies() {
         val userRef = userId?.let {
             db.child("users").child(it).child("companies")
@@ -813,7 +829,7 @@ class CompanyMenu : AppCompatActivity() {
         }
     }
 
-    // metoda pro funkcnost hamburgeru
+    // metoda pro funkcnost hamburger menu
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return if (drawerToggle.onOptionsItemSelected(item)) {
             true // Událost byla zpracována výsuvným menu
@@ -838,7 +854,7 @@ class CompanyMenu : AppCompatActivity() {
                         or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 )
     }
-
+//Metoda pro zobrazení správy profilu uživatele
     private fun profileSettingsPopup(){
         // Nastavení velikosti dialogu
         profileSettingsDialog.window?.setLayout(
@@ -866,7 +882,7 @@ class CompanyMenu : AppCompatActivity() {
 
         profileSettingsDialog.show()
     }
-
+//metoda na změnu uživatelského jména nebo hesla
     private fun changeProfileParameters(type: String){
         // Vytvoření dialogu
         val dialog = Dialog(this)

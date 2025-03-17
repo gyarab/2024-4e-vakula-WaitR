@@ -88,10 +88,11 @@ class Company_manager : AppCompatActivity() {
     private val userCompaniesRef = userId?.let { db.child("users").child(it).child("companies") }
     private val handler = Handler(Looper.getMainLooper())
     private val allUsersList = mutableListOf<String>()
+    //za každých 5 sekund zavolá metodu na kontrolu zda li má být poslána notifikace
     private val checkNotificationsRunnable = object : Runnable {
         override fun run() {
-            checkAndSendNotifications() // Zavolá tvou funkci
-            handler.postDelayed(this, 5000) // Naplánuje další spuštění za 5 sekund
+            checkAndSendNotifications()
+            handler.postDelayed(this, 5000)
         }
     }
 
@@ -238,10 +239,6 @@ class Company_manager : AppCompatActivity() {
                     showInviteUserPopUp()
                     true
                 }
-                R.id.manager_info_button -> {
-                    //TODO
-                    true
-                }
                 R.id.manager_logout_of_company_button -> {
                     // zmena online statusu pri opusteni podniku
                     val onlineStatusMap = mapOf(
@@ -269,7 +266,7 @@ class Company_manager : AppCompatActivity() {
                 else -> false
             }
         }
-        // zavolani metody pro nastaveni listeneru
+        //Nastavení listenerů
         createNotificationChannel(this)
         setupRealtimeListener()
         startListeningForNotifications()
@@ -302,6 +299,7 @@ class Company_manager : AppCompatActivity() {
         }
     }
 
+    //Metoda co změní ikonku pro notifikace při novách oznámení
     private fun showBadge(show: Boolean) {
         if (show) {
             notificationMenuItem.icon = ContextCompat.getDrawable(this, R.drawable.ic_notification_with_badge)
@@ -313,7 +311,7 @@ class Company_manager : AppCompatActivity() {
         navigationView.invalidate()
     }
 
-    //Trida pro zobrazeni nastaveni pro spolecnost
+    //Trida pro zobrazeni nastavení spolecnosti
     private fun companySettingsPopup(){
         companySettingsDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -329,6 +327,7 @@ class Company_manager : AppCompatActivity() {
         companySettingsDialog.show()
     }
 
+    //Vykreslí vše do layotu co se týče správy společnosti
     private fun drawSettings(){
         val companyName = settings.companyName
         val seatedNotificationTimePeriod = settings.seatedNotSendPeriod
@@ -700,6 +699,7 @@ class Company_manager : AppCompatActivity() {
         }
     }
 
+    // metoda pro změnu časo o jak dlouho se budou posílat jednotlivé typy notifikací
     private fun changeNotificationPeriod(type: String){
         // Vytvoření dialogu
         val dialog = Dialog(this)
@@ -748,7 +748,8 @@ class Company_manager : AppCompatActivity() {
         }
         dialog.show()
     }
-
+//metoda pro správa uživatele
+//možné uživatele povýšit nebo vyhodit ze společnsoti
     private fun manageUserSettings(userName: String, userId: String){
         // Vytvoření dialogu
         val dialog = Dialog(this)
@@ -831,7 +832,7 @@ class Company_manager : AppCompatActivity() {
         }
         dialog.show()
     }
-
+//změna jména společnosti
     private fun changeCompanyName(){
         // Vytvoření dialogu
         val dialog = Dialog(this)
@@ -941,7 +942,7 @@ class Company_manager : AppCompatActivity() {
             Log.e("Firebase", "Chyba při načítání názvu společnosti: ${it.message}")
         }
     }
-
+//metoda pro zobrazení dialogu s notifikacema
     private fun tableNotificationPopup(){
         tableNotificationDialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -952,10 +953,10 @@ class Company_manager : AppCompatActivity() {
             tableNotificationDialog.dismiss()
         }
         drawNotifications()
-        //showBadge(false)
+        showBadge(false)
         tableNotificationDialog.show()
     }
-
+//Vykreslí notifikace
     private fun drawNotifications(){
         notificationsLayout.removeAllViews()
         notificationsList.forEach { notification ->
@@ -968,14 +969,14 @@ class Company_manager : AppCompatActivity() {
             }
         }
     }
-    //TODO
+    //pomocná metoda pro vykreslení notifikací podle parametrů
     private fun createNotification(notification: Notification, message: String){
         val linearLayout = LinearLayout(this).apply {
             layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(32, 0, 5, 0)
+                setMargins(15, 10, 15, 10)
             }
             orientation = LinearLayout.HORIZONTAL
             val backgroundDrawable = GradientDrawable().apply {
@@ -983,7 +984,7 @@ class Company_manager : AppCompatActivity() {
                 cornerRadius = 30f // Zaoblení rohů v pixelech
             }
             background = backgroundDrawable
-            gravity = Gravity.CENTER
+            gravity = Gravity.CENTER_VERTICAL
             setPadding(16, 16, 16, 16)
         }
         val confirmButton = ImageButton(this).apply {
@@ -993,8 +994,12 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             setPadding(16, 16, 16, 16)
+            val backgroundDrawable = GradientDrawable().apply {
+                setColor(Color.GREEN) // Barva pozadí
+                cornerRadius = 30f // Zaoblení rohů v pixelech
+            }
+            background = backgroundDrawable
             scaleType = ImageView.ScaleType.CENTER_INSIDE
-            setBackgroundColor(Color.GREEN)
         }
         confirmButton.setOnClickListener {
             val notificationRef = db.child("companies").child(CompanyID).child("Notifications").child(notification.id)
@@ -1031,14 +1036,14 @@ class Company_manager : AppCompatActivity() {
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             ).apply {
-                setMargins(8,0,0,0)
+                setMargins(8,5,5,8)
             }
         }
         linearLayout.addView(confirmButton)
         linearLayout.addView(itemView)
         notificationsLayout.addView(linearLayout)
     }
-
+    // update aktivity v Analytics u uživatele
     private fun updateUserDataInAnalytics(){
         val userRef = userId?.let {
                 db.child("companies").child(CompanyID).child("Analytics").child("users").child(it).child("activity")
@@ -1052,7 +1057,7 @@ class Company_manager : AppCompatActivity() {
             Log.e("Firebase", "Chyba při načítání numberOfServedTimes: ${error.message}")
         }
     }
-
+//Metoda pro zprovoznění notifikací v aplikaci
     private fun createNotificationChannel(context: Context) {
         val name = "WaitR Channel"
         val descriptionText = "Notifikace pro WaitR"
@@ -1064,7 +1069,7 @@ class Company_manager : AppCompatActivity() {
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
-
+//dialoga pro pozvání nových uživatelů do společnosti
     private fun showInviteUserPopUp(){
         // Vytvoření dialogu
         val dialog = Dialog(this)
@@ -1255,24 +1260,19 @@ class Company_manager : AppCompatActivity() {
         showBadge(hasUnsentNotifications)
     }
 
-    //vymaze notifikaci
-    private fun removeNotificationFromFirebase(id: String) {
-        db.child("companies").child(CompanyID).child("Notifications").child(id).removeValue()
-    }
-
-    // Metoda pro meneni fragmentu
+    // Metoda pro měnění fragmentů
     private fun setCurrentFragment(fragment: Fragment, tag: String) {
         val transaction = supportFragmentManager.beginTransaction()
 
         // Skryjte všechny fragmenty
         supportFragmentManager.fragments.forEach { transaction.hide(it) }
 
-        // Pokud fragment již existuje, zobrazte ho
+        // Pokud fragment již existuje, zobraz ho
         val existingFragment = supportFragmentManager.findFragmentByTag(tag)
         if (existingFragment != null) {
             transaction.show(existingFragment)
         } else {
-            // Pokud fragment neexistuje, přidejte ho
+            // Pokud fragment neexistuje, přidej ho
             transaction.add(R.id.companyframelayout, fragment, tag)
         }
 
@@ -1341,7 +1341,7 @@ class Company_manager : AppCompatActivity() {
                 loadCurrentUsersToLayout()
             }
     }
-    // upravi v NavigationDrawer menu polozku Members
+    // upravi v NavigationDrawer menu položku Members
     private fun currentMembersPopup(){
         loadCurrentUsersToLayout()
         val closePopup = currentMembersDialog.findViewById<Button>(R.id.close_current_users_popup)
@@ -1350,7 +1350,7 @@ class Company_manager : AppCompatActivity() {
         }
         currentMembersDialog.show()
     }
-    //dynamicke nacteni uzivatelu do layoutu
+    //dynamicke načtení uživatelů do layoutu
     private fun loadCurrentUsersToLayout(){
         displayOnlineUsers.removeAllViews()
         displayOfflineUsers.removeAllViews()
@@ -1432,7 +1432,8 @@ class Company_manager : AppCompatActivity() {
             Log.e("Firebase", "Chyba při načítání Analytics: ${error.message}")
         }
     }
-
+//metoda co projde uživatele a podle toho updatne analytics
+//odebere uživatele co byli hyhozeni a přidá nově příchozí
     private fun analyticsUserTraversal(list: MutableList<String>, finalList: MutableList<String>){
             allUsersList.forEach { user ->
                 if (list.contains(user)){
@@ -1442,7 +1443,7 @@ class Company_manager : AppCompatActivity() {
                 }
             }
     }
-    //nastaveni realtime listeneru
+    //nastaveni realtime listeneru pro změnu v seznamu uživatelů
     private fun setupRealtimeListener() {
         val usersRef = db.child("companies").child(CompanyID).child("users")
         valueEventListener = object : ValueEventListener {
@@ -1456,6 +1457,7 @@ class Company_manager : AppCompatActivity() {
         }
         usersRef.addValueEventListener(valueEventListener!!)
     }
+
     //listener jestli uzivatel nebyl vyhozen ze spolecnosti
     private fun startCompanyListener() {
         companyListener = object : ValueEventListener {

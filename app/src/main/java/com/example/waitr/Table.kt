@@ -1,5 +1,5 @@
 package com.example.waitr
-
+//objektová struktura pro stůl
 data class Table(
     val id: String = "",
     var name: String = "",
@@ -13,6 +13,7 @@ data class Table(
     var yPosition: Float = 0f,
     var locked: String? = null
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,
@@ -29,6 +30,7 @@ data class Table(
         )
     }
 
+    //kopie dat
     fun deepCopy(): Table{
         return Table(
             id = this.id,

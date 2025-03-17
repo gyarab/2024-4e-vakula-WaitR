@@ -134,6 +134,7 @@ class Food_menu : Fragment() {
         helpButton.setOnClickListener {
             menuInfoPopup()
         }
+        //načte menu
         fetchMenu{}
     }
 
@@ -170,6 +171,7 @@ class Food_menu : Fragment() {
         }
     }
 
+    //zobrazí dialog pro editaci menu
     private fun showEditMenuPopup(){
         if (menu.locked == null) {
             menu.locked = userId
@@ -224,6 +226,7 @@ class Food_menu : Fragment() {
             ).show()
         }
     }
+    // zobrazí dialog pro info
     private fun menuInfoPopup(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -240,6 +243,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    //metoda pro přidání nové menu položky
     private fun addItemPopup(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -261,6 +265,7 @@ class Food_menu : Fragment() {
             val itemDiscription = itemDiscriptionInput.text.toString().trim()
             val itemPriceText = itemPriceInput.text.toString().trim()
 
+            //ošetření výjimek
             if (itemName.isEmpty() || itemDiscription.isEmpty() || itemPriceText.isEmpty()) {
                 Toast.makeText(dialog.context, "All fields must be filled!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -281,7 +286,7 @@ class Food_menu : Fragment() {
             }
             val randomID = UUID.randomUUID().toString()
             val newMenuItem = MenuItem(randomID, itemName, itemPrice, itemDiscription)
-
+            //uložení do objektové struktury
             val itemView = TextView(fragmentContext).apply {
                 text = "$itemName - $itemPrice Kč"
                 textSize = 25f
@@ -326,6 +331,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    // metoda pro přidání nové skupiny položek do menu
     private fun addGroupPopup(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -404,6 +410,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    //pomocná metoda pro nalezení View prvku pomocí jeho tagu
     private fun findViewWithTagRecursively(root: ViewGroup, tag: String): View? {
         for (i in 0 until root.childCount) {
             val child = root.getChildAt(i)
@@ -421,6 +428,7 @@ class Food_menu : Fragment() {
         }
         return null
     }
+    //metoda pro zobrazení možnosti úprav menu položky
     private fun itemOptionPopup(itemId: String){
         val item = findItemById(editMenu, itemId)
         val itemName = item?.name
@@ -497,6 +505,7 @@ class Food_menu : Fragment() {
         }
         itemOptionsDialog.show()
     }
+    //metoda pro změnu jména položky
     private fun changeItemName(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -534,6 +543,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    //metoda pro změnu ceny položky
     private fun changeItemPrice(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -573,6 +583,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    //metoda pro změnu popisu položky
     private fun changeItemDescription(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -610,7 +621,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
-
+//metoda zobrazující dialog s jménem, cenou a popisem položky
     private fun itemDisplayPopup(){
         val item = findItemById(menu, selectedItemID!!)
         val itemName = item?.name
@@ -636,6 +647,7 @@ class Food_menu : Fragment() {
         }
         dialog.show()
     }
+    //metoda pro možnosti úprav skupiny menu
     private fun groupOptionsPopup(groupId: String){
         //najde MenuGroup
         val menuGroup = findGroupById(editMenu, groupId)
@@ -689,6 +701,7 @@ class Food_menu : Fragment() {
         }
         groupOptionsDialog.show()
     }
+    //změna jména
     private fun changeGroupName(){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -752,6 +765,7 @@ class Food_menu : Fragment() {
         // Pokud nic nenalezeno
         return null
     }
+    //uloží objektovou struktutu menu do databáse
     private fun updateMenu(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
@@ -818,6 +832,7 @@ class Food_menu : Fragment() {
             analyticsRecursiveTraversal(subGroup, list, finalList)
         }
     }
+    //načtení objektu menu z db
     private fun fetchMenu(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
@@ -861,6 +876,7 @@ class Food_menu : Fragment() {
             }
         })
     }
+    //vykreslení editovací plochy pro menu
     private fun updateEditMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup) {
         parentLayout.removeAllViews()
         // Nejprve vyčistit layout
@@ -968,6 +984,7 @@ class Food_menu : Fragment() {
         // Přidání vytvořeného layoutu skupiny do rodičovského layoutu
         parent.addView(menuGroupLayout)
     }
+    //překreslí layout
     private fun updateMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup){
         // Nejprve vyčistit layout
         parentLayout.removeAllViews()

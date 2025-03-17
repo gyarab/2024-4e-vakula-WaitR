@@ -1,6 +1,6 @@
 package com.example.waitr
 
-
+//objektová struktura pro nastaveni
 data class Settings(
     var companyName: String = "",
     var users: MutableList<User> = mutableListOf(),

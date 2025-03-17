@@ -1,10 +1,11 @@
 package com.example.waitr
-
+//objektová struktura pro objednávku
 data class Order(
     var menuItems: MutableList<MenuItem> = mutableListOf(),
     var totalPrice: Double = 0.0,
     var paid: Boolean = false
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "menuItems" to menuItems.map { it.toMap() },
@@ -24,6 +25,7 @@ data class Order(
         return false
     }
 
+    //kopie dat
     fun deepCopy(): Order {
         return Order(
             menuItems = this.menuItems.map { it.deepCopy() }.toMutableList(),

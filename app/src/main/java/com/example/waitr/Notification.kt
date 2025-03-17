@@ -1,5 +1,5 @@
 package com.example.waitr
-
+//objektová struktura pro notifikace
 data class Notification(
     var id: String = "",
     var tableId: String = "",
@@ -8,6 +8,7 @@ data class Notification(
     var timeToSend: Long = 0,
     var send: Boolean = false
 ){
+    //mapování parametrů pro zápis do databáze
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "id" to id,

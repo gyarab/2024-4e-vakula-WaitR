@@ -33,7 +33,7 @@ class Registration : AppCompatActivity() {
         super.onStart()
         FirebaseAuth.getInstance().signOut()
 
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // zkontroluje jestli je uživatel přihlášen
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val intent = Intent(applicationContext, CompanyMenu::class.java)

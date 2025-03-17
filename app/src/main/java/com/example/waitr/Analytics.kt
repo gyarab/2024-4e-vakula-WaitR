@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
+// malá datová struktura pro lepší ukládaní dat do listu
 data class X(
     val id: String,
     val name: String
@@ -81,7 +82,7 @@ class Analytics : Fragment() {
         return view
     }
 
-    //metoda pro nakreslnei ui elementu do layoutu
+    //metoda pro nakreslení ui elementu do layoutu
     private fun drawAnalytics(){
         analyticsLayout.removeAllViews()
 
@@ -234,6 +235,7 @@ class Analytics : Fragment() {
         analyticsLayout.addView(userActivityAnalyticsLayout)
     }
 
+    //nakreslení grafu pro návštěvnost stolů
     private fun drawTableBarChard(): BarChart {
         val tableBarChart = BarChart(fragmentContext)
         tableBarChart.layoutParams = LinearLayout.LayoutParams(
@@ -291,6 +293,7 @@ class Analytics : Fragment() {
         return tableBarChart
     }
 
+    //nakreslení grafu pro popularitu položek v menu
     private fun drawItemBarChard(): BarChart {
         val itemBarChart = BarChart(fragmentContext)
         itemBarChart.layoutParams = LinearLayout.LayoutParams(
@@ -347,7 +350,7 @@ class Analytics : Fragment() {
         itemBarChart.invalidate()
         return itemBarChart
     }
-
+    //nakreslení grafu pro počet obsloužených stolů u uživatele
     private fun drawUserServedBarChard(): BarChart {
         val usersServedBarChart = BarChart(fragmentContext)
         usersServedBarChart.layoutParams = LinearLayout.LayoutParams(
@@ -405,6 +408,7 @@ class Analytics : Fragment() {
         return usersServedBarChart
     }
 
+    //nakreslení grafu pro aktivitu uživatelů
     private fun drawUserActivityBarChard(): BarChart {
         val usersActivityBarChart = BarChart(fragmentContext)
         usersActivityBarChart.layoutParams = LinearLayout.LayoutParams(
@@ -481,6 +485,7 @@ class Analytics : Fragment() {
         return null
     }
 
+    //zobrazení dialogu s více daty
     private fun viewMoreDataPopup(whichData: String){
         // Vytvoření dialogu
         val dialog = Dialog(fragmentContext)
@@ -681,6 +686,7 @@ class Analytics : Fragment() {
         }
     }
 
+    //načte seznam všech položek v menu z databáze
     private fun fetchAllMenuItems(onComplete: () -> Unit) {
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Menu")
@@ -708,7 +714,7 @@ class Analytics : Fragment() {
             Toast.makeText(context, "Error loading menu: ${error.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
+    //pomocná rekurzivní metoda pro průchod přes objektovou strukturu menu
     private fun recursiveMenuBrowse(menuGroup: MenuGroup) {
         allMenuItemsList.addAll(menuGroup.items)
         menuGroup.subGroups.forEach { subGroup ->
@@ -716,6 +722,7 @@ class Analytics : Fragment() {
         }
     }
 
+    //načte všechny stoly z databáze
     private fun fetchAllTables(onComplete: () -> Unit){
         val companyMenuRef = CompanyID?.let {
             db.child("companies").child(it).child("Model")
@@ -743,6 +750,7 @@ class Analytics : Fragment() {
         }
     }
 
+    //načte všechny uživatele z databáze
     private fun fetchAllUsers(onComplete: () -> Unit){
         val usersRef = CompanyID?.let {
             db.child("companies").child(it).child("users")
