@@ -120,22 +120,46 @@ class Company_manager : AppCompatActivity() {
         CompanyID = intentmain.getStringExtra("COMPANY_ID").toString()
 
         // Vytvoření fragmentů a předání CompanyID
-        CompanyID.let {
-            modelView = Model_view.newInstance(it)
-            foodMenu = Food_menu.newInstance(it)
-            analytics = Analytics.newInstance(it)
+        if (savedInstanceState == null) {
+            CompanyID.let { id ->
+                if (id.isNotEmpty()) {
+                    modelView = Model_view.newInstance(id)
+                    foodMenu = Food_menu.newInstance(id)
+                    analytics = Analytics.newInstance(id)
 
-            setCurrentFragment(modelView)
-            bottomNavigationView = findViewById(R.id.bottomNavigationView)
-            bottomNavigationView.setOnNavigationItemSelectedListener {
-                when(it.itemId){
-                    R.id.ModelView -> setCurrentFragment(modelView)
-                    R.id.Foodmenu -> setCurrentFragment(foodMenu)
-                    R.id.Analytics -> setCurrentFragment(analytics)
+                    // Přidejte všechny fragmenty, ale zobrazte pouze výchozí
+                    supportFragmentManager.beginTransaction()
+                        .add(R.id.companyframelayout, modelView, "ModelView")
+                        .add(R.id.companyframelayout, foodMenu, "FoodMenu")
+                        .add(R.id.companyframelayout, analytics, "Analytics")
+                        .hide(foodMenu)
+                        .hide(analytics)
+                        .commit()
+                } else {
+                    Log.e("CompanyManager", "CompanyID is empty")
                 }
-                true
             }
+        } else {
+            // Obnovení fragmentů z FragmentManager
+            modelView = supportFragmentManager.findFragmentByTag("ModelView") as? Model_view
+                ?: Model_view.newInstance(CompanyID)
+            foodMenu = supportFragmentManager.findFragmentByTag("FoodMenu") as? Food_menu
+                ?: Food_menu.newInstance(CompanyID)
+            analytics = supportFragmentManager.findFragmentByTag("Analytics") as? Analytics
+                ?: Analytics.newInstance(CompanyID)
         }
+
+        // Nastavení bottomNavigationView
+        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView.setOnNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.ModelView -> modelView.let { fragment -> setCurrentFragment(fragment, "ModelView") }
+                R.id.Foodmenu -> foodMenu.let { fragment -> setCurrentFragment(fragment, "FoodMenu") }
+                R.id.Analytics -> analytics.let { fragment -> setCurrentFragment(fragment, "Analytics") }
+            }
+            true
+        }
+
         //definovani dynamickych UI prvku
         currentMembersDialog = Dialog(this)
         currentMembersDialog.setContentView(R.layout.current_members_popup)
@@ -835,6 +859,10 @@ class Company_manager : AppCompatActivity() {
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (newName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             val companyRef = db.child("companies").child(CompanyID).child("name")
             companyRef.setValue(newName).addOnSuccessListener {
@@ -1233,15 +1261,21 @@ class Company_manager : AppCompatActivity() {
     }
 
     // Metoda pro meneni fragmentu
-    private fun setCurrentFragment(fragment: Fragment) {
+    private fun setCurrentFragment(fragment: Fragment, tag: String) {
         val transaction = supportFragmentManager.beginTransaction()
+
+        // Skryjte všechny fragmenty
         supportFragmentManager.fragments.forEach { transaction.hide(it) }
 
-        if (fragment.isAdded) {
-            transaction.show(fragment)
+        // Pokud fragment již existuje, zobrazte ho
+        val existingFragment = supportFragmentManager.findFragmentByTag(tag)
+        if (existingFragment != null) {
+            transaction.show(existingFragment)
         } else {
-            transaction.add(R.id.companyframelayout, fragment)
+            // Pokud fragment neexistuje, přidejte ho
+            transaction.add(R.id.companyframelayout, fragment, tag)
         }
+
         transaction.commit()
     }
     // metoda na funkcnost hamburgeru

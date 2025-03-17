@@ -192,6 +192,10 @@ class CompanyMenu : AppCompatActivity() {
         createButton.setOnClickListener {
             val companyName = companyNameInput.text.toString().trim()
             if (companyName.isNotEmpty()) {
+                if (companyName.length > 20) {
+                    Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
                 selectedCompanyName = companyName
                 if (userId != null) {
                     // vytvoreni id pro spolecnost
@@ -381,7 +385,7 @@ class CompanyMenu : AppCompatActivity() {
                 }
 
                 setBackgroundColor(
-                    ContextCompat.getColor(context, R.color.background_blue)
+                    ContextCompat.getColor(context, R.color.background_green)
                 )
 
                 isAllCaps = false
@@ -526,14 +530,12 @@ class CompanyMenu : AppCompatActivity() {
                                         val textViewID = View.generateViewId()
 
                                         companyName?.let { name ->
-                                            //TODO
-                                            // Dynamické vytvoření TextView pro každou pozvánku
                                             val inviteLayout = LinearLayout(this).apply {
                                                 layoutParams = LinearLayout.LayoutParams(
-                                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT,
                                                     LinearLayout.LayoutParams.WRAP_CONTENT
                                                 ).apply {
-                                                    setMargins(10, 10, 10, 10)
+                                                    setMargins(15, 15, 15, 15)
                                                 }
                                                 orientation = LinearLayout.VERTICAL
                                                 val backgroundDrawable = GradientDrawable().apply {
@@ -556,31 +558,36 @@ class CompanyMenu : AppCompatActivity() {
                                             }
                                             val buttonsLayout = LinearLayout(this).apply {
                                                 layoutParams = LinearLayout.LayoutParams(
-                                                    LinearLayout.LayoutParams.MATCH_PARENT,
+                                                    LinearLayout.LayoutParams.WRAP_CONTENT,
                                                     LinearLayout.LayoutParams.WRAP_CONTENT
                                                 )
                                                 orientation = LinearLayout.HORIZONTAL
                                                 setPadding(16, 16, 16, 16)
+                                                gravity = Gravity.CENTER
                                             }
                                             val acceptButton = ImageButton(this).apply {
                                                 setImageResource(R.drawable.baseline_done_24)
                                                 layoutParams = LinearLayout.LayoutParams(
                                                     LinearLayout.LayoutParams.WRAP_CONTENT,
                                                     LinearLayout.LayoutParams.WRAP_CONTENT
-                                                )
-                                                setPadding(16, 16, 16, 16)
+                                                ).apply {
+                                                    setMargins(15,15,15,15)
+                                                }
+                                                setPadding(20, 20, 20, 20)
                                                 scaleType = ImageView.ScaleType.CENTER_INSIDE
-                                                setBackgroundColor(Color.GREEN)
+                                                background = ContextCompat.getDrawable(context, R.drawable.round_green_background)
                                             }
                                             val declineButton = ImageButton(this).apply {
                                                 setImageResource(R.drawable.baseline_close_24)
                                                 layoutParams = LinearLayout.LayoutParams(
                                                     LinearLayout.LayoutParams.WRAP_CONTENT,
                                                     LinearLayout.LayoutParams.WRAP_CONTENT
-                                                )
-                                                setPadding(16, 16, 16, 16)
+                                                ).apply {
+                                                    setMargins(15,15,15,15)
+                                                }
+                                                setPadding(20, 20, 20, 20)
                                                 scaleType = ImageView.ScaleType.CENTER_INSIDE
-                                                setBackgroundColor(Color.RED)
+                                                background = ContextCompat.getDrawable(context, R.drawable.round_red_background)
                                             }
                                             buttonsLayout.addView(acceptButton)
                                             buttonsLayout.addView(declineButton)
@@ -885,7 +892,11 @@ class CompanyMenu : AppCompatActivity() {
                 changeUsernameButton.setOnClickListener {
                     val newUsername = parametrToChange.text.toString().trim()
                     if (newUsername.isEmpty()){
-                        Toast.makeText(dialog.context, "You must enter the height first", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
+                        return@setOnClickListener
+                    }
+                    if (newUsername.length > 50) {
+                        Toast.makeText(dialog.context, "Name cannot exceed 50 characters", Toast.LENGTH_SHORT).show()
                         return@setOnClickListener
                     }
                     val usernameRef = userId?.let { it1 -> db.child("users").child(it1).child("username") }

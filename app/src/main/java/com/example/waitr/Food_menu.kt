@@ -3,6 +3,7 @@ package com.example.waitr
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -52,6 +53,12 @@ class Food_menu : Fragment() {
     private val currentUser = auth.currentUser
     private val userId = currentUser?.uid
     private lateinit var authorization: String
+    private lateinit var fragmentContext: Context
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        fragmentContext = context // Uložení Contextu do globální proměnné
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +66,16 @@ class Food_menu : Fragment() {
             CompanyID = it.getString(CompanyID)
         }
         menu = MenuGroup("menuId", "menu", mutableListOf(), mutableListOf())
+        editMenuDialoge = Dialog(fragmentContext).apply {
+            setContentView(R.layout.edit_food_menu_popup)
+            setCancelable(true)
+
+            // Přidejte dismiss listener pouze jednou
+            setOnDismissListener {
+                menu.locked = null
+                updateMenu {}
+            }
+        }
     }
 
     override fun onCreateView(
@@ -67,15 +84,13 @@ class Food_menu : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_food_menu, container, false)
         menuLayout = view.findViewById(R.id.menu_layout)
-        editMenuDialoge = Dialog(requireContext())
-        editMenuDialoge.setContentView(R.layout.edit_food_menu_popup)
         editMenuLayout = editMenuDialoge.findViewById(R.id.edit_menu_layout)
-        itemOptionsDialog = Dialog(requireContext())
+        itemOptionsDialog = Dialog(fragmentContext)
         itemOptionsDialog.setContentView(R.layout.item_option_popup)
         nameOfTheItem = itemOptionsDialog.findViewById(R.id.name_of_the_item)
         priceOfTheItem = itemOptionsDialog.findViewById(R.id.price_of_the_item)
         descriptionOfTheItem = itemOptionsDialog.findViewById(R.id.discription_of_the_item)
-        groupOptionsDialog = Dialog(requireContext())
+        groupOptionsDialog = Dialog(fragmentContext)
         groupOptionsDialog.setContentView(R.layout.group_option_popup)
         nameOfTheGroup = groupOptionsDialog.findViewById(R.id.name_of_the_group)
         // Inflate the layout for this fragment
@@ -83,12 +98,12 @@ class Food_menu : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        noMenuTODisplayTextView = TextView(context).apply {
+        noMenuTODisplayTextView = TextView(fragmentContext).apply {
             text = "You need to create your menu first"
             textSize = 25f
             gravity = Gravity.CENTER
         }
-        addMenuButtonIfNon = ImageButton(context).apply {
+        addMenuButtonIfNon = ImageButton(fragmentContext).apply {
             contentDescription = "Add Menu"
             setImageResource(R.drawable.baseline_add_24)
             scaleType = ImageView.ScaleType.FIT_CENTER
@@ -114,6 +129,10 @@ class Food_menu : Fragment() {
         }
         editButton.setOnClickListener {
             showEditMenuPopup()
+        }
+        val helpButton = view.findViewById<ImageButton>(R.id.help_menu_button)
+        helpButton.setOnClickListener {
+            menuInfoPopup()
         }
         fetchMenu{}
     }
@@ -152,11 +171,6 @@ class Food_menu : Fragment() {
     }
 
     private fun showEditMenuPopup(){
-
-        editMenuDialoge.setOnDismissListener {
-            menu.locked = null
-            updateMenu {}
-        }
         if (menu.locked == null) {
             menu.locked = userId
             updateMenu {
@@ -180,7 +194,7 @@ class Food_menu : Fragment() {
                 }
             }
             cancelButton.setOnClickListener {
-                val builder = AlertDialog.Builder(requireContext())
+                val builder = AlertDialog.Builder(fragmentContext)
                 builder.setTitle("Cancel changes")
                 builder.setMessage("Are you sure you want to cancel all the changes?")
 
@@ -210,9 +224,25 @@ class Food_menu : Fragment() {
             ).show()
         }
     }
+    private fun menuInfoPopup(){
+        // Vytvoření dialogu
+        val dialog = Dialog(fragmentContext)
+        dialog.setContentView(R.layout.info_for_menu_popup)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels),
+            (resources.displayMetrics.heightPixels)
+        )
+        val closeButton = dialog.findViewById<Button>(R.id.close_menu_info_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
     private fun addItemPopup(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.add_item_to_menu_popup)
 
         // Nastavení velikosti dialogu
@@ -235,6 +265,14 @@ class Food_menu : Fragment() {
                 Toast.makeText(dialog.context, "All fields must be filled!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (itemName.length > 50) {
+                Toast.makeText(dialog.context, "Name cannot exceed 50 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (itemDiscription.length > 120) {
+                Toast.makeText(dialog.context, "description cannot exceed 120 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val itemPrice = try {
                 itemPriceText.toDouble()
             } catch (e: NumberFormatException) {
@@ -244,7 +282,7 @@ class Food_menu : Fragment() {
             val randomID = UUID.randomUUID().toString()
             val newMenuItem = MenuItem(randomID, itemName, itemPrice, itemDiscription)
 
-            val itemView = TextView(context).apply {
+            val itemView = TextView(fragmentContext).apply {
                 text = "$itemName - $itemPrice Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
@@ -290,7 +328,7 @@ class Food_menu : Fragment() {
     }
     private fun addGroupPopup(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.add_group_to_menu_popup)
 
         // Nastavení velikosti dialogu
@@ -303,6 +341,10 @@ class Food_menu : Fragment() {
 
         addButton.setOnClickListener {
             val groupName = groupNameInput.text.toString().trim()
+            if (groupName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             if (groupName.isEmpty()){
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -310,7 +352,7 @@ class Food_menu : Fragment() {
                 val randomID = UUID.randomUUID().toString()
                 val menuGroup = MenuGroup(randomID, groupName, mutableListOf(), mutableListOf())
 
-                val groupHeader = TextView(context).apply {
+                val groupHeader = TextView(fragmentContext).apply {
                     text = "- $groupName:"
                     textSize = 25f
                     setPadding(16, 16, 16, 16)
@@ -328,7 +370,7 @@ class Food_menu : Fragment() {
                         }
                     )
                 )
-                val menuGroupLayout = LinearLayout(context).apply {
+                val menuGroupLayout = LinearLayout(fragmentContext).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -457,13 +499,13 @@ class Food_menu : Fragment() {
     }
     private fun changeItemName(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -482,6 +524,10 @@ class Food_menu : Fragment() {
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (newName.length > 50) {
+                Toast.makeText(dialog.context, "Name cannot exceed 50 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             newItemname = newName
             nameOfTheItem.text = newItemname
             dialog.dismiss()
@@ -490,13 +536,13 @@ class Food_menu : Fragment() {
     }
     private fun changeItemPrice(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -529,13 +575,13 @@ class Food_menu : Fragment() {
     }
     private fun changeItemDescription(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -554,6 +600,10 @@ class Food_menu : Fragment() {
                 Toast.makeText(dialog.context, "You must enter the description first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (newDescription.length > 120) {
+                Toast.makeText(dialog.context, "Description cannot exceed 120 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             newItemDescription = newDescription
             descriptionOfTheItem.text = newItemDescription
             dialog.dismiss()
@@ -567,7 +617,7 @@ class Food_menu : Fragment() {
         val itemPrice = item?.price
         val itemDescription = item?.description
 
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.display_item_layout)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.9).toInt(),
@@ -641,13 +691,13 @@ class Food_menu : Fragment() {
     }
     private fun changeGroupName(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -664,6 +714,10 @@ class Food_menu : Fragment() {
             val newName = parametrToChange.text.toString().trim()
             if (newName.isEmpty()){
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (newName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             newGroupname = newName
@@ -705,14 +759,9 @@ class Food_menu : Fragment() {
         companyMenuRef
             ?.updateChildren(menu.toMap())
             ?.addOnSuccessListener {
-                Toast.makeText(
-                    context,
-                    "Changes saved!",
-                    Toast.LENGTH_SHORT
-                ).show()
                 //update Analytics
                 updateAnalytics()
-                fetchMenu(onComplete)
+                onComplete()
             }
             ?.addOnFailureListener {
                 Toast.makeText(
@@ -813,10 +862,10 @@ class Food_menu : Fragment() {
         })
     }
     private fun updateEditMenuUI(parentLayout: LinearLayout, menuGroup: MenuGroup) {
-        // Nejprve vyčistit layout
         parentLayout.removeAllViews()
+        // Nejprve vyčistit layout
         menuGroup.items.forEach { menuItem ->
-            val itemView = TextView(context).apply {
+            val itemView = TextView(fragmentContext).apply {
                 text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
@@ -849,7 +898,7 @@ class Food_menu : Fragment() {
     // rekurzivní funkce pro vykreslení MenuGroup
     private fun renderEditMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
-        val groupHeader = TextView(context).apply {
+        val groupHeader = TextView(fragmentContext).apply {
             text = "- ${menuGroup.name}:"
             textSize = 25f
             setPadding(16, 16, 16, 16)
@@ -869,7 +918,7 @@ class Food_menu : Fragment() {
         )
 
         // Vytvoření layoutu pro podskupiny
-        val menuGroupLayout = LinearLayout(context).apply {
+        val menuGroupLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -884,7 +933,7 @@ class Food_menu : Fragment() {
 
         // Přidání všech položek do layoutu skupiny
         menuGroup.items.forEach { menuItem ->
-            val itemView = TextView(context).apply {
+            val itemView = TextView(fragmentContext).apply {
                 text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
@@ -928,7 +977,7 @@ class Food_menu : Fragment() {
             parentLayout.addView(addMenuButtonIfNon)
         } else {
             menuGroup.items.forEach { menuItem ->
-                val itemView = TextView(context).apply {
+                val itemView = TextView(fragmentContext).apply {
                     text = "${menuItem.name} - ${menuItem.price} Kč"
                     textSize = 25f
                     setPadding(16, 16, 16, 16)
@@ -962,7 +1011,7 @@ class Food_menu : Fragment() {
     //rekurzivní funkce pro vykreslení MenuGroup
     private fun renderMenuGroup(menuGroup: MenuGroup, parent: LinearLayout) {
         // Vytvoření hlavičky MenuGroup
-        val groupHeader = TextView(context).apply {
+        val groupHeader = TextView(fragmentContext).apply {
             text = "- ${menuGroup.name}:"
             textSize = 25f
             setPadding(16, 16, 16, 16)
@@ -970,7 +1019,7 @@ class Food_menu : Fragment() {
         }
 
         // Vytvoření layoutu pro podskupiny
-        val menuGroupLayout = LinearLayout(context).apply {
+        val menuGroupLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -984,7 +1033,7 @@ class Food_menu : Fragment() {
         menuGroupLayout.addView(groupHeader)
 
         // Vytvoření layoutu pro podřízené položky
-        val childContainer = LinearLayout(context).apply {
+        val childContainer = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -1002,7 +1051,7 @@ class Food_menu : Fragment() {
 
         // Přidání všech položek do layoutu skupiny
         menuGroup.items.forEach { menuItem ->
-            val itemView = TextView(context).apply {
+            val itemView = TextView(fragmentContext).apply {
                 text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)

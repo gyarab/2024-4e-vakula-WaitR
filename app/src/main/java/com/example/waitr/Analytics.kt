@@ -1,6 +1,7 @@
 package com.example.waitr
 
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
@@ -24,7 +25,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 
@@ -48,6 +48,12 @@ class Analytics : Fragment() {
     private val allMenuItemsList = mutableListOf<MenuItem>()
     private val allUsersList = mutableListOf<X>()
     private lateinit var analyticsLayout: LinearLayout
+    private lateinit var fragmentContext: Context
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        fragmentContext = context // Uložení Contextu do globální proměnné
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +85,7 @@ class Analytics : Fragment() {
     private fun drawAnalytics(){
         analyticsLayout.removeAllViews()
 
-        val tableAnalyticsLayout = LinearLayout(requireContext()).apply {
+        val tableAnalyticsLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -87,7 +93,7 @@ class Analytics : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(16, 16, 16, 16)
         }
-        val tableAnalyticsTextview = TextView(requireContext()).apply {
+        val tableAnalyticsTextview = TextView(fragmentContext).apply {
             text = "Top 5 most used tables:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
@@ -97,7 +103,7 @@ class Analytics : Fragment() {
             )
         }
         val tableBarChart = drawTableBarChard()
-        val viewMoreTableDataButton = MaterialButton(requireContext()).apply {
+        val viewMoreTableDataButton = MaterialButton(fragmentContext).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -116,7 +122,7 @@ class Analytics : Fragment() {
         tableAnalyticsLayout.addView(viewMoreTableDataButton)
         analyticsLayout.addView(tableAnalyticsLayout)
 
-        val itemAnalyticsLayout = LinearLayout(requireContext()).apply {
+        val itemAnalyticsLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -124,7 +130,7 @@ class Analytics : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(16, 16, 16, 16)
         }
-        val itemAnalyticsTextview = TextView(requireContext()).apply {
+        val itemAnalyticsTextview = TextView(fragmentContext).apply {
             text = "Top 5 most popular items:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
@@ -134,7 +140,7 @@ class Analytics : Fragment() {
             )
         }
         val itemBarChard = drawItemBarChard()
-        val viewMoreItemDataButton = MaterialButton(requireContext()).apply {
+        val viewMoreItemDataButton = MaterialButton(fragmentContext).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -153,7 +159,7 @@ class Analytics : Fragment() {
         itemAnalyticsLayout.addView(viewMoreItemDataButton)
         analyticsLayout.addView(itemAnalyticsLayout)
 
-        val userServedAnalyticsLayout = LinearLayout(requireContext()).apply {
+        val userServedAnalyticsLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -161,7 +167,7 @@ class Analytics : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(16, 16, 16, 16)
         }
-        val userServedAnalyticsTextview = TextView(requireContext()).apply {
+        val userServedAnalyticsTextview = TextView(fragmentContext).apply {
             text = "Top 5 users with most served tables:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
@@ -171,7 +177,7 @@ class Analytics : Fragment() {
             )
         }
         val userServedBarChard = drawUserServedBarChard()
-        val viewMoreUserServedTableDataButton = MaterialButton(requireContext()).apply {
+        val viewMoreUserServedTableDataButton = MaterialButton(fragmentContext).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -190,7 +196,7 @@ class Analytics : Fragment() {
         userServedAnalyticsLayout.addView(viewMoreUserServedTableDataButton)
         analyticsLayout.addView(userServedAnalyticsLayout)
 
-        val userActivityAnalyticsLayout = LinearLayout(requireContext()).apply {
+        val userActivityAnalyticsLayout = LinearLayout(fragmentContext).apply {
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -198,7 +204,7 @@ class Analytics : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(16, 16, 16, 16)
         }
-        val userActivityAnalyticsTextview = TextView(requireContext()).apply {
+        val userActivityAnalyticsTextview = TextView(fragmentContext).apply {
             text = "Top 5 most active users:"
             textSize = 30f
             setPadding(16, 16, 16, 16)
@@ -208,7 +214,7 @@ class Analytics : Fragment() {
             )
         }
         val userActivityBarChard = drawUserActivityBarChard()
-        val viewMoreUserActivityDataButton = MaterialButton(requireContext()).apply {
+        val viewMoreUserActivityDataButton = MaterialButton(fragmentContext).apply {
             text = "show more"
             textSize = 20f
             setPadding(16, 16, 16, 16)
@@ -229,7 +235,7 @@ class Analytics : Fragment() {
     }
 
     private fun drawTableBarChard(): BarChart {
-        val tableBarChart = BarChart(context)
+        val tableBarChart = BarChart(fragmentContext)
         tableBarChart.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             600
@@ -259,6 +265,7 @@ class Analytics : Fragment() {
             granularity = 1f
             setDrawGridLines(false)
             labelCount = top5Tables.size
+            labelRotationAngle = -40f
         }
 
         val maxVisits = top5Tables.maxOfOrNull { it.numberOfTimesServed }?.toFloat() ?: 10f
@@ -284,7 +291,7 @@ class Analytics : Fragment() {
     }
 
     private fun drawItemBarChard(): BarChart {
-        val itemBarChart = BarChart(context)
+        val itemBarChart = BarChart(fragmentContext)
         itemBarChart.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             600
@@ -314,6 +321,7 @@ class Analytics : Fragment() {
             granularity = 1f
             setDrawGridLines(false)
             labelCount = top5Items.size
+            labelRotationAngle = -40f
         }
 
         val maxVisits = top5Items.maxOfOrNull { it.numberOfTimesServed }?.toFloat() ?: 10f
@@ -339,7 +347,7 @@ class Analytics : Fragment() {
     }
 
     private fun drawUserServedBarChard(): BarChart {
-        val usersServedBarChart = BarChart(context)
+        val usersServedBarChart = BarChart(fragmentContext)
         usersServedBarChart.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             600
@@ -369,6 +377,7 @@ class Analytics : Fragment() {
             granularity = 1f
             setDrawGridLines(false)
             labelCount = top5userServed.size
+            labelRotationAngle = -40f
         }
 
         val maxVisits = top5userServed.maxOfOrNull { it.numberOfServedTables }?.toFloat() ?: 10f
@@ -394,7 +403,7 @@ class Analytics : Fragment() {
     }
 
     private fun drawUserActivityBarChard(): BarChart {
-        val usersActivityBarChart = BarChart(context)
+        val usersActivityBarChart = BarChart(fragmentContext)
         usersActivityBarChart.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             600
@@ -424,6 +433,7 @@ class Analytics : Fragment() {
             granularity = 1f
             setDrawGridLines(false)
             labelCount = top5userActivity.size
+            labelRotationAngle = -40f
         }
 
         val maxVisits = top5userActivity.maxOfOrNull { it.activity }?.toFloat() ?: 10f
@@ -469,7 +479,7 @@ class Analytics : Fragment() {
 
     private fun viewMoreDataPopup(whichData: String){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.show_more_data_popup)
 
         // Nastavení velikosti dialogu
@@ -490,12 +500,12 @@ class Analytics : Fragment() {
             "table" -> {
                 textView.text = "Tables"
                 sortedTablesData.forEach { data ->
-                    val layout = LinearLayout(context).apply {
+                    val layout = LinearLayout(fragmentContext).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         ).apply {
-                            setMargins(0, 8, 0, 8)
+                            setMargins(15, 15, 15, 15)
                         }
                         orientation = LinearLayout.VERTICAL
                         val backgroundDrawable = GradientDrawable().apply {
@@ -506,7 +516,7 @@ class Analytics : Fragment() {
                         gravity = Gravity.CENTER_HORIZONTAL
                         setPadding(16, 16, 16, 16)
                     }
-                    val textView2 = TextView(context).apply {
+                    val textView2 = TextView(fragmentContext).apply {
                         text = "${findNameOfTheTable(data.id)} visits: ${data.numberOfTimesServed}"
                         textSize = 25f
                         setPadding(16, 16, 16, 16)
@@ -522,12 +532,12 @@ class Analytics : Fragment() {
             "item" -> {
                 textView.text = "Items"
                 sortedItemsData.forEach { data ->
-                    val layout = LinearLayout(context).apply {
+                    val layout = LinearLayout(fragmentContext).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         ).apply {
-                            setMargins(0, 8, 0, 8)
+                            setMargins(15, 15, 15, 15)
                         }
                         orientation = LinearLayout.VERTICAL
                         val backgroundDrawable = GradientDrawable().apply {
@@ -538,7 +548,7 @@ class Analytics : Fragment() {
                         gravity = Gravity.CENTER_HORIZONTAL
                         setPadding(16, 16, 16, 16)
                     }
-                    val textView2 = TextView(context).apply {
+                    val textView2 = TextView(fragmentContext).apply {
                         text = "${findNameOfTheItems(data.id)} times ordered: ${data.numberOfTimesServed}"
                         textSize = 25f
                         setPadding(16, 16, 16, 16)
@@ -554,12 +564,12 @@ class Analytics : Fragment() {
             "userServed" -> {
                 textView.text = "Users"
                 sortedByTablesUsersData.forEach { data ->
-                    val layout = LinearLayout(context).apply {
+                    val layout = LinearLayout(fragmentContext).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         ).apply {
-                            setMargins(0, 8, 0, 8)
+                            setMargins(15, 15, 15, 15)
                         }
                         orientation = LinearLayout.VERTICAL
                         val backgroundDrawable = GradientDrawable().apply {
@@ -570,7 +580,7 @@ class Analytics : Fragment() {
                         gravity = Gravity.CENTER_HORIZONTAL
                         setPadding(16, 16, 16, 16)
                     }
-                    val textView2 = TextView(context).apply {
+                    val textView2 = TextView(fragmentContext).apply {
                         text = "${findNameOfTheUser(data.id)} tables served: ${data.numberOfServedTables}"
                         textSize = 25f
                         setPadding(16, 16, 16, 16)
@@ -586,12 +596,12 @@ class Analytics : Fragment() {
             "userActivity" -> {
                 textView.text = "Users"
                 sortedByActivityUsersData.forEach { data ->
-                    val layout = LinearLayout(context).apply {
+                    val layout = LinearLayout(fragmentContext).apply {
                         layoutParams = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.MATCH_PARENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
                         ).apply {
-                            setMargins(0, 8, 0, 8)
+                            setMargins(15, 15, 15, 15)
                         }
                         orientation = LinearLayout.VERTICAL
                         val backgroundDrawable = GradientDrawable().apply {
@@ -602,7 +612,7 @@ class Analytics : Fragment() {
                         gravity = Gravity.CENTER_HORIZONTAL
                         setPadding(16, 16, 16, 16)
                     }
-                    val textView2 = TextView(context).apply {
+                    val textView2 = TextView(fragmentContext).apply {
                         text = "${findNameOfTheUser(data.id)} activity: ${data.activity}"
                         textSize = 25f
                         setPadding(16, 16, 16, 16)

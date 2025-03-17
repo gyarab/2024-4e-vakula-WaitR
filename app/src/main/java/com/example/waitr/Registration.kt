@@ -84,6 +84,10 @@ class Registration : AppCompatActivity() {
                 Toast.makeText(this, "Enter Username", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (username.length > 50) {
+                Toast.makeText(this, "Name cannot exceed 50 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
 
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->

@@ -243,7 +243,7 @@
                     android:autoSizeMinTextSize="1dp"
                     android:autoSizeTextType="uniform"
                     android:text=""
-                    android:textSize="10sp" />
+                    android:textSize="22sp" />
 
                 <Button
                     android:id="@+id/change_item_discription"

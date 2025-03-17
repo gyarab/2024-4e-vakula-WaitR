@@ -3,6 +3,7 @@ package com.example.waitr
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.GradientDrawable
@@ -11,7 +12,6 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.Log
-import android.util.TypedValue
 import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -32,10 +32,8 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
-import androidx.core.view.setPadding
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.transition.Visibility
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -115,6 +113,12 @@ class Model_view : Fragment() {
     private var eatingTableNotificationPeriod = 5
     private var paidTableNotificationPeriod = 5
     private lateinit var authorization: String
+    private lateinit var fragmentContext: Context
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        fragmentContext = context // Uložení Contextu do globální proměnné
+    }
 
     // zde psat pouze kod nesouvisejici s UI
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,32 +138,32 @@ class Model_view : Fragment() {
     // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_model_view, container, false)
     // nastaveni promenne editModelDialoge
-    editModelDialoge = Dialog(requireContext())
+    editModelDialoge = Dialog(fragmentContext)
     editModelDialoge.setContentView(R.layout.edit_model_view_popup)
     val scrollableView = editModelDialoge.findViewById<HorizontalScrollView>(R.id.edit_model_horizontal_scroll_view)
     editModelScenesLayout = scrollableView.findViewById(R.id.linearlayout_for_scenes)
     editModelSceneLayout = editModelDialoge.findViewById(R.id.edit_model_canvas_layout)
     confirmTableChanges = editModelDialoge.findViewById(R.id.confirm_table_changes_button)
-    tableOptionsDialog = Dialog(requireContext())
+    tableOptionsDialog = Dialog(fragmentContext)
     tableOptionsDialog.setContentView(R.layout.table_options_popup)
     nameOfTheTable = tableOptionsDialog.findViewById(R.id.name_of_the_table)
     heightOfTheTable = tableOptionsDialog.findViewById(R.id.height_of_the_table)
     widthOfTheTable = tableOptionsDialog.findViewById(R.id.width_of_the_table)
-    helperOptionsDialog = Dialog(requireContext())
+    helperOptionsDialog = Dialog(fragmentContext)
     helperOptionsDialog.setContentView(R.layout.helper_options_popup)
     heightOfTheHelper = helperOptionsDialog.findViewById(R.id.height_of_the_helper)
     widthOfTheHelper = helperOptionsDialog.findViewById(R.id.width_of_the_helper)
-    sceneOptionsDialog = Dialog(requireContext())
+    sceneOptionsDialog = Dialog(fragmentContext)
     sceneOptionsDialog.setContentView(R.layout.scene_options_popup)
     nameOfTheScene = sceneOptionsDialog.findViewById(R.id.name_of_the_scene)
-    emptyTableManagingDialog = Dialog(requireContext())
+    emptyTableManagingDialog = Dialog(fragmentContext)
     emptyTableManagingDialog.setContentView(R.layout.managing_table_empty_state)
-    seatedTableManagingDialog = Dialog(requireContext())
+    seatedTableManagingDialog = Dialog(fragmentContext)
     seatedTableManagingDialog.setContentView(R.layout.managing_table_seated_state)
     checkOutButton = seatedTableManagingDialog.findViewById<Button>(R.id.manage_table_check_out_button)
     tableOrdersLayout = seatedTableManagingDialog.findViewById(R.id.manage_customers_layout)
     tableTotalPriceTextView = seatedTableManagingDialog.findViewById(R.id.manage_table_view_total_price_of_the_table)
-    paidTableManagingDialog = Dialog(requireContext())
+    paidTableManagingDialog = Dialog(fragmentContext)
     paidTableManagingDialog.setContentView(R.layout.managing_table_paid_state)
 
     confirmTableChanges.setOnClickListener {
@@ -198,12 +202,12 @@ class Model_view : Fragment() {
     currentScene = view.findViewById(R.id.canvas_layout)
     val horizontalScrollView = view.findViewById<HorizontalScrollView>(R.id.horizontal_scroll_view)
     modelScenesBar = horizontalScrollView.findViewById(R.id.scenes_bar)
-    noStagesTODisplayTextView = TextView(context).apply {
+    noStagesTODisplayTextView = TextView(fragmentContext).apply {
         text = "You need to create your first scene "
         textSize = 25f
         gravity = Gravity.CENTER
     }
-    addStageButtonIfNon = ImageButton(context).apply {
+    addStageButtonIfNon = ImageButton(fragmentContext).apply {
         contentDescription = "Add Stage"
         setImageResource(R.drawable.baseline_add_24)
         scaleType = ImageView.ScaleType.FIT_CENTER
@@ -219,8 +223,7 @@ class Model_view : Fragment() {
             showEditModelPopUp()
         }
     }
-    //TODO
-    dynamicLinearLayout = LinearLayout(context).apply {
+    dynamicLinearLayout = LinearLayout(fragmentContext).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER
         layoutParams = ConstraintLayout.LayoutParams(
@@ -257,7 +260,7 @@ class Model_view : Fragment() {
         }
         helpButton = view.findViewById(R.id.help_button)
         helpButton.setOnClickListener {
-            //TODO dodelat help tlacitko
+            modelInfoPopup()
         }
         // nacte model z database ktery nasledne vykresli
         fetchModel{
@@ -321,7 +324,7 @@ class Model_view : Fragment() {
                 val options =
                     listOf("Number of people", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
                 val adapter =
-                    ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, options)
+                    ArrayAdapter(fragmentContext, android.R.layout.simple_spinner_item, options)
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinner.adapter = adapter
                 val confirmButton =
@@ -419,7 +422,7 @@ class Model_view : Fragment() {
         val table = findTableById(model, selectedTableId!!)
         tableOrdersLayout.removeAllViews()
         table?.listOfCustomers?.forEach { customer ->
-           val customerLayout = LinearLayout(context).apply {
+           val customerLayout = LinearLayout(fragmentContext).apply {
                layoutParams = LinearLayout.LayoutParams(
                    LinearLayout.LayoutParams.WRAP_CONTENT,
                    LinearLayout.LayoutParams.WRAP_CONTENT
@@ -429,7 +432,7 @@ class Model_view : Fragment() {
                orientation = LinearLayout.VERTICAL
            }
 
-           val customerHeaderLayout = LinearLayout(context).apply {
+           val customerHeaderLayout = LinearLayout(fragmentContext).apply {
                layoutParams = LinearLayout.LayoutParams(
                    LinearLayout.LayoutParams.WRAP_CONTENT,
                    LinearLayout.LayoutParams.WRAP_CONTENT
@@ -437,7 +440,7 @@ class Model_view : Fragment() {
                orientation = LinearLayout.HORIZONTAL
            }
 
-           val customerView = TextView(context).apply {
+           val customerView = TextView(fragmentContext).apply {
                text = customer.name
                textSize = 25f
                setPadding(16, 16, 16, 16)
@@ -454,7 +457,7 @@ class Model_view : Fragment() {
                displayDataOfACustomerPopup(table)
            }
 
-           val addItemsImageButton = ImageButton(context).apply {
+           val addItemsImageButton = ImageButton(fragmentContext).apply {
                setImageResource(R.drawable.baseline_add_24)
                tag = customer.id
                layoutParams = LinearLayout.LayoutParams(
@@ -474,7 +477,7 @@ class Model_view : Fragment() {
            customerLayout.addView(customerHeaderLayout)
 
            customer.order.menuItems.forEach { menuItem ->
-               val itemHeaderLayout = LinearLayout(context).apply {
+               val itemHeaderLayout = LinearLayout(fragmentContext).apply {
                    layoutParams = LinearLayout.LayoutParams(
                        LinearLayout.LayoutParams.WRAP_CONTENT,
                        LinearLayout.LayoutParams.WRAP_CONTENT
@@ -484,7 +487,7 @@ class Model_view : Fragment() {
                    orientation = LinearLayout.HORIZONTAL
                }
 
-               val itemView = TextView(context).apply {
+               val itemView = TextView(fragmentContext).apply {
                    text = "${menuItem.name} - ${menuItem.price} Kč"
                    textSize = 20f
                    setPadding(16, 16, 16, 16)
@@ -501,7 +504,7 @@ class Model_view : Fragment() {
                    displayDataOfTheItemInOrderPopup(table)
                }
                if (!menuItem.served){
-                   val waitingImageButton = ImageButton(context).apply {
+                   val waitingImageButton = ImageButton(fragmentContext).apply {
                        setImageResource(R.drawable.baseline_access_time_24)
                        layoutParams = LinearLayout.LayoutParams(
                            LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -537,7 +540,7 @@ class Model_view : Fragment() {
         val name = customer?.name
         val orderPrice = customer?.order?.totalPrice
 
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.display_data_of_a_customer_layout)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -550,7 +553,7 @@ class Model_view : Fragment() {
         displayTotalOrderPrice.text = "Total price: ${orderPrice} Kč"
         val layoutToDisplayOrder = dialog.findViewById<LinearLayout>(R.id.display_orders_layout)
         customer?.order?.menuItems?.forEach { menuItem ->
-            val itemView = TextView(context).apply {
+            val itemView = TextView(fragmentContext).apply {
                 text = "${menuItem.name} - ${menuItem.price} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
@@ -577,7 +580,7 @@ class Model_view : Fragment() {
         val name = item?.name
         val price = item?.price
 
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.display_item_data_of_a_order_layout)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -644,7 +647,7 @@ class Model_view : Fragment() {
     private fun addItemsToOrderPopup(table: Table){
         val customer = findCustomerById(table, selectedCustomerId)
 
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.add_item_to_order_layout)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -681,7 +684,7 @@ class Model_view : Fragment() {
         // HashMap pro sledování počtu výskytů jednotlivých menuItem.id
         val overAllItemsCounts = mutableMapOf<String, Int>()
 
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.managing_table_proceed_to_checkout)
         dialog.window?.setLayout(
             (resources.displayMetrics.widthPixels * 0.95).toInt(),
@@ -732,7 +735,7 @@ class Model_view : Fragment() {
                 overAllItemsCounts[menuItem.name] = overAllItemsCounts.getOrDefault(menuItem.name, 0) + 1
             }
 
-            val customerLayout = LinearLayout(context).apply {
+            val customerLayout = LinearLayout(fragmentContext).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -741,7 +744,7 @@ class Model_view : Fragment() {
                 }
                 orientation = LinearLayout.VERTICAL
             }
-            val customerHeaderLayout = LinearLayout(context).apply {
+            val customerHeaderLayout = LinearLayout(fragmentContext).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -750,7 +753,7 @@ class Model_view : Fragment() {
                 }
                 orientation = LinearLayout.HORIZONTAL
             }
-            val customerView = TextView(context).apply {
+            val customerView = TextView(fragmentContext).apply {
                 text = "${customer.name}: ${customer.order.totalPrice} Kč"
                 textSize = 25f
                 setPadding(16, 16, 16, 16)
@@ -765,7 +768,7 @@ class Model_view : Fragment() {
                 maxLines = 2
                 ellipsize = TextUtils.TruncateAt.END
             }
-            val paidButton = Button(context).apply {
+            val paidButton = Button(fragmentContext).apply {
                 tag = customer.id
                 text = "Pay"
                 textSize = 20f
@@ -792,7 +795,7 @@ class Model_view : Fragment() {
             customerLayout.addView(customerHeaderLayout)
 
             itemCounts.forEach { (itemName, count) ->
-                val itemView = TextView(context).apply {
+                val itemView = TextView(fragmentContext).apply {
                     text = "${count}x ${itemName}"  // Nastavení textu s počtem výskytů
                     textSize = 20f
                     setPadding(16, 16, 16, 16)
@@ -970,7 +973,7 @@ class Model_view : Fragment() {
                 selectedStageId = editModel.listOfScenes.get(0).id
                 drawEditScene()
             } else {
-                val textView = TextView(context).apply {
+                val textView = TextView(fragmentContext).apply {
                     this.text = "No Scene"
                     this.textSize = 18f // Velikost textu
                     this.setTextColor(Color.LTGRAY) // Barva textu
@@ -998,8 +1001,8 @@ class Model_view : Fragment() {
             }
             // Nastavení velikosti dialogu
             editModelDialoge.window?.setLayout(
-                (resources.displayMetrics.widthPixels * 1).toInt(),
-                (resources.displayMetrics.heightPixels * 1).toInt()
+                (resources.displayMetrics.widthPixels * 1),
+                (resources.displayMetrics.heightPixels * 1)
             )
             // Reference na prvky v popup layoutu
             saveButton = editModelDialoge.findViewById(R.id.save_model_edit)
@@ -1015,7 +1018,7 @@ class Model_view : Fragment() {
             }
             cancelButton.setOnClickListener {
                 selectedStageId = null
-                val builder = AlertDialog.Builder(requireContext())
+                val builder = AlertDialog.Builder(fragmentContext)
                 builder.setTitle("Cancel changes")
                 builder.setMessage("Are you sure you want to cancel all the changes?")
 
@@ -1050,10 +1053,29 @@ class Model_view : Fragment() {
         }
     }
 
+    private fun modelInfoPopup(){
+        // Vytvoření dialogu
+        val dialog = Dialog(fragmentContext)
+        dialog.setContentView(R.layout.info_for_model_popup)
+
+        // Nastavení velikosti dialogu
+        dialog.window?.setLayout(
+            (resources.displayMetrics.widthPixels),
+            (resources.displayMetrics.heightPixels)
+        )
+
+        val closeButton = dialog.findViewById<Button>(R.id.close_model_info_button)
+        closeButton.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun addTablePopup(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.add_table_to_model_popup)
 
         // Nastavení velikosti dialogu
@@ -1065,7 +1087,7 @@ class Model_view : Fragment() {
         val tableNameInput = dialog.findViewById<TextInputEditText>(R.id.table_name)
         val addButton = dialog.findViewById<Button>(R.id.add_table_button)
         addButton.setOnClickListener {
-            if (!canAddNewTable(editModelSceneLayout)){
+            if (!canAddNewObject(editModelSceneLayout)){
                 Toast.makeText(dialog.context, "You cant add anymore objects", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -1077,6 +1099,10 @@ class Model_view : Fragment() {
             val tableName = tableNameInput.text.toString().trim()
             if (tableName.isEmpty()){
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (tableName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             val randomID = UUID.randomUUID().toString()
@@ -1095,7 +1121,7 @@ class Model_view : Fragment() {
             currentModelScene?.listOfTables?.add(table)
             Log.e("editmodel", editModel.toString())
             Log.e("model", model.toString())
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 text = tableName
                 textSize = 18f
                 gravity = Gravity.CENTER
@@ -1243,7 +1269,7 @@ class Model_view : Fragment() {
 
     private fun addScenePopup(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.add_scene_to_model_popup)
 
         // Nastavení velikosti dialogu
@@ -1260,6 +1286,10 @@ class Model_view : Fragment() {
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (sceneName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             val randomID = UUID.randomUUID().toString()
 
             val scene = ModelScene(randomID, sceneName, mutableListOf(), mutableListOf())
@@ -1267,7 +1297,7 @@ class Model_view : Fragment() {
             selectedStageId = randomID
             drawEditScene()
 
-            val textViewForScene = TextView(requireContext()).apply {
+            val textViewForScene = TextView(fragmentContext).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
@@ -1305,12 +1335,12 @@ class Model_view : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun addHelperPopup(){
-        if (!canAddNewTable(editModelSceneLayout)){
-            Toast.makeText(requireContext(), "You cant add anymore objects", Toast.LENGTH_SHORT).show()
+        if (!canAddNewObject(editModelSceneLayout)){
+            Toast.makeText(fragmentContext, "You cant add anymore objects", Toast.LENGTH_SHORT).show()
             return
         }
         if (editModel.listOfScenes.isEmpty()){
-            Toast.makeText(requireContext(), "First you need to create scene", Toast.LENGTH_SHORT).show()
+            Toast.makeText(fragmentContext, "First you need to create scene", Toast.LENGTH_SHORT).show()
         } else {
             val randomId = UUID.randomUUID().toString()
             val helper = HelperShape(
@@ -1323,7 +1353,7 @@ class Model_view : Fragment() {
             val scene = findSceneById(editModel, selectedStageId!!)
             scene?.listOfHelpers?.add(helper)
 
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
                 setBackgroundColor(Color.BLACK)
@@ -1449,7 +1479,7 @@ class Model_view : Fragment() {
         }
     }
 
-    private fun canAddNewTable(layout: ConstraintLayout): Boolean {
+    private fun canAddNewObject(layout: ConstraintLayout): Boolean {
 
         // Celková plocha layoutu
         val layoutWidth = layout.width
@@ -1474,7 +1504,7 @@ class Model_view : Fragment() {
 
         // Kontrola, zda nový prvek nepřekročí 85 % plochy layoutu
         val totalAreaAfterAdding = totalOccupiedArea + 150*150
-        val maxAllowedArea = totalLayoutArea * 0.85
+        val maxAllowedArea = totalLayoutArea * 0.9
 
         if (totalAreaAfterAdding > maxAllowedArea) {
             return false
@@ -1496,7 +1526,7 @@ class Model_view : Fragment() {
             }
         }
         scene.listOfTables.forEach { table ->
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 text = table.name
                 textSize = 18f
                 tag = TableTag(table.id, table.state)
@@ -1646,10 +1676,10 @@ class Model_view : Fragment() {
             editModelSceneLayout.addView(textView)
         }
         scene.listOfHelpers.forEach { helper ->
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
-                setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background_light_black))
+                setBackgroundColor(ContextCompat.getColor(fragmentContext, R.color.background_light_black))
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -1776,7 +1806,7 @@ class Model_view : Fragment() {
     private fun drawEditScenesToBar(){
         editModelScenesLayout.removeAllViews()
         if (editModel.listOfScenes.isEmpty()){
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 this.text = "No Scene"
                 this.textSize = 18f // Velikost textu
                 this.setTextColor(Color.WHITE) // Barva textu
@@ -1786,7 +1816,7 @@ class Model_view : Fragment() {
             editModel.listOfScenes.forEach { scene ->
                 val name = scene.name
                 val id = scene.id
-                val textViewForScene = TextView(requireContext()).apply {
+                val textViewForScene = TextView(fragmentContext).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
@@ -1861,7 +1891,7 @@ class Model_view : Fragment() {
         }
         val deleteButton = sceneOptionsDialog.findViewById<Button>(R.id.delete_scene_options_button)
         deleteButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(fragmentContext)
             builder.setTitle("Delete this scene")
             builder.setMessage("Are you sure you want to delete this scene?")
 
@@ -1880,7 +1910,7 @@ class Model_view : Fragment() {
                     drawEditScenesToBar()
                     drawEditScene()
                 } else {
-                    val textView = TextView(context).apply {
+                    val textView = TextView(fragmentContext).apply {
                         this.text = "No Scene"
                         this.textSize = 18f // Velikost textu
                         this.setTextColor(Color.LTGRAY) // Barva textu
@@ -1925,13 +1955,13 @@ class Model_view : Fragment() {
 
     private fun changeSceneName(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -1948,6 +1978,10 @@ class Model_view : Fragment() {
             val newName = parametrToChange.text.toString().trim()
             if (newName.isEmpty()){
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (newName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             newSceneName = newName
@@ -2010,7 +2044,7 @@ class Model_view : Fragment() {
         }
         val deleteButton = tableOptionsDialog.findViewById<Button>(R.id.delete_table_options_button)
         deleteButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(fragmentContext)
             builder.setTitle("Delete this table")
             builder.setMessage("Are you sure you want to delete this table?")
 
@@ -2051,13 +2085,13 @@ class Model_view : Fragment() {
 
     private fun changeTableName(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.5).toInt(),
-            (resources.displayMetrics.heightPixels * 0.4).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -2076,6 +2110,10 @@ class Model_view : Fragment() {
                 Toast.makeText(dialog.context, "You must enter the name first", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+            if (newName.length > 20) {
+                Toast.makeText(dialog.context, "Name cannot exceed 20 characters", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
             newTableName = newName
             nameOfTheTable.text = newTableName
             dialog.dismiss()
@@ -2085,13 +2123,13 @@ class Model_view : Fragment() {
 
     private fun changeTableHeight(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.8).toInt(),
-            (resources.displayMetrics.heightPixels * 0.7).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -2136,13 +2174,13 @@ class Model_view : Fragment() {
 
     private fun changeTableWidth(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.8).toInt(),
-            (resources.displayMetrics.heightPixels * 0.7).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -2227,7 +2265,7 @@ class Model_view : Fragment() {
         }
         val deleteButton = helperOptionsDialog.findViewById<Button>(R.id.delete_helper_options_button)
         deleteButton.setOnClickListener {
-            val builder = AlertDialog.Builder(requireContext())
+            val builder = AlertDialog.Builder(fragmentContext)
             builder.setTitle("Cancel changes")
             builder.setMessage("Are you sure you want to cancel all the changes?")
 
@@ -2264,13 +2302,13 @@ class Model_view : Fragment() {
 
     private fun changeHelperHeight(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.8).toInt(),
-            (resources.displayMetrics.heightPixels * 0.7).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -2315,13 +2353,13 @@ class Model_view : Fragment() {
 
     private fun changeHelperWidth(){
         // Vytvoření dialogu
-        val dialog = Dialog(requireContext())
+        val dialog = Dialog(fragmentContext)
         dialog.setContentView(R.layout.change_parameters_for_menu_elements)
 
         // Nastavení velikosti dialogu
         dialog.window?.setLayout(
-            (resources.displayMetrics.widthPixels * 0.8).toInt(),
-            (resources.displayMetrics.heightPixels * 0.7).toInt()
+            (resources.displayMetrics.widthPixels * 0.95).toInt(),
+            (resources.displayMetrics.heightPixels * 0.85).toInt()
         )
         // Reference na prvky v popup layoutu
         val textView = dialog.findViewById<TextView>(R.id.parametr_view)
@@ -2666,7 +2704,7 @@ class Model_view : Fragment() {
             }
         }
         scene.listOfTables.forEach { table ->
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 text = table.name
                 textSize = 18f
                 tag = TableTag(table.id, table.state)
@@ -2714,10 +2752,10 @@ class Model_view : Fragment() {
             currentScene.addView(textView)
         }
         scene.listOfHelpers.forEach { helper ->
-            val textView = TextView(context).apply {
+            val textView = TextView(fragmentContext).apply {
                 textSize = 18f
                 gravity = Gravity.CENTER
-                setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.background_light_black))
+                setBackgroundColor(ContextCompat.getColor(fragmentContext, R.color.background_light_black))
                 layoutParams = ConstraintLayout.LayoutParams(
                     ConstraintLayout.LayoutParams.WRAP_CONTENT,
                     ConstraintLayout.LayoutParams.WRAP_CONTENT
@@ -2765,7 +2803,7 @@ class Model_view : Fragment() {
     private fun drawScenesToBar(){
         modelScenesBar.removeAllViews()
         if (model.listOfScenes.isEmpty()){
-            val textView = TextView(requireContext()).apply {
+            val textView = TextView(fragmentContext).apply {
                 this.text = "No Scene"
                 this.textSize = 18f // Velikost textu
                 this.setTextColor(Color.WHITE) // Barva textu
@@ -2775,7 +2813,7 @@ class Model_view : Fragment() {
             model.listOfScenes.forEach { scene ->
                 val name = scene.name
                 val id = scene.id
-                val textViewForScene = TextView(requireContext()).apply {
+                val textViewForScene = TextView(fragmentContext).apply {
                     layoutParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
