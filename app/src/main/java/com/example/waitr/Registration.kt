@@ -60,7 +60,7 @@ class Registration : AppCompatActivity() {
         prihlasSe = findViewById(R.id.loginnow)
         database = FirebaseDatabase.getInstance("https://waitr-dee9a-default-rtdb.europe-west1.firebasedatabase.app/").reference
 
-        prihlasSe.setOnClickListener(){
+        prihlasSe.setOnClickListener{
             val intent = Intent(applicationContext, Login::class.java)
             startActivity(intent)
             finish()
@@ -96,12 +96,11 @@ class Registration : AppCompatActivity() {
                         // Získání UID vytvořeného uživatele
                         val userId = auth.currentUser?.uid
                         if (userId != null) {
-                            // Přidání uživatele do Realtime Database
                             val userMap = mapOf(
                                 "username" to username,
                                 "email" to email
                             )
-
+                            // Přidání uživatele do Realtime Database
                             database.child("users").child(userId).setValue(userMap)
                                 .addOnSuccessListener {
                                     Toast.makeText(

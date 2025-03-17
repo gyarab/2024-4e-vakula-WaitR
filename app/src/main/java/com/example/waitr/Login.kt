@@ -31,7 +31,7 @@ class Login : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         FirebaseAuth.getInstance().signOut()
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // jestli uživatel je přihlášen, pošle ho to na jinou aktivitu
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val intent = Intent(applicationContext, CompanyMenu::class.java)
@@ -60,12 +60,12 @@ class Login : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
-
+        //funkce tlačítka login
         loginButton.setOnClickListener {
             val email = editTextEmail.getText().toString()
             val password = editTextPassword.getText().toString()
             nacitaciKolecko.visibility = View.VISIBLE
-
+            //ošetření nechtěných inputů
             if (TextUtils.isEmpty(email)){
                 Toast.makeText(this, "Enter Email", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -74,7 +74,7 @@ class Login : AppCompatActivity() {
                 Toast.makeText(this, "Enter Password", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-
+        //přihlášení přes knihovní funkci FirebaseAuth
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     nacitaciKolecko.visibility = View.GONE

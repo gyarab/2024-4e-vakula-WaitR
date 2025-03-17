@@ -21,19 +21,20 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        //Spusti třídu ktera posloucha na vypnuti aplikace
         startService(Intent(this, BackgroundService::class.java))
 
         val toRegisterButton = findViewById<Button>(R.id.ToRegisterPage_button)
         val toLoginButton = findViewById<Button>(R.id.ToLoginPage_button)
 
         toRegisterButton.setOnClickListener {
-            // Navigate to the "Registration"
+            // Navigace na aktivitu "Registration"
             val intent = Intent(this, Registration::class.java)
             startActivity(intent)
         }
 
         toLoginButton.setOnClickListener {
-            // Navigate to te "Login"
+            // Navigace na aktivitu "Login"
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
         }
