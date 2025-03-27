@@ -206,11 +206,24 @@ class CompanyMenu : AppCompatActivity() {
                     if (companyId != null) {
                         selectedCompanyId = companyId // Nastavení ID do globální proměnné
                         // Vytvoř nový Button
-                        val newButton = Button(this).apply {
-                            selectedCompanyName = companyName
+                        val newButton = MaterialButton(this).apply {
                             text = companyName
-                            //tag = companyId // Uložení ID podniku
                             tag = CompanyTag(companyId, companyName, "owner")
+
+                            layoutParams = LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.WRAP_CONTENT
+                            ).apply {
+                                setMargins(10.dpToPx(), 10.dpToPx(), 10.dpToPx(), 10.dpToPx())
+                            }
+
+                            setBackgroundColor(
+                                ContextCompat.getColor(context, R.color.background_blue)
+                            )
+
+                            isAllCaps = false
+                            textSize = 20f
+                            gravity = Gravity.CENTER
                         }
                         newButton.setOnClickListener {
                             val companyTag = it.tag as CompanyTag

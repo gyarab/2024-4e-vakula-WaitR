@@ -1207,45 +1207,40 @@ class Model_view : Fragment() {
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Přepočítat posun na procentuální změnu (bias)
                             val scaleX = deltaX / editModelSceneLayout.width.toFloat()
                             val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            // Vypočítat nové bias hodnoty
                             var newBiasX = initialBiasX + scaleX
                             var newBiasY = initialBiasY + scaleY
 
-                            // Omezit bias na rozsah 0.0 - 1.0
                             newBiasX = newBiasX.coerceIn(0f, 1f)
                             newBiasY = newBiasY.coerceIn(0f, 1f)
 
-                            // Nastavit nové bias hodnoty
-                            params.horizontalBias = newBiasX
-                            params.verticalBias = newBiasY
-                            view.layoutParams = params
+                            // Vypočítat navrhovanou novou pozici
+                            val newLeft = (newBiasX * (editModelSceneLayout.width - view.width)).toInt()
+                            val newTop = (newBiasY * (editModelSceneLayout.height - view.height)).toInt()
+                            val newRight = newLeft + view.width
+                            val newBottom = newTop + view.height
+                            val newRect = Rect(newLeft, newTop, newRight, newBottom)
 
-                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            // Zkontrolovat kolize
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
                                     val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherLeft = (otherParams.horizontalBias * (editModelSceneLayout.width - otherView.width)).toInt()
+                                    val otherTop = (otherParams.verticalBias * (editModelSceneLayout.height - otherView.height)).toInt()
                                     val otherRect = Rect(
-                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
-                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
+                                        otherLeft,
+                                        otherTop,
+                                        otherLeft + otherView.width,
+                                        otherTop + otherView.height
                                     )
-                                    val newRect = Rect(
-                                        (newBiasX * editModelSceneLayout.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height).toInt(),
-                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
-                                    )
+
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
                                         break
@@ -1254,11 +1249,9 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj bias
                                 params.horizontalBias = newBiasX
                                 params.verticalBias = newBiasY
                                 view.layoutParams = params
-
                                 finalBiasX = newBiasX
                                 finalBiasY = newBiasY
                             }
@@ -1420,45 +1413,40 @@ class Model_view : Fragment() {
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Přepočítat posun na procentuální změnu (bias)
                             val scaleX = deltaX / editModelSceneLayout.width.toFloat()
                             val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            // Vypočítat nové bias hodnoty
                             var newBiasX = initialBiasX + scaleX
                             var newBiasY = initialBiasY + scaleY
 
-                            // Omezit bias na rozsah 0.0 - 1.0
                             newBiasX = newBiasX.coerceIn(0f, 1f)
                             newBiasY = newBiasY.coerceIn(0f, 1f)
 
-                            // Nastavit nové bias hodnoty
-                            params.horizontalBias = newBiasX
-                            params.verticalBias = newBiasY
-                            view.layoutParams = params
+                            // Vypočítat navrhovanou novou pozici
+                            val newLeft = (newBiasX * (editModelSceneLayout.width - view.width)).toInt()
+                            val newTop = (newBiasY * (editModelSceneLayout.height - view.height)).toInt()
+                            val newRight = newLeft + view.width
+                            val newBottom = newTop + view.height
+                            val newRect = Rect(newLeft, newTop, newRight, newBottom)
 
-                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            // Zkontrolovat kolize
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
                                     val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherLeft = (otherParams.horizontalBias * (editModelSceneLayout.width - otherView.width)).toInt()
+                                    val otherTop = (otherParams.verticalBias * (editModelSceneLayout.height - otherView.height)).toInt()
                                     val otherRect = Rect(
-                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
-                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
+                                        otherLeft,
+                                        otherTop,
+                                        otherLeft + otherView.width,
+                                        otherTop + otherView.height
                                     )
-                                    val newRect = Rect(
-                                        (newBiasX * editModelSceneLayout.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height).toInt(),
-                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
-                                    )
+
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
                                         break
@@ -1467,11 +1455,9 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj bias
                                 params.horizontalBias = newBiasX
                                 params.verticalBias = newBiasY
                                 view.layoutParams = params
-
                                 finalBiasX = newBiasX
                                 finalBiasY = newBiasY
                             }
@@ -1616,46 +1602,40 @@ class Model_view : Fragment() {
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Přepočítat posun na procentuální změnu (bias)
                             val scaleX = deltaX / editModelSceneLayout.width.toFloat()
                             val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            // Vypočítat nové bias hodnoty
                             var newBiasX = initialBiasX + scaleX
                             var newBiasY = initialBiasY + scaleY
 
-                            // Omezit bias na rozsah 0.0 - 1.0
                             newBiasX = newBiasX.coerceIn(0f, 1f)
                             newBiasY = newBiasY.coerceIn(0f, 1f)
 
-                            // Nastavit nové bias hodnoty
-                            params.horizontalBias = newBiasX
-                            params.verticalBias = newBiasY
-                            view.layoutParams = params
+                            // Vypočítat navrhovanou novou pozici
+                            val newLeft = (newBiasX * (editModelSceneLayout.width - view.width)).toInt()
+                            val newTop = (newBiasY * (editModelSceneLayout.height - view.height)).toInt()
+                            val newRight = newLeft + view.width
+                            val newBottom = newTop + view.height
+                            val newRect = Rect(newLeft, newTop, newRight, newBottom)
 
-                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            // Zkontrolovat kolize
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams =
-                                        otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherLeft = (otherParams.horizontalBias * (editModelSceneLayout.width - otherView.width)).toInt()
+                                    val otherTop = (otherParams.verticalBias * (editModelSceneLayout.height - otherView.height)).toInt()
                                     val otherRect = Rect(
-                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
-                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
+                                        otherLeft,
+                                        otherTop,
+                                        otherLeft + otherView.width,
+                                        otherTop + otherView.height
                                     )
-                                    val newRect = Rect(
-                                        (newBiasX * editModelSceneLayout.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height).toInt(),
-                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
-                                    )
+
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
                                         break
@@ -1664,11 +1644,9 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj bias
                                 params.horizontalBias = newBiasX
                                 params.verticalBias = newBiasY
                                 view.layoutParams = params
-
                                 finalBiasX = newBiasX
                                 finalBiasY = newBiasY
                             }
@@ -1741,46 +1719,40 @@ class Model_view : Fragment() {
                         }
 
                         MotionEvent.ACTION_MOVE -> {
-                            // Vypočítat posun od počátečního dotyku
                             val deltaX = event.rawX - initialTouchX
                             val deltaY = event.rawY - initialTouchY
 
-                            // Přepočítat posun na procentuální změnu (bias)
                             val scaleX = deltaX / editModelSceneLayout.width.toFloat()
                             val scaleY = deltaY / editModelSceneLayout.height.toFloat()
 
-                            // Vypočítat nové bias hodnoty
                             var newBiasX = initialBiasX + scaleX
                             var newBiasY = initialBiasY + scaleY
 
-                            // Omezit bias na rozsah 0.0 - 1.0
                             newBiasX = newBiasX.coerceIn(0f, 1f)
                             newBiasY = newBiasY.coerceIn(0f, 1f)
 
-                            // Nastavit nové bias hodnoty
-                            params.horizontalBias = newBiasX
-                            params.verticalBias = newBiasY
-                            view.layoutParams = params
+                            // Vypočítat navrhovanou novou pozici
+                            val newLeft = (newBiasX * (editModelSceneLayout.width - view.width)).toInt()
+                            val newTop = (newBiasY * (editModelSceneLayout.height - view.height)).toInt()
+                            val newRight = newLeft + view.width
+                            val newBottom = newTop + view.height
+                            val newRect = Rect(newLeft, newTop, newRight, newBottom)
 
-                            // Zkontrolovat, zda nové umístění nepřekrývá jiné prvky
+                            // Zkontrolovat kolize
                             var canMove = true
                             for (i in 0 until editModelSceneLayout.childCount) {
                                 val otherView = editModelSceneLayout.getChildAt(i)
                                 if (otherView != view && otherView is TextView) {
-                                    val otherParams =
-                                        otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherParams = otherView.layoutParams as ConstraintLayout.LayoutParams
+                                    val otherLeft = (otherParams.horizontalBias * (editModelSceneLayout.width - otherView.width)).toInt()
+                                    val otherTop = (otherParams.verticalBias * (editModelSceneLayout.height - otherView.height)).toInt()
                                     val otherRect = Rect(
-                                        (otherParams.horizontalBias * editModelSceneLayout.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height).toInt(),
-                                        (otherParams.horizontalBias * editModelSceneLayout.width + otherView.width).toInt(),
-                                        (otherParams.verticalBias * editModelSceneLayout.height + otherView.height).toInt()
+                                        otherLeft,
+                                        otherTop,
+                                        otherLeft + otherView.width,
+                                        otherTop + otherView.height
                                     )
-                                    val newRect = Rect(
-                                        (newBiasX * editModelSceneLayout.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height).toInt(),
-                                        (newBiasX * editModelSceneLayout.width + view.width).toInt(),
-                                        (newBiasY * editModelSceneLayout.height + view.height).toInt()
-                                    )
+
                                     if (Rect.intersects(newRect, otherRect)) {
                                         canMove = false
                                         break
@@ -1789,11 +1761,9 @@ class Model_view : Fragment() {
                             }
 
                             if (canMove) {
-                                // Pokud nedochází k překryvu, aktualizuj bias
                                 params.horizontalBias = newBiasX
                                 params.verticalBias = newBiasY
                                 view.layoutParams = params
-
                                 finalBiasX = newBiasX
                                 finalBiasY = newBiasY
                             }
@@ -2063,7 +2033,7 @@ class Model_view : Fragment() {
 
                 val viewToRemove = findViewWithTag(editModelSceneLayout, selectedTableId!!)
                 val layout = viewToRemove?.parent
-                if (layout is FrameLayout){
+                if (layout is ConstraintLayout){
                     layout.removeView(viewToRemove)
                 }
                 dialog.dismiss()
