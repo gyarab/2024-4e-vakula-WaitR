@@ -962,9 +962,9 @@ class Company_manager : AppCompatActivity() {
         notificationsList.forEach { notification ->
             if (notification.send){
                 when(notification.type){
-                    "seated" -> createNotification(notification,"Check table ${notification.tableName} if customers have picked their order!")
-                    "eating" -> createNotification(notification,"Check table ${notification.tableName} if customers want something else!")
-                    "paid" -> createNotification(notification, "Table ${notification.tableName} needs to be cleaned!")
+                    "seated" -> createNotification(notification,"Check table \"${notification.tableName}\" if customers have picked their order!")
+                    "eating" -> createNotification(notification,"Check table \"${notification.tableName}\" if customers want something else!")
+                    "paid" -> createNotification(notification, "Table \"${notification.tableName}\" needs to be cleaned!")
                 }
             }
         }
@@ -1211,9 +1211,9 @@ class Company_manager : AppCompatActivity() {
             .setAutoCancel(true)  // Zmizí po kliknutí
 
         when (type){
-            "seated" -> notification.setContentText("Check table ${tableName} if customers have picked their order!")
-            "eating" -> notification.setContentText("Check table ${tableName} if customers want something else!")
-            "paid" -> notification.setContentText("Table ${tableName} needs to be cleaned!")
+            "seated" -> notification.setContentText("Check table \"${tableName}\" if customers have picked their order!")
+            "eating" -> notification.setContentText("Check table \"${tableName}\" if customers want something else!")
+            "paid" -> notification.setContentText("Table \"${tableName}\" needs to be cleaned!")
             else -> {}
         }
 

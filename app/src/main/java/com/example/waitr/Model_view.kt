@@ -2428,10 +2428,10 @@ class Model_view : Fragment() {
                         val otherBottom = otherTop + otherTable.height
 
                         // Zkontroluj překryv mezi prvky
-                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
-                                selectedLeft >= otherRight || // Není vpravo
-                                selectedBottom <= otherTop || // Není nahoře
-                                selectedTop >= otherBottom)   // Není dole
+                        val isOverlapping = selectedLeft < otherRight &&
+                                selectedRight > otherLeft &&
+                                selectedTop < otherBottom &&
+                                selectedBottom > otherTop
 
                         if (isOverlapping) {
                             return false // Prvky se překrývají
@@ -2519,10 +2519,10 @@ class Model_view : Fragment() {
                         val otherBottom = otherTop + otherTable.height
 
                         // Zkontroluj překryv mezi prvky
-                        val isOverlapping = !(selectedRight <= otherLeft || // Není vlevo
-                                selectedLeft >= otherRight || // Není vpravo
-                                selectedBottom <= otherTop || // Není nahoře
-                                selectedTop >= otherBottom)   // Není dole
+                        val isOverlapping = selectedLeft < otherRight &&
+                                selectedRight > otherLeft &&
+                                selectedTop < otherBottom &&
+                                selectedBottom > otherTop
 
                         if (isOverlapping) {
                             return false // Prvky se překrývají
@@ -3055,8 +3055,6 @@ class Model_view : Fragment() {
                 eatingTableNotificationPeriod = snapshot.child("eatingNotification").getValue(Int::class.java) ?: 5
                 paidTableNotificationPeriod = snapshot.child("paidNotification").getValue(Int::class.java) ?: 5
 
-                // Debug log (pokud chceš vidět změny v Logcat)
-                Log.d("SettingsListener", "Updated settings: Seated=$seatedTableNotificationPeriod, Eating=$eatingTableNotificationPeriod, Paid=$paidTableNotificationPeriod")
             }
 
             override fun onCancelled(error: DatabaseError) {
